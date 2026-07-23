@@ -64,13 +64,14 @@ def main():
             MapPhoneActionToRobotAction(platform=teleop_config.phone_os),
             EEReferenceAndDelta(
                 kinematics=kinematics_solver,
-                end_effector_step_sizes={"x": 0.5, "y": 0.5, "z": 0.5},
+                # gentler mapping: phone motion -> smaller arm motion (less lunging)
+                end_effector_step_sizes={"x": 0.3, "y": 0.3, "z": 0.3},
                 motor_names=list(robot.bus.motors.keys()),
                 use_latched_reference=True,
             ),
             EEBoundsAndSafety(
-                end_effector_bounds={"min": [-1.0, -1.0, -1.0], "max": [1.0, 1.0, 1.0]},
-                max_ee_step_m=0.20,
+                end_effector_bounds={"min": [-0.5, -0.5, -0.1], "max": [0.5, 0.5, 0.5]},
+                max_ee_step_m=0.08,  # cap per-frame jump; fast phone moves get skipped, not lunged
             ),
             GripperVelocityToJoint(
                 speed_factor=20.0,
@@ -104,20 +105,32 @@ def main():
     if not robot.is_connected or not teleop_device.is_connected:
         raise ValueError("Robot or teleop is not connected!")
 
-    print("Starting teleop loop. Move your phone to teleoperate the robot...")
-    while True:
-        t0 = time.perf_counter()
+    print("Starting teleop loop. Hold B1 + move the phone. Ctrl+C to STOP (arm goes safe).")
+    try:
+        while True:
+            t0 = time.perf_counter()
+            try:
+                robot_obs = robot.get_observation()
+                phone_obs = teleop_device.get_action()
+                joint_action = phone_to_robot_joints_processor((phone_obs, robot_obs))
+                _ = robot.send_action(joint_action)
+                log_rerun_data(observation=phone_obs, action=joint_action)
+            except ValueError as e:
+                # EE-jump safety trip on a fast phone move — skip this frame
+                # instead of crashing (and instead of lunging).
+                print(f"[skip frame] {e}")
+            precise_sleep(max(1.0 / FPS - (time.perf_counter() - t0), 0.0))
+    except KeyboardInterrupt:
+        print("\nStopping...")
+    finally:
+        # CRITICAL: always disconnect so torque is disabled and the arm goes
+        # limp/safe. Without this, Ctrl+C leaves the arm powered and holding.
         try:
-            robot_obs = robot.get_observation()
-            phone_obs = teleop_device.get_action()
-            joint_action = phone_to_robot_joints_processor((phone_obs, robot_obs))
-            _ = robot.send_action(joint_action)
-            log_rerun_data(observation=phone_obs, action=joint_action)
-        except ValueError as e:
-            # e.g. EE-jump safety trip on a fast phone move — skip this frame
-            # instead of crashing the whole session.
-            print(f"[skip frame] {e}")
-        precise_sleep(max(1.0 / FPS - (time.perf_counter() - t0), 0.0))
+            teleop_device.disconnect()
+        except Exception:
+            pass
+        robot.disconnect()  # disable_torque_on_disconnect=True -> arm relaxes
+        print("Robot disconnected, torque disabled. Safe.")
 
 
 if __name__ == "__main__":
