@@ -16,17 +16,18 @@ Web app replacing phosphobot/LeLab for this lab. One purpose: **run the data fly
 - Replicating phosphobot pro features (marketplace, cloud training UX).
 - Replacing `lerobot-rollout` CLI for eval/DAgger in v1 (v2).
 
-## Architecture
+## Architecture — TypeScript-first, Python as a device driver
 ```
 app/
-  backend/    Python 3.12, uv project, deps: lerobot==0.6.0, fastapi, uvicorn, opencv-python, huggingface_hub
-  frontend/   bun + Vite + React + shadcn, dev proxy → backend :8100
+  web/      React + Vite + shadcn — talks only to server
+  server/   Bun + Hono — THE backend: all state, logic, API; spawns/supervises driver
+  driver/   ~3 Python files in a uv env pinned lerobot==0.6.0 — robot loops only
 ```
-- Backend serves REST + `/ws/joints` (websocket joint stream) + `/cams/{name}` (MJPEG multipart). Port **8100** (LeLab keeps 8000).
-- Singleton `RobotManager` owns the serial ports; explicit state machine: `disconnected → connected → teleop | recording`. One owner of the arm at a time; endpoints reject illegal transitions.
-- Record/teleop loops cribbed from LeLab's `record.py`/`teleoperate.py` (readable locally in the lelab uv env, same lerobot version).
-- App-local sidecar store `app/backend/data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
-- Frontend production build served by FastAPI static mount (single-process launch: `make run`).
+- **server (TS)** owns: REST/WS API (port **8100**), HF Hub (token from `~/.cache/huggingface/token`, list/poll via HF JSON API), local dataset scan (`meta/info.json` + **hyparquet** for parquet stats), report card (brightness via sharp, coverage via threshold+PCA in TS), episode thumbnails (ffmpeg CLI), runs registry (JSON sidecar), Colab cell generation, coach sampling, rig profile, journal drafts, static frontend serving. Chain layers (hackathon) plug in here — all TS SDKs.
+- **driver (Python)** is stateless and does only what lerobot physically requires: teleop / record / rollout / DAgger / calibrate / replay loops, serial, cameras-during-sessions. Control channel = **ndjson-RPC over stdio** (TS sends `{cmd, config}` with full config each call; driver emits `state`/`episode_saved`/`error` events). Frames = one localhost **MJPEG port**, proxied by server. Crash → supervisor restarts, UI surfaces it. Loops cribbed from LeLab's `record.py`/`teleoperate.py` (same lerobot version, readable locally).
+- One owner of the arm: server-side state machine `disconnected → connected → teleop | recording | rollout` gates driver commands; illegal transitions rejected in TS.
+- Sidecar store `app/server/data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
+- Litmus test: delete `driver/` → everything except live robot control still works (datasets, trainings, grading, journal).
 
 ## Preflight (blocks recording until green)
 - **Cameras**: enumerate; live thumbnails; user confirms "workspace" / "wrist" per session (macOS index shuffle). Persist last-known mapping, always re-confirm.
