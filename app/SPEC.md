@@ -19,15 +19,35 @@ Web app replacing phosphobot/LeLab for this lab. One purpose: **run the data fly
 ## Architecture — TypeScript-first, Python as a device driver
 ```
 app/
-  web/      React + Vite + shadcn — talks only to server
-  server/   Bun + Hono — THE backend: all state, logic, API; spawns/supervises driver
+  console/  ONE TypeScript app: TanStack Start (React 19, Router, Query, shadcn) + Effect v4 API
   driver/   ~3 Python files in a uv env pinned lerobot==0.6.0 — robot loops only
 ```
-- **server (TS)** owns: REST/WS API (port **8100**), HF Hub (token from `~/.cache/huggingface/token`, list/poll via HF JSON API), local dataset scan (`meta/info.json` + **hyparquet** for parquet stats), report card (brightness via sharp, coverage via threshold+PCA in TS), episode thumbnails (ffmpeg CLI), runs registry (JSON sidecar), Colab cell generation, coach sampling, rig profile, journal drafts, static frontend serving. Chain layers (hackathon) plug in here — all TS SDKs.
+- **Single process, single contract.** Custom server entry (Bun, port **8100**): `/api/*` → Effect **HttpApi** web handler; everything else → TanStack Start. Effect layer built once at module scope (stashed on `globalThis` in dev so Vite HMR can't double-init; driver acquired lazily so reloads never orphan a Python process).
+- **HttpApi is the only API contract** → server handlers, derived `HttpApiClient` for the frontend (no hand-written fetch, no duplicated types), `/api/openapi.json` + Scalar docs at `/api/docs` (hackathon: chain-layer service consumes the same OpenAPI). Frontend: TanStack Query option factories over the derived client, one module-scope browser runtime, `runClientEffect` promise bridge — no raw API calls in components.
+- Outside the typed contract (raw routes beside HttpApi): `/api/ws` (joint state + session events — `SubscriptionRef` stream → WS) and `/api/cams/*` (MJPEG passthrough from driver).
+- **console (TS)** owns: HF Hub (token from `~/.cache/huggingface/token`, list/poll via HF JSON API), local dataset scan (`meta/info.json` + **hyparquet** for parquet stats), report card (brightness via sharp, coverage via threshold+PCA in TS), episode thumbnails (ffmpeg CLI), runs registry (JSON sidecar), Colab cell generation, coach sampling, rig profile, journal drafts. Chain layers (hackathon) plug in here — all TS SDKs; operator gating = HttpApi middleware.
+- **Deliberately absent** (single-user localhost tool, principle #5): no database, no ORM, no auth framework, no cookie sessions. "Repositories" are FileSystem/Hub/driver-backed. Effect v4 is beta — pin all `effect`/`@effect/*` packages to one exact version.
 - **driver (Python)** is stateless and does only what lerobot physically requires: teleop / record / rollout / DAgger / calibrate / replay loops, serial, cameras-during-sessions. Control channel = **ndjson-RPC over stdio** (TS sends `{cmd, config}` with full config each call; driver emits `state`/`episode_saved`/`error` events). Frames = one localhost **MJPEG port**, proxied by server. Crash → supervisor restarts, UI surfaces it. Loops cribbed from LeLab's `record.py`/`teleoperate.py` (same lerobot version, readable locally).
 - One owner of the arm: server-side state machine `disconnected → connected → teleop | recording | rollout` gates driver commands; illegal transitions rejected in TS.
-- Sidecar store `app/server/data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
+- Sidecar store `app/console/.data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
 - Litmus test: delete `driver/` → everything except live robot control still works (datasets, trainings, grading, journal).
+
+### Effect architecture (server)
+Services (`ServiceMap.Service`, one `Layer` each, composed once at entry):
+- `RigConfig` — ports/ids/cams/brightness band/HF user via `Config` (no `process.env`).
+- `HfHub` — `HttpClient` against HF JSON API; `testLayer` for offline.
+- `DatasetCatalog` — local scan + Hub merge, sync state.
+- `ReportCard` — parquet stats (hyparquet), brightness (sharp), coverage (threshold+PCA); cached in sidecar.
+- `RunsRegistry` — lineage sidecar via `FileSystem`.
+- `TrainingLauncher` — Colab cell gen + status derivation from Hub ckpt polling.
+- `RobotDriver` — Python subprocess as a **scoped resource** (`Command` + `Scope`: guaranteed kill on shutdown, `Schedule`-based restart on crash). stdout ndjson decoded into a `Stream` of `DriverEvent` (`Schema.Union`: `EpisodeSaved | StateChanged | DriverError`); commands Schema-encoded. `testLayer` = fake driver with scripted events → **all flows testable with no robot attached**.
+- `RobotSession` — state machine in a `SubscriptionRef` (changes are a `Stream` → WS fan-out); illegal transitions rejected here.
+- `Journal`, `CoachSampler` — pure logic behind services.
+
+Domain: branded IDs (`RepoId`, `RunId`, `EpisodeIndex`), `Schema.Class` records (`Dataset`, `Run`, `Checkpoint`), `Schema.TaggedClass` unions (`RunStatus`, `RobotState`, `DriverEvent`) with exhaustive `Match.valueTags`.
+Errors: `Schema.TaggedErrorClass` — `PortBusyError` (hint: close LeLab/CLI), `DriverCrashedError`, `PreflightFailedError` (lists failed gates), `IllegalTransitionError`, `HubUnreachableError` (degrade to local-only), `DatasetNotFoundError`. Recovery via `catchTags`, never blanket `catchAll`.
+Testing: `@effect/vitest` (`it.effect`), fresh layers per test; build M0/M1 against `RobotDriver.testLayer` + `HfHub.testLayer` first, swap live layers when hardware is attached.
+Setup note: before first Effect code, create the source mirror `.agent-sources/effect/` (shallow clone, kept out of commits via `.git/info/exclude`) per the effect-ts skill's source-first rule.
 
 ## Preflight (blocks recording until green)
 - **Cameras**: enumerate; live thumbnails; user confirms "workspace" / "wrist" per session (macOS index shuffle). Persist last-known mapping, always re-confirm.
