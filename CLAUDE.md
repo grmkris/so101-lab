@@ -21,11 +21,20 @@ Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal:
 3. **Coverage + orientation** — a ~40-ep dataset can't learn position AND orientation invariance. Keep object orientation consistent; spread positions evenly (incl. corners) or the thin regions fail. This was proven: act_v3 failed left-of-center because only 5/20 eps were left.
 4. **macOS shuffles camera indexes on replug** — ALWAYS verify indexes before a session (snippet in crib-sheet). Currently overhead C922=0, wrist Innomaker=1, but they swap.
 
-## Current state (2026-07-16)
-- **Workspace rebuilt:** arm faces a white wall (clean bg), 2 cameras (overhead C922 + wrist Innomaker), taped ~30cm pick rectangle on black mat, white block, glass bowl drop-off. Cables mostly cleared + taped. Lighting locked ~130.
-- Calibration is current (arm relocated, not disassembled → teleop mirrors clean → no recalibration needed).
-- **Next action:** record `kris0/so101_pickplace_wall_v1` — 50 eps, both cams, even spread, consistent orientation, ~6 recovery demos. Then push → Colab train `act_wall_v1` (40k steps) → `lerobot-rollout --strategy.type=episodic` eval. This is the first policy with every lever pulled at once + a wrist cam for depth.
-- Prior policies (single overhead cam): `act_v3` (20 eps, failed left), `act_v4` (39 eps, ~half success — single-cam depth ceiling). Wrist cam is the fix for the "descends but misses" failure.
+## Current state (2026-07-23) — see journal.md 2026-07-23 for the full run
+- **2-cam wall setup:** arm at white wall, overhead C922 (idx 0) + wrist Innomaker (idx 1), 640×480@30. Taped pick rectangle, black mat, lighting locked ~120–130. Calibration current (id `arm`). **Verify cam indexes every session** (macOS shuffles).
+- **Working policy:** `act_wall_v1` (20 eps, single orientation) = reliable grasp ✅. **Orientation model:** dataset `kris0/so101_pickplace_wall_v1_20260722_174720` (57 clean eps, 0°/±45°/±90°). `act_wall_v3_final` continued-training on Colab (warm-start from 10k ckpt, loss ~0.11). Local 20k-equiv ckpt at `~/act_wall_v3_20k/checkpoints/010000/pretrained_model`.
+- **Eval finding:** orientation invariance works at 90°/center; **weak at edges + ±45°** (coverage gaps + maybe undertraining).
+- **Next action:** finish `act_wall_v3_final` to 40k → eval orientations → **DAgger-correct** the edge/45° failures (`--strategy.type=dagger` + leader, `tab` to take over) → add corrections, retrain.
 
-## After a reliable grasp works
-DAgger corrections (`--strategy.type=dagger` + teleop, grab leader on failure, tagged `intervention=True`) to climb from ~70%→~95% without hundreds of new demos → then the teleop web UI ("placement coach": live cam → coverage heatmap → placement overlay) → then chess (board ~34cm playing area is bigger than arm reach from an edge mount; solve by center-side mount or smaller board).
+## Hard lessons locked in (2026-07-23)
+- **Colab:** run ONE training at a time (parallel A100s trip concurrency → disconnect). Always `--save_checkpoint_to_hub=true` so a disconnect can't lose progress. Continue from a Hub ckpt: `--policy.type=act --policy.pretrained_path=<local ckpt dir>`. Escape Colab entirely with **HF Jobs** (`lerobot-train --job.target=a100-large --job.detach=true`, needs HF Pro).
+- **At our scale train from scratch by default** (57 eps ≈ 1.5h A100); warm-start only to recover a crash or for DAgger.
+- **`lerobot-edit-dataset delete_episodes` is fragile** on multi-resume datasets — push to Hub first, or exclude eps at train time via `--dataset.episodes`.
+- Eval on **Mac MPS is slow (~12 Hz)** — usable for eval, not for data collection.
+
+## Phone teleop — WORKS (`phone_teleop/`)
+iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Run `phone_teleop/teleoperate.py`. Needs iPhone hotspot + firewall off + a lerobot B1-bool patch (documented in `phone_teleop/README.md`). Remote path: Tailscale.
+
+## Roadmap after the orientation model
+DAgger to close edge/45° gaps → **pegboard peg-insertion** (new playground: rigid link pieces over pegs = the precision-placement / assembly skill, canonical + chess-relevant) → teleop web UI (placement coach) → chess (board ~34cm > edge-mount reach; solve via center-side mount or smaller board).
