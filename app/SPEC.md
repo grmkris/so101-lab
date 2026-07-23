@@ -1,12 +1,15 @@
 # Lab Console (working name) — spec
 
-Web app replacing phosphobot/LeLab for this lab. One purpose: **run the data flywheel with quality gates** — control → guided record → grade → (train/eval later) — for the SO-101 on this Mac, lerobot 0.6.0.
+Web app replacing phosphobot/LeLab for this lab. One purpose: **run the data flywheel with quality gates** — control → guided record → grade → train → eval — for the SO-101 on this Mac, lerobot 0.6.0.
+
+**Standalone-first**: the app is a complete ML-practitioner tool with zero blockchain dependency. Hackathon layers (payments/identity/provenance) bolt on as a separate service talking to this app's API; the core never imports them.
 
 ## Principles (non-negotiable, encode the hard-won levers)
 1. **Thin wrapper over lerobot 0.6.0.** Backend imports lerobot classes in-process from an env pinned `lerobot==0.6.0`. Never reimplement drivers, calibration math, or dataset format. Version lever preserved by construction.
 2. **Quality gates are the product.** Preflight before every session (cam indexes, brightness, calibration). Coverage engineered during recording, not discovered post-mortem.
 3. **Never destructive.** No episode deletion (fragile tool, locked-in lesson). Exclusion lists only. Push to Hub early.
 4. **Journal always.** Every session produces a draft `journal.md` entry.
+5. **No database.** HF Hub (datasets, model repos, checkpoints) + the local lerobot cache ARE the state. The app is a control plane/lens over them, plus thin sidecar JSON for what the Hub can't hold (run configs, lineage, eval notes, coach state). Delete the app → nothing of value is lost.
 
 ## Non-goals
 - Multi-robot/fleet, cloud hosting, auth, other robot types, mobile UI.
@@ -30,6 +33,16 @@ app/
 - **Brightness**: mean gray of overhead frame within configured band (default 115–131). Warn outside.
 - **Calibration**: follower + leader calibration files exist for id `arm`; show age.
 - **Disk**: free space check.
+
+## Features — M0 hub foundation (no hardware needed — build first)
+- HF auth status (reuse cached token), whoami.
+- **Datasets**: local browse (scan `~/.cache/huggingface/lerobot` meta files, no lerobot import needed) + Hub browse (`kris0/*`).
+- **Trainings registry**: every training run as a first-class object with full lineage:
+  `run = {name, status: draft→launched→done/failed, dataset(repo_id + exclude list), policy(type, pretrained_path for warm-start), steps/batch/save_freq, hub model repo, wandb url, eval notes}`.
+  - List view merges sidecar runs with `kris0/*` Hub model repos → past trainings (act_wall_v1/v3, act_v3/v4, v052c…) appear day one.
+  - **Launcher**: "new training" form prefilled from a dataset → generates the exact version-matched Colab cell (crib-sheet convention: v0.6.0 checkout, `--save_checkpoint_to_hub`, `--policy.repo_id`) to copy-paste; registers the run as launched; **progress tracked by polling the Hub repo for checkpoints** (no agent needed inside Colab). One-click HF Jobs later when HF Pro exists.
+  - Recommend `--wandb.enable=true` going forward; run page links the wandb curve.
+- Acceptance: see all past trainings; create + launch a run; its checkpoints appear as they hit the Hub.
 
 ## Features — M1 walking skeleton (control + record)
 - Ports: auto-discover `/dev/tty.usbmodem*`, map to follower/leader from saved config.
