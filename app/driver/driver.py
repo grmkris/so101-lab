@@ -25,11 +25,11 @@ import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 
 import cv2
 
 import recorder
+import teleop
 from shared import BRIGHTNESS, FRAMES, LOCK, emit, log
 
 BACKEND = None  # RealBackend | SimBackend | None
@@ -139,106 +139,6 @@ def require_backend():
     return BACKEND
 
 
-# ---------- unified teleop loop (source × backend) ----------
-
-TELEOP: dict = {"active": False, "source": None, "source_name": None}
-
-URDF_PATH = str(
-    (Path(__file__).parent.parent.parent / "phone_teleop/SO101/so101_new_calib.urdf").resolve()
-)
-
-
-def make_source(name: str, backend):
-    if name == "leader":
-        if backend.name != "real":
-            raise ValueError("leader source needs the real backend")
-        if backend.teleop is None:
-            raise ValueError("connect with the leader arm first")
-        return backend.teleop
-    if name == "scripted":
-        if backend.name != "sim":
-            raise ValueError("scripted source is sim-only")
-        from backends.sim import KEYFRAMES
-        from sources.scripted import ScriptedExpert
-
-        expert = ScriptedExpert(backend, KEYFRAMES)
-        expert.reset()
-        return expert
-    if name == "keys":
-        from sources.keys import BrowserKeys
-
-        return BrowserKeys(
-            urdf_path=URDF_PATH,
-            motor_names=backend.lerobot_joint_names,
-            seed_obs=backend.current_joints_pos(),
-        )
-    raise ValueError(f"unknown teleop source: {name}")
-
-
-def _emit_teleop_state(state: str) -> None:
-    emit({
-        "event": "robot_state",
-        "state": state,
-        "backend": BACKEND.name if BACKEND else "real",
-        "source": TELEOP["source_name"] if state == "teleop" else None,
-    })
-
-
-def teleop_loop(source, backend, rate_hz: int) -> None:
-    last_emit = 0.0
-    try:
-        while TELEOP["active"]:
-            action = source.get_action()
-            backend.apply_action(action)
-            now = time.time()
-            if now - last_emit >= 0.1:
-                emit({"event": "joints", "values": backend.get_joints()})
-                last_emit = now
-            time.sleep(1 / rate_hz)
-    except Exception as exc:  # noqa: BLE001
-        log(f"teleop loop error: {exc}")
-        emit({"event": "error", "where": "teleop", "error": str(exc)})
-    finally:
-        TELEOP.update(active=False, source=None, source_name=None)
-        if hasattr(backend, "teleop_done"):
-            backend.teleop_done()
-        backend.state = "connected"
-        _emit_teleop_state("connected")
-
-
-def cmd_teleop_start(req: dict) -> dict:
-    backend = require_backend()
-    if TELEOP["active"]:
-        raise ValueError("teleop already active")
-    if RECORDING["thread"] is not None and RECORDING["thread"].is_alive():
-        raise ValueError("recording is active")
-
-    name = req.get("source") or ("scripted" if backend.name == "sim" else "leader")
-    backend.teleop_ready(name)
-    source = make_source(name, backend)
-    TELEOP.update(active=True, source=source, source_name=name)
-    backend.state = "teleop"
-    rate = 60 if name == "leader" else 30
-    threading.Thread(
-        target=teleop_loop, args=(source, backend, rate), name="teleop-loop", daemon=True
-    ).start()
-    _emit_teleop_state("teleop")
-    return {"state": "teleop", "source": name}
-
-
-def cmd_teleop_stop() -> dict:
-    TELEOP["active"] = False
-    return {"state": "connected"}
-
-
-def cmd_teleop_input(req: dict) -> dict:
-    source = TELEOP.get("source")
-    if source is None or not hasattr(source, "set_input"):
-        raise ValueError("no input-driven teleop source active")
-    source.set_input(req.get("axes") or {})
-    return {"ok": True}
-
-
 def cmd_connect(req: dict) -> dict:
     global BACKEND
     if BACKEND is not None:
@@ -258,7 +158,7 @@ def cmd_connect(req: dict) -> dict:
 
 def cmd_disconnect() -> dict:
     global BACKEND
-    TELEOP["active"] = False
+    teleop.stop(wait=True)
     if BACKEND is None:
         return {"state": "disconnected"}
     result = BACKEND.disconnect()
@@ -270,6 +170,7 @@ def cmd_record_start(req: dict) -> dict:
     if RECORDING["thread"] is not None and RECORDING["thread"].is_alive():
         raise ValueError("recording already active")
     backend = require_backend()
+    teleop.stop(wait=True)  # recorder owns the arm — a live teleop loop must end first
     stop_previews()  # recorder owns the cameras (real backend)
 
     cfg = {
@@ -282,12 +183,12 @@ def cmd_record_start(req: dict) -> dict:
         "resume": bool(req.get("resume", False)),
         "cameras": req.get("cameras") or {},
     }
-    robot, teleop, on_episode_start = backend.prepare_record(cfg)
+    robot, teleop_device, on_episode_start = backend.prepare_record(cfg)
     events = recorder.make_events()
 
     def worker() -> None:
         try:
-            saved = recorder.run_session(robot, teleop, cfg, events, on_episode_start)
+            saved = recorder.run_session(robot, teleop_device, cfg, events, on_episode_start)
             log(f"record session done, saved={saved}")
         except Exception as exc:  # noqa: BLE001 — recorder already emitted the failed state
             log(f"record session failed: {exc}")
@@ -381,14 +282,18 @@ def main() -> None:
             elif cmd == "torque":
                 result = require_backend().torque(bool(req.get("on")))
             elif cmd == "estop":
-                TELEOP["active"] = False
+                teleop.stop()
                 result = require_backend().estop()
             elif cmd == "teleop_start":
-                result = cmd_teleop_start(req)
+                result = teleop.start(
+                    req,
+                    require_backend(),
+                    RECORDING["thread"] is not None and RECORDING["thread"].is_alive(),
+                )
             elif cmd == "teleop_stop":
-                result = cmd_teleop_stop()
+                result = teleop.stop()
             elif cmd == "teleop_input":
-                result = cmd_teleop_input(req)
+                result = teleop.set_input(req)
             elif cmd == "get_joints":
                 result = require_backend().get_joints()
             elif cmd == "record_start":

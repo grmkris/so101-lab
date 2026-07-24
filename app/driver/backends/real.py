@@ -2,7 +2,6 @@
 Connect/teleop structure cribbed from LeLab's teleoperate.py (worker owns disconnect).
 """
 
-import time
 
 from shared import emit, log
 
@@ -14,8 +13,6 @@ class RealBackend:
         self.robot = None
         self.teleop = None
         self.state = "disconnected"
-        self.teleop_active = False
-        self.joints: dict[str, float] = {}
         self._ports: dict = {}
 
     # ---------- lifecycle ----------
@@ -82,13 +79,10 @@ class RealBackend:
             raise
 
     def disconnect(self) -> dict:
-        self.teleop_active = False
-        time.sleep(0.1)
         self._safe_disconnect(self.robot)
         self._safe_disconnect(self.teleop)
         self.robot = self.teleop = None
         self.state = "disconnected"
-        self.joints.clear()
         self._emit_state()
         return {"state": "disconnected"}
 
@@ -105,7 +99,6 @@ class RealBackend:
 
     def estop(self) -> dict:
         """Torque kill. Arm goes limp — hold it if it's raised."""
-        self.teleop_active = False
         if self.robot is not None:
             try:
                 self.robot.bus.disable_torque()
@@ -174,8 +167,6 @@ class RealBackend:
             raise ValueError("recording needs the leader arm — reconnect with leader")
 
         # recorder owns the serial ports + cameras from here
-        self.teleop_active = False
-        time.sleep(0.1)
         self._safe_disconnect(self.robot)
         self._safe_disconnect(self.teleop)
         self.robot = self.teleop = None
@@ -205,5 +196,4 @@ class RealBackend:
         # recorder disconnected the devices it owned; back to square one
         self.robot = self.teleop = None
         self.state = "disconnected"
-        self.joints.clear()
         self._emit_state()
