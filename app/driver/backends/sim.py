@@ -10,6 +10,7 @@ practice and demo insurance.
 real lerobot Teleoperator because record_loop isinstance-checks its teleop.
 """
 
+import os
 import random
 import threading
 import time
@@ -108,8 +109,11 @@ class SimBackend:
         self.state = "connected"
         self.paused = False
         self._alive = True
+        self.teleop = None  # optional real leader arm driving the sim
         threading.Thread(target=self._physics_loop, name="sim-physics", daemon=True).start()
         threading.Thread(target=self._render_loop, name="sim-render", daemon=True).start()
+        if os.environ.get("LAB_SIM_VIEWER") == "1":
+            threading.Thread(target=self._viewer_loop, name="sim-viewer", daemon=True).start()
         log("sim backend up (MuJoCo)")
 
     # ---------- unit conversion (lerobot: degrees, gripper 0..100) ----------
@@ -189,15 +193,61 @@ class SimBackend:
             n += 1
             time.sleep(1 / 15)
 
+    def _viewer_loop(self) -> None:
+        """Native MuJoCo window. macOS needs the process launched via mjpython —
+        see LAB_DRIVER_PYTHON in the run scripts."""
+        try:
+            import mujoco.viewer
+        except Exception as exc:  # noqa: BLE001
+            log(f"viewer unavailable: {exc}")
+            return
+        try:
+            with mujoco.viewer.launch_passive(
+                self.model, self.data, show_left_ui=False, show_right_ui=False
+            ) as viewer:
+                log("MuJoCo viewer window open")
+                while self._alive and viewer.is_running():
+                    with self.sim_lock:
+                        viewer.sync()
+                    time.sleep(1 / 30)
+        except Exception as exc:  # noqa: BLE001 — a dead window must not kill the sim
+            log(f"viewer closed: {exc}")
+
     # ---------- protocol commands ----------
 
-    def connect(self, _req: dict) -> dict:
+    def connect(self, req: dict) -> dict:
+        # A real leader arm can drive the sim: its get_action() is already in
+        # lerobot space (degrees + gripper 0..100), which is exactly what
+        # apply_action consumes. Optional — without it the scripted expert and
+        # the browser sources still work.
+        leader_port = req.get("leaderPort")
+        if leader_port:
+            from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
+
+            try:
+                teleop = SO101Leader(
+                    SO101LeaderConfig(port=leader_port, id=req.get("robotId", "arm"))
+                )
+                teleop.connect()
+                self.teleop = teleop
+                log(f"sim: leader arm attached on {leader_port}")
+            except Exception as exc:  # noqa: BLE001 — surfaced to the user
+                raise ValueError(
+                    f"Could not connect to the leader arm on {leader_port}. "
+                    "Is it plugged in and not held by another process?"
+                ) from exc
         emit({"event": "robot_state", "state": self.state, "backend": self.name})
-        return {"state": self.state, "leader": True}  # scripted expert plays the leader
+        return {"state": self.state, "leader": self.teleop is not None}
 
     def disconnect(self) -> dict:
         self._alive = False
         self.state = "disconnected"
+        if self.teleop is not None:
+            try:
+                self.teleop.disconnect()
+            except Exception:  # noqa: BLE001 — best effort, port must be freed
+                pass
+            self.teleop = None
         with LOCK:
             FRAMES.pop("workspace_cam", None)
             FRAMES.pop("wrist_cam", None)
@@ -217,8 +267,8 @@ class SimBackend:
 
     def teleop_ready(self, source: str) -> None:
         """Called by the driver before its unified teleop loop starts."""
-        if source == "leader":
-            raise ValueError("leader arm source needs the real backend")
+        if source == "leader" and self.teleop is None:
+            raise ValueError("connect with the leader arm first (sim + leader)")
         self.paused = False
 
     # ---------- record ----------
@@ -240,8 +290,8 @@ class SimBackend:
 
     def prepare_record(self, cfg: dict):
         source = cfg.get("source", "scripted")
-        if source == "leader":
-            raise ValueError("leader arm source needs the real backend")
+        if source == "leader" and self.teleop is None:
+            raise ValueError("connect with the leader arm first (sim + leader)")
         self.paused = False
         self.state = "recording"
         emit({"event": "robot_state", "state": self.state, "backend": self.name})

@@ -174,10 +174,25 @@ function DrivePage() {
 							<Button
 								size="sm"
 								variant="outline"
+								onClick={() => command.mutate("connect_real")}
+							>
+								Connect REAL
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
 								onClick={() => command.mutate("teleop_start")}
 							>
 								<Play />
-								Start teleop (keys)
+								Teleop (keys)
+							</Button>
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => command.mutate("teleop_start_leader")}
+							>
+								<Play />
+								Teleop (leader arm)
 							</Button>
 							<Button
 								size="sm"

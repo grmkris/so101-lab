@@ -107,15 +107,28 @@ export const startRigLink = (opts: {
 	const runCommand = async (verb: string) => {
 		switch (verb) {
 			case "connect_sim":
+				// withLeader so a physical leader arm can drive the sim
 				await localApi("/api/robot/connect", {
 					method: "POST",
-					body: JSON.stringify({ withLeader: false, backend: "sim" }),
+					body: JSON.stringify({ withLeader: true, backend: "sim" }),
+				});
+				break;
+			case "connect_real":
+				await localApi("/api/robot/connect", {
+					method: "POST",
+					body: JSON.stringify({ withLeader: true, backend: "real" }),
 				});
 				break;
 			case "teleop_start":
 				await localApi("/api/robot/teleop/start", {
 					method: "POST",
 					body: JSON.stringify({ source: "keys" }),
+				});
+				break;
+			case "teleop_start_leader":
+				await localApi("/api/robot/teleop/start", {
+					method: "POST",
+					body: JSON.stringify({ source: "leader" }),
 				});
 				break;
 			case "teleop_stop":

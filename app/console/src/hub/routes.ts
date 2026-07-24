@@ -32,7 +32,9 @@ const json = (body: unknown, status = 200): Response =>
 /** Verbs a remote guest is allowed to trigger. Everything else is rig-local. */
 const ALLOWED_VERBS = new Set([
 	"connect_sim",
+	"connect_real",
 	"teleop_start",
+	"teleop_start_leader",
 	"teleop_stop",
 	"estop",
 	"disconnect",

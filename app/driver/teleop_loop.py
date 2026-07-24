@@ -28,9 +28,9 @@ def is_active() -> bool:
 
 def make_source(name: str, backend):
     if name == "leader":
-        if backend.name != "real":
-            raise ValueError("leader source needs the real backend")
-        if backend.teleop is None:
+        # Works on sim too: the leader's get_action() is already lerobot-space
+        # (degrees + gripper 0..100), which both backends consume unchanged.
+        if getattr(backend, "teleop", None) is None:
             raise ValueError("connect with the leader arm first")
         return backend.teleop
     if name == "scripted":
