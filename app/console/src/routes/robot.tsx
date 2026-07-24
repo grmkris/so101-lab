@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArmPanel } from "#/components/arm-panel";
+import { PageHeader } from "#/components/page-header";
 import {
 	cameraStatusQuery,
 	confirmCameras,
@@ -42,11 +43,11 @@ function RobotPage() {
 	const band = s?.brightnessBand ?? { min: 115, max: 131 };
 
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-bold">Robot</h1>
-			<p className="mt-1 text-sm text-muted-foreground">
-				macOS shuffles camera indexes on replug: verify every session.
-			</p>
+		<div>
+			<PageHeader
+				title="Robot"
+				description="macOS shuffles camera indexes on replug: verify every session."
+			/>
 
 			<ArmPanel />
 

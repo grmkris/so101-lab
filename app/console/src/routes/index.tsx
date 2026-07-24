@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeader } from "#/components/page-header";
 import {
 	cameraStatusQuery,
 	datasetsQuery,
@@ -24,19 +25,19 @@ function Home() {
 	const card = "rounded border p-4 text-sm";
 
 	return (
-		<div className="p-6">
-			<div className="flex items-baseline gap-3">
-				<h1 className="text-3xl font-bold">Lab Console</h1>
-				<span className="text-sm text-muted-foreground">
-					{health.isPending
+		<div>
+			<PageHeader
+				title="Lab Console"
+				description={
+					health.isPending
 						? "checking…"
 						: health.isError
 							? "API unreachable"
-							: `hf ${health.data.hfUser} · v${health.data.version}`}
-				</span>
-			</div>
+							: `hf ${health.data.hfUser} · v${health.data.version}`
+				}
+			/>
 
-			<div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div className={card}>
 					<div className="flex items-center justify-between">
 						<span className="font-medium">Rig</span>

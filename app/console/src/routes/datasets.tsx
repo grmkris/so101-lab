@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeader } from "#/components/page-header";
 import { datasetsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/datasets")({ component: DatasetsPage });
@@ -10,11 +11,11 @@ function DatasetsPage() {
 	const datasets = useQuery(datasetsQuery);
 
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-bold">Datasets</h1>
-			<p className="mt-1 text-sm text-muted-foreground">
-				Local cache (~/.cache/huggingface/lerobot) merged with Hub (kris0/*)
-			</p>
+		<div>
+			<PageHeader
+				title="Datasets"
+				description="Local cache (~/.cache/huggingface/lerobot) merged with Hub (kris0/*)"
+			/>
 
 			{datasets.isPending ? (
 				<p className="mt-6 text-muted-foreground">scanning…</p>

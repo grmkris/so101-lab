@@ -7,7 +7,11 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { ExternalLink, FlaskConical } from "lucide-react";
 
+import { ShellStatus } from "#/components/shell-status";
+import { ThemeToggle } from "#/components/theme-toggle";
+import { Toaster } from "#/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 const queryClient = new QueryClient();
@@ -36,6 +40,13 @@ export const Route = createRootRoute({
 	shellComponent: RootDocument,
 });
 
+const NAV = [
+	{ to: "/robot", label: "Robot" },
+	{ to: "/record", label: "Record" },
+	{ to: "/datasets", label: "Datasets" },
+	{ to: "/trainings", label: "Trainings" },
+] as const;
+
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" className="dark" suppressHydrationWarning>
@@ -52,56 +63,53 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<QueryClientProvider client={queryClient}>
-					<nav className="flex items-center gap-4 border-b px-6 py-3 text-sm">
-						<Link to="/" className="font-semibold">
+					<nav className="sticky top-0 z-10 flex items-center gap-4 border-b bg-background/90 px-6 py-3 text-sm backdrop-blur">
+						<Link to="/" className="flex items-center gap-2 font-semibold">
+							<FlaskConical className="size-4 text-muted-foreground" />
 							Lab Console
 						</Link>
-						<Link
-							to="/robot"
-							className="text-muted-foreground hover:text-foreground"
-						>
-							Robot
-						</Link>
-						<Link
-							to="/record"
-							className="text-muted-foreground hover:text-foreground"
-						>
-							Record
-						</Link>
-						<Link
-							to="/datasets"
-							className="text-muted-foreground hover:text-foreground"
-						>
-							Datasets
-						</Link>
-						<Link
-							to="/trainings"
-							className="text-muted-foreground hover:text-foreground"
-						>
-							Trainings
-						</Link>
-						<a
-							href="/api/docs"
-							className="ml-auto text-muted-foreground hover:text-foreground"
-							target="_blank"
-							rel="noreferrer"
-						>
-							API docs
-						</a>
+						{NAV.map((item) => (
+							<Link
+								key={item.to}
+								to={item.to}
+								className="text-muted-foreground hover:text-foreground"
+								activeProps={{
+									className: "font-semibold text-foreground",
+								}}
+							>
+								{item.label}
+							</Link>
+						))}
+						<div className="ml-auto flex items-center gap-3">
+							<ShellStatus />
+							<a
+								href="/api/docs"
+								className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+								target="_blank"
+								rel="noreferrer"
+							>
+								API docs
+								<ExternalLink className="size-3" />
+							</a>
+							<ThemeToggle />
+						</div>
 					</nav>
-					{children}
+					<main className="mx-auto w-full max-w-5xl px-6 py-8">{children}</main>
+					<Toaster position="bottom-center" />
 				</QueryClientProvider>
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-					]}
-				/>
+				{import.meta.env.DEV && (
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+						]}
+					/>
+				)}
 				<Scripts />
 			</body>
 		</html>

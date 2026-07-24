@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { PageHeader } from "#/components/page-header";
 import { createRun, datasetsQuery } from "#/lib/queries";
 
 type NewTrainingSearch = { dataset?: string; episodes?: string };
@@ -51,12 +52,12 @@ function NewTrainingPage() {
 	const label = "mt-4 block text-sm font-medium";
 
 	return (
-		<div className="max-w-xl p-6">
-			<h1 className="text-2xl font-bold">New training</h1>
-			<p className="mt-1 text-sm text-muted-foreground">
-				Generates a version-matched Colab cell (lerobot v0.6.0, checkpoints
-				pushed to Hub)
-			</p>
+		<div className="max-w-xl">
+			<PageHeader
+				title="New training"
+				description="Generates a version-matched Colab cell (lerobot v0.6.0, checkpoints pushed to Hub)"
+				back={{ to: "/trainings", label: "Trainings" }}
+			/>
 
 			<label className={label}>
 				Dataset

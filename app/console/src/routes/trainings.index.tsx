@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeader } from "#/components/page-header";
+import { Button } from "#/components/ui/button";
 import { runsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/trainings/")({
@@ -18,21 +20,16 @@ function TrainingsPage() {
 	const runs = useQuery(runsQuery);
 
 	return (
-		<div className="p-6">
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-2xl font-bold">Trainings</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Sidecar registry merged with kris0/* Hub models
-					</p>
-				</div>
-				<Link
-					to="/trainings/new"
-					className="rounded bg-foreground px-3 py-1.5 text-sm text-background"
-				>
-					New training
-				</Link>
-			</div>
+		<div>
+			<PageHeader
+				title="Trainings"
+				description="Sidecar registry merged with kris0/* Hub models"
+				actions={
+					<Button asChild>
+						<Link to="/trainings/new">New training</Link>
+					</Button>
+				}
+			/>
 
 			{runs.isPending ? (
 				<p className="mt-6 text-muted-foreground">loading…</p>

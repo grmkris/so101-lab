@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { KeyJogPad } from "#/components/key-jog-pad";
+import { PageHeader } from "#/components/page-header";
 import {
 	recordControl,
 	recordStart,
@@ -77,18 +78,22 @@ function RecordPage() {
 	const label = "mt-3 block text-sm font-medium";
 
 	return (
-		<div className="p-6">
-			<div className="flex items-center gap-3">
-				<h1 className="text-2xl font-bold">Record</h1>
-				<span
-					className={`rounded px-2 py-0.5 text-xs font-bold ${isSim ? "bg-purple-600 text-white" : "bg-muted"}`}
-				>
-					{backend.toUpperCase()}
-				</span>
-				<span className="text-sm text-muted-foreground">
-					arm: {robot.data?.state ?? "…"}
-				</span>
-			</div>
+		<div>
+			<PageHeader
+				title="Record"
+				badge={
+					<span className="flex items-center gap-3">
+						<span
+							className={`rounded px-2 py-0.5 text-xs font-bold ${isSim ? "bg-purple-600 text-white" : "bg-muted"}`}
+						>
+							{backend.toUpperCase()}
+						</span>
+						<span className="text-sm font-normal text-muted-foreground">
+							arm: {robot.data?.state ?? "…"}
+						</span>
+					</span>
+				}
+			/>
 
 			{robot.data?.state === "disconnected" && (
 				<p className="mt-4 text-sm text-amber-600">

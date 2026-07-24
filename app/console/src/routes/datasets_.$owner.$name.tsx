@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { PageHeader } from "#/components/page-header";
 import { datasetEpisodesQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/datasets_/$owner/$name")({
@@ -21,9 +22,9 @@ function DatasetReportPage() {
 	};
 
 	if (report.isPending)
-		return <p className="p-6 text-muted-foreground">reading meta…</p>;
+		return <p className="text-muted-foreground">reading meta…</p>;
 	if (report.isError)
-		return <p className="p-6 text-red-500">failed: {String(report.error)}</p>;
+		return <p className="text-red-500">failed: {String(report.error)}</p>;
 	const r = report.data;
 
 	const kept = r.episodes.map((e) => e.index).filter((i) => !excluded.has(i));
@@ -31,18 +32,24 @@ function DatasetReportPage() {
 	const flagged = r.episodes.filter((e) => e.flag !== null);
 
 	return (
-		<div className="p-6">
-			<h1 className="font-mono text-2xl font-bold">{repoId}</h1>
-			<p className="mt-1 text-sm text-muted-foreground">
-				{r.episodes.length} episodes · median {r.medianFrames ?? "—"} frames ·{" "}
-				{r.fps ?? "—"} fps
-				{flagged.length > 0 && (
-					<span className="text-amber-600">
-						{" "}
-						· {flagged.length} length outlier{flagged.length > 1 ? "s" : ""}
-					</span>
-				)}
-			</p>
+		<div>
+			<PageHeader
+				title={repoId}
+				titleClassName="font-mono"
+				back={{ to: "/datasets", label: "Datasets" }}
+				description={
+					<>
+						{r.episodes.length} episodes · median {r.medianFrames ?? "—"} frames
+						· {r.fps ?? "—"} fps
+						{flagged.length > 0 && (
+							<span className="text-amber-600">
+								{" "}
+								· {flagged.length} length outlier{flagged.length > 1 ? "s" : ""}
+							</span>
+						)}
+					</>
+				}
+			/>
 
 			{!r.local && (
 				<p className="mt-4 text-sm text-amber-600">

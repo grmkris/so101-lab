@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { PageHeader } from "#/components/page-header";
 import { checkpointsQuery, patchRun, runQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/trainings/$runId")({
@@ -26,10 +27,9 @@ function RunPage() {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["runs"] }),
 	});
 
-	if (run.isPending)
-		return <p className="p-6 text-muted-foreground">loading…</p>;
+	if (run.isPending) return <p className="text-muted-foreground">loading…</p>;
 	if (run.isError)
-		return <p className="p-6 text-red-500">failed: {String(run.error)}</p>;
+		return <p className="text-red-500">failed: {String(run.error)}</p>;
 	const r = run.data;
 
 	const targetSteps = r.config?.steps ?? null;
@@ -42,19 +42,25 @@ function RunPage() {
 		: null;
 
 	return (
-		<div className="max-w-3xl p-6">
-			<h1 className="font-mono text-2xl font-bold">{r.name}</h1>
-			<p className="mt-1 text-sm text-muted-foreground">
-				{r.status} · {r.hubModelId} ·{" "}
-				<a
-					className="underline"
-					target="_blank"
-					rel="noreferrer"
-					href={`https://huggingface.co/${r.hubModelId}`}
-				>
-					hub
-				</a>
-			</p>
+		<div className="max-w-3xl">
+			<PageHeader
+				title={r.name}
+				titleClassName="font-mono"
+				back={{ to: "/trainings", label: "Trainings" }}
+				description={
+					<>
+						{r.status} · {r.hubModelId} ·{" "}
+						<a
+							className="underline"
+							target="_blank"
+							rel="noreferrer"
+							href={`https://huggingface.co/${r.hubModelId}`}
+						>
+							hub
+						</a>
+					</>
+				}
+			/>
 
 			{r.config && (
 				<div className="mt-4 rounded border p-4 text-sm">
