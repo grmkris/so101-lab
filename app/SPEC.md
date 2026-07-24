@@ -28,6 +28,7 @@ app/
 - **console (TS)** owns: HF Hub (token from `~/.cache/huggingface/token`, list/poll via HF JSON API), local dataset scan (`meta/info.json` + **hyparquet** for parquet stats), report card (brightness via sharp, coverage via threshold+PCA in TS), episode thumbnails (ffmpeg CLI), runs registry (JSON sidecar), Colab cell generation, coach sampling, rig profile, journal drafts. Chain layers (hackathon) plug in here — all TS SDKs; operator gating = HttpApi middleware.
 - **Deliberately absent** (single-user localhost tool, principle #5): no database, no ORM, no auth framework, no cookie sessions. "Repositories" are FileSystem/Hub/driver-backed. Effect v4 is beta — pin all `effect`/`@effect/*` packages to one exact version.
 - **driver (Python)** is stateless and does only what lerobot physically requires: teleop / record / rollout / DAgger / calibrate / replay loops, serial, cameras-during-sessions. Control channel = **ndjson-RPC over stdio** (TS sends `{cmd, config}` with full config each call; driver emits `state`/`episode_saved`/`error` events). Frames = one localhost **MJPEG port**, proxied by server. Crash → supervisor restarts, UI surfaces it. Loops cribbed from LeLab's `record.py`/`teleoperate.py` (same lerobot version, readable locally).
+- **Driver backends**: the RPC protocol is the seam. `connect {backend: "real" | "sim"}` selects who answers it — `real` (serial + OpenCV + lerobot, the default) or `sim` (MuJoCo; see "Sim mode" below). The console never knows the difference; every feature above the protocol works unchanged.
 - One owner of the arm: server-side state machine `disconnected → connected → teleop | recording | rollout` gates driver commands; illegal transitions rejected in TS.
 - Sidecar store `app/console/.data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
 - Litmus test: delete `driver/` → everything except live robot control still works (datasets, trainings, grading, journal).
@@ -91,6 +92,18 @@ Setup note: before first Effect code, create the source mirror `.agent-sources/e
 - Coverage counts merge M2 report card (existing eps) + current session, so extending a dataset targets its real gaps.
 - Acceptance: record 20-ep puzzle dataset where no bin has <2 eps.
 
+## Sim mode (MuJoCo) — second driver backend
+Same driver process, same RPC verbs, MuJoCo instead of hardware. Target structure: extract a backend interface from the real implementation (`real.py` / `sim.py` behind the shared protocol). The whole flywheel — record → curate → grade → train → eval — runs identically on sim; datasets are ordinary LeRobot datasets written to the same cache (tag `sim: true` in the sidecar; show a SIM badge in the catalog and on every page while active).
+
+**Behavior deltas in sim**: physical preflight gates (cam-index confirm, brightness band, calibration age, port checks) are skipped/N-A — only the leader's serial port matters if leader-teleop is used; cameras = MuJoCo offscreen renders down the same MJPEG pipe; E-stop = pause physics.
+
+**Phases:**
+- **sim-1 (plumbing double):** load scene (MuJoCo Menagerie `trs_so_arm100` + table + cube), scripted motion primitives (interpolated `move_to_pose`/`hold` à la ECE4560; four-step pick sequence), rendered MJPEG, joint-state events. Acceptance: full console session (connect → "cams" → teleop-view → record 2 eps) with zero hardware; dataset loads in `LeRobotDataset`. Upgrades the fake `testLayer` story with a physically honest double + hackathon demo insurance.
+- **sim-2 (teleop + real demos in sim):** physical leader arm (serial) drives the simulated follower; record loop writes LeRobot episodes from sim state + renders. Evaluate **so101-nexus** first (pip, MuJoCo backend, leader→sim teleop, LeRobot datasets, 6 Gymnasium tasks) — **gate: its lerobot dependency must be compatible with pinned 0.6.0**; if not, own glue over Menagerie using pick-101's lessons (fingertip box collision pads per MuJoCo #239, damped-least-squares IK, Cartesian jog).
+- **sim-3 (RL, post-MVP):** nexus Gymnasium tasks + BC-warm-start → PPO/SAC as a second run type in the Trainings registry; scripted-expert bulk data generation for pipeline tests.
+
+**Boundary (locked-in from the literature):** sim-trained RGB policies do NOT transfer to the real arm without domain-randomization work (state-based RL hit 100% in sim, RGB sim2real failed — ggando.com/blog/so101-rl-lift). Sim is for plumbing, UI/driver testing, teleop practice, task prototyping, eval-grid rehearsal, and RL experiments. Real camera data remains the fuel for real-arm policies. Keep sim and real datasets/models visibly separated (SIM badge, sidecar tag).
+
 ## Features — cross-cutting
 - **Journal draft**: on session end, generate the dated entry (dataset, eps, lighting band observed, cam mapping, coach coverage summary); one-click append to `journal.md` (never silent auto-append).
 - Config file `app/backend/config.yaml`: ports, ids, cam defaults, brightness band, HF user.
@@ -105,7 +118,7 @@ Setup note: before first Effect code, create the source mirror `.agent-sources/e
 ```
 GET  /health, /config
 GET  /ports                         # discovered serial ports
-POST /robot/connect|disconnect      # {follower: bool, leader: bool}
+POST /robot/connect|disconnect      # {follower: bool, leader: bool, backend: "real"|"sim"}
 POST /robot/torque {on}, /robot/home, /robot/estop
 POST /teleop/start|stop
 GET  /cameras                       # enumerate + thumbnails
@@ -129,3 +142,5 @@ WS   /ws/joints ; GET /cams/{name}  # mjpeg
 - Serial port contention with LeLab/CLI — RobotManager must fail loud with "port busy" hint.
 - CV placement detection accuracy on colored puzzle pieces vs white block — calibrate threshold per task; prompted-vs-actual logging measures its own error.
 - MJPEG at 2×640×480@30 over localhost is fine; don't prematurely WebRTC.
+- so101-nexus is Beta (APIs churn) and its lerobot version coupling is unverified against our pinned 0.6.0 — evaluate behind the sim-2 gate; fall back to own Menagerie glue.
+- MuJoCo offscreen rendering at 2 cams × 30 fps on Apple Silicon: expected fine, but verify before wiring the record loop to it (drop to 15 fps preview + full-rate capture if needed).
