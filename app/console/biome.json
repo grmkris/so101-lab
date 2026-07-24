@@ -25,7 +25,8 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true
-		}
+		},
+		"includes": ["**", "!**/src/components/ui/**"]
 	},
 	"javascript": {
 		"formatter": {
@@ -33,4 +34,3 @@
 		}
 	}
 }
-

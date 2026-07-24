@@ -38,8 +38,16 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" className="dark" suppressHydrationWarning>
 			<head>
+				{/* runs pre-paint: dark is the SSR default, honor a saved light preference before first render */}
+				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap, no user input
+					dangerouslySetInnerHTML={{
+						__html:
+							'try{localStorage.getItem("theme")==="light"&&document.documentElement.classList.remove("dark")}catch(e){}',
+					}}
+				/>
 				<HeadContent />
 			</head>
 			<body>
