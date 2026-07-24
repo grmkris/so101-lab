@@ -74,16 +74,26 @@ def stop_previews() -> None:
     time.sleep(0.2)
 
 
+# macOS exposes phantom camera slots that open and read fine but return pure
+# black. A real camera in a dark room still reads well above this.
+BLACK_FRAME_MEAN = 2.0
+
+
 def cmd_list_cameras() -> list[dict]:
     stop_previews()  # macOS: one owner per device
     found = []
     for idx in range(6):
         cap = cv2.VideoCapture(idx)
         if cap.isOpened():
-            ok, frame = cap.read()
-            if ok:
+            for _ in range(5):  # first frames can be blank while the device wakes
+                ok, frame = cap.read()
+                if ok and float(frame.mean()) > BLACK_FRAME_MEAN:
+                    break
+            if ok and float(frame.mean()) > BLACK_FRAME_MEAN:
                 h, w = frame.shape[:2]
                 found.append({"index": idx, "width": w, "height": h})
+            elif ok:
+                log(f"camera {idx} ignored — returns black frames (phantom device)")
         cap.release()
     return found
 
