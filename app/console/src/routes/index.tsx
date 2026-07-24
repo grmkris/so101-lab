@@ -11,6 +11,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "#/components/ui/card";
+import { modeQuery } from "#/lib/hub-api";
 import {
 	cameraStatusQuery,
 	datasetsQuery,
@@ -18,6 +19,7 @@ import {
 	robotStateQuery,
 	runsQuery,
 } from "#/lib/queries";
+import { LobbyPage } from "./lobby";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -39,6 +41,15 @@ function CardLink({
 }
 
 function Home() {
+	const mode = useQuery(modeQuery);
+	// A hub has no arm and no local dataset cache — send it to the lobby rather
+	// than render a dashboard about hardware it does not have.
+	if (mode.data?.mode === "hub") return <LobbyPage />;
+	if (mode.isPending) return null;
+	return <LabDashboard />;
+}
+
+function LabDashboard() {
 	const health = useQuery(healthQuery);
 	const robot = useQuery(robotStateQuery);
 	const cams = useQuery(cameraStatusQuery);

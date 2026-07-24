@@ -21,6 +21,8 @@ export interface Rig {
 	source: string | null;
 	joints: Record<string, number>;
 	cams: ReadonlyArray<string>;
+	/** surfaced to the operator: a dead teleop loop must not be silent */
+	lastError: string | null;
 	lastSeen: number;
 	frames: Map<string, RigFrame>;
 	/** latest-wins: a dropped input packet is corrected by the next one */

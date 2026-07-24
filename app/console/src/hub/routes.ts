@@ -46,6 +46,7 @@ const rigSummary = (rig: Rig) => ({
 	online: isOnline(rig),
 	cams: rig.cams,
 	joints: rig.joints,
+	lastError: rig.lastError,
 	holder: leaseHolder(rig),
 	linkMs: rig.linkMs,
 	lastSeen: rig.lastSeen,
@@ -102,6 +103,7 @@ export const handleHubRequest = async (
 			source: string | null;
 			joints: Record<string, number>;
 			cams: ReadonlyArray<string>;
+			lastError?: string | null;
 			linkMs?: number;
 		};
 		if (!body.name) return json({ error: "name required" }, 400);
@@ -111,6 +113,7 @@ export const handleHubRequest = async (
 			source: body.source,
 			joints: body.joints ?? {},
 			cams: body.cams ?? [],
+			lastError: body.lastError ?? null,
 			linkMs: body.linkMs ?? 0,
 		});
 		await impair();

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Hand, OctagonX, Play, Square } from "lucide-react";
+import { Hand, OctagonX, Play, Square, TriangleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { CamFeed, CamOffAir } from "#/components/cam-feed";
@@ -12,6 +12,7 @@ import {
 	SimBadge,
 	StatusBadge,
 } from "#/components/status-badge";
+import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import {
@@ -195,6 +196,16 @@ function DrivePage() {
 								E-STOP
 							</Button>
 						</div>
+					)}
+
+					{data?.lastError && (
+						<Alert className="border-warn/50 text-warn [&>svg]:text-warn">
+							<TriangleAlert />
+							<AlertTitle>Rig reported a fault</AlertTitle>
+							<AlertDescription className="font-mono text-xs">
+								{data.lastError}
+							</AlertDescription>
+						</Alert>
 					)}
 
 					{iAmDriving ? (

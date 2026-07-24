@@ -44,6 +44,9 @@ class DriverProc {
 	backendName = "real";
 	sourceName: string | null = null;
 	hasLeader = false;
+	/** Driver `error` events used to be dropped on the floor — that is how a
+	 * dead teleop loop stayed invisible. */
+	lastError: string | null = null;
 	recordState: RecordState = {
 		active: false,
 		phase: "idle",
@@ -108,6 +111,9 @@ class DriverProc {
 					this.streams = msg.streams as ReadonlyArray<string>;
 				} else if (msg.event === "joints") {
 					Object.assign(this.joints, msg.values as Record<string, number>);
+				} else if (msg.event === "error") {
+					this.lastError = `${msg.where ?? "driver"}: ${msg.error}`;
+					console.error(`[driver-manager] ${this.lastError}`);
 				} else if (msg.event === "robot_state") {
 					this.robotState = String(msg.state);
 					if (msg.backend) this.backendName = String(msg.backend);
@@ -191,6 +197,7 @@ export interface DriverManagerShape {
 		source: string | null;
 		leader: boolean;
 		joints: Record<string, number>;
+		lastError: string | null;
 	}>;
 	readonly record: () => Effect.Effect<RecordState>;
 	readonly setLeader: (leader: boolean) => Effect.Effect<void>;
@@ -215,6 +222,7 @@ export class DriverManager extends Context.Service<
 				source: driverProc.sourceName,
 				leader: driverProc.hasLeader,
 				joints: { ...driverProc.joints },
+				lastError: driverProc.lastError,
 			})),
 		record: () => Effect.sync(() => ({ ...driverProc.recordState })),
 		setLeader: (leader: boolean) =>

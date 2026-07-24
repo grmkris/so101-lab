@@ -18,7 +18,8 @@ import { impairmentQuery, rigsQuery } from "#/lib/hub-api";
 
 export const Route = createFileRoute("/lobby")({ component: LobbyPage });
 
-function LobbyPage() {
+/** Also rendered at `/` on a hub, where a local-rig dashboard would be a lie. */
+export function LobbyPage() {
 	const rigs = useQuery(rigsQuery);
 	const impairment = useQuery(impairmentQuery);
 	const imp = impairment.data;
@@ -96,11 +97,17 @@ function LobbyPage() {
 									{rig.holder ? " · in use" : ""}
 								</p>
 
-								<Button asChild disabled={!rig.online}>
-									<Link to="/drive/$rig" params={{ rig: rig.name }}>
-										{rig.holder ? "Watch" : "Drive this rig"}
-									</Link>
-								</Button>
+								{/* `disabled` on an asChild anchor does nothing — render a
+								    real disabled button instead of a clickable dead link */}
+								{rig.online ? (
+									<Button asChild>
+										<Link to="/drive/$rig" params={{ rig: rig.name }}>
+											{rig.holder ? "Watch" : "Drive this rig"}
+										</Link>
+									</Button>
+								) : (
+									<Button disabled>Rig offline</Button>
+								)}
 							</CardContent>
 						</Card>
 					))}

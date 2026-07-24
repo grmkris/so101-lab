@@ -1,5 +1,9 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+	QueryClient,
+	QueryClientProvider,
+	useQuery,
+} from "@tanstack/react-query";
 import {
 	createRootRoute,
 	HeadContent,
@@ -12,6 +16,7 @@ import { ExternalLink, FlaskConical } from "lucide-react";
 import { ShellStatus } from "#/components/shell-status";
 import { ThemeToggle } from "#/components/theme-toggle";
 import { Toaster } from "#/components/ui/sonner";
+import { modeQuery } from "#/lib/hub-api";
 import appCss from "../styles.css?url";
 
 const queryClient = new QueryClient();
@@ -40,13 +45,35 @@ export const Route = createRootRoute({
 	shellComponent: RootDocument,
 });
 
-const NAV = [
-	{ to: "/lobby", label: "Lobby" },
+// A hub has no arm, no cameras and no lerobot cache — offering the lab pages
+// there would be lying. A rig is not a hub, so it has no lobby.
+const HUB_NAV = [{ to: "/lobby", label: "Lobby" }] as const;
+const RIG_NAV = [
 	{ to: "/robot", label: "Robot" },
 	{ to: "/record", label: "Record" },
 	{ to: "/datasets", label: "Datasets" },
 	{ to: "/trainings", label: "Trainings" },
 ] as const;
+
+function Nav() {
+	const mode = useQuery(modeQuery);
+	// render no links until the role is known — a wrong link is worse than none
+	const items = mode.data ? (mode.data.mode === "hub" ? HUB_NAV : RIG_NAV) : [];
+	return (
+		<>
+			{items.map((item) => (
+				<Link
+					key={item.to}
+					to={item.to}
+					className="text-muted-foreground hover:text-foreground"
+					activeProps={{ className: "font-semibold text-foreground" }}
+				>
+					{item.label}
+				</Link>
+			))}
+		</>
+	);
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
@@ -69,18 +96,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							<FlaskConical className="size-4 text-muted-foreground" />
 							Lab Console
 						</Link>
-						{NAV.map((item) => (
-							<Link
-								key={item.to}
-								to={item.to}
-								className="text-muted-foreground hover:text-foreground"
-								activeProps={{
-									className: "font-semibold text-foreground",
-								}}
-							>
-								{item.label}
-							</Link>
-						))}
+						<Nav />
 						<div className="ml-auto flex items-center gap-3">
 							<ShellStatus />
 							<a

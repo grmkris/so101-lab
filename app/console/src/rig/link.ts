@@ -38,6 +38,7 @@ interface RobotState {
 	backend: string;
 	source: string | null;
 	joints: Record<string, number>;
+	lastError: string | null;
 }
 
 export const startRigLink = (opts: {
@@ -72,6 +73,7 @@ export const startRigLink = (opts: {
 					source: robot?.source ?? null,
 					joints: robot?.joints ?? {},
 					cams: advertised,
+					lastError: robot?.lastError ?? null,
 					linkMs,
 				}),
 			});

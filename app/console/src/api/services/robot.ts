@@ -39,6 +39,7 @@ export class RobotSvc extends Context.Service<RobotSvc, RobotShape>()(
 							source: r.source,
 							leader: r.leader,
 							joints: r.joints,
+							lastError: r.lastError,
 							rig: {
 								followerPort: RIG.followerPort,
 								leaderPort: RIG.leaderPort,

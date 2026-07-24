@@ -194,6 +194,9 @@ export class RobotState extends Schema.Class<RobotState>("RobotState")(
 		backend: Schema.String, // real | sim
 		source: Schema.NullOr(Schema.String), // leader | scripted | keys | phone (while teleop)
 		leader: Schema.Boolean,
+		/** Last driver-side failure (e.g. the teleop loop dying). Without this a
+		 * remote operator just sees the arm stop and has no idea why. */
+		lastError: Schema.NullOr(Schema.String),
 		joints: Schema.Record(Schema.String, Schema.Number),
 		rig: Schema.Struct({
 			followerPort: Schema.String,

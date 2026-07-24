@@ -51,6 +51,12 @@ def build_ee_pipeline(
             EEBoundsAndSafety(
                 end_effector_bounds={"min": [-0.5, -0.5, -0.1], "max": [0.5, 0.5, 0.5]},
                 max_ee_step_m=0.08,
+                # Clamp an over-limit step instead of aborting the teleop loop.
+                # lerobot computes the clamped position either way, so the safety
+                # envelope is identical — raise_on_jump only decides whether a
+                # transient IK glitch kills the session. It does, and a remote
+                # operator then just sees the arm stop with no explanation.
+                raise_on_jump=False,
             ),
             GripperVelocityToJoint(speed_factor=gripper_speed),
             InverseKinematicsEEToJoints(
