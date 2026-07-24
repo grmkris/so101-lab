@@ -37,4 +37,13 @@ Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal:
 iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Run `phone_teleop/teleoperate.py`. Needs iPhone hotspot + firewall off + a lerobot B1-bool patch (documented in `phone_teleop/README.md`). Remote path: Tailscale.
 
 ## Roadmap after the orientation model
-DAgger to close edge/45° gaps → **pegboard peg-insertion** (new playground: rigid link pieces over pegs = the precision-placement / assembly skill, canonical + chess-relevant) → teleop web UI (placement coach) → chess (board ~34cm > edge-mount reach; solve via center-side mount or smaller board).
+1. **SmolVLA fine-tune on blue-pegs** (queued next real-world move — see journal 2026-07-24; ggando: SmolVLA 100% vs ACT 80% on same demos). A/B vs `act_blue_pegs_v1`.
+2. DAgger corrections for tight-tolerance failures (keyboard trusted-timeout patch applied, untested — needs arm connected; verify "Keyboard listener started" at startup, leader should sync on pause).
+3. **Sim track (`sim/`)** — learning/prototyping only, NOT sim2real (ggando: pixel RL 100% in sim, total failure on real arm). MuJoCo + ECE 4560 lab curriculum + so101-nexus (leader-teleop-into-sim). RL training later on Colab.
+4. Pegboard mastery → teleop web UI (placement coach) → chess (board ~34cm > edge-mount reach; center-side mount or smaller board).
+
+## Data collection rules (ggando-validated, 2026-07-24)
+- ONE consistent grasp strategy per dataset (mixed strategies = erratic policy at identical loss).
+- Dense small workspace beats broad coverage at small ep counts.
+- Record SLOW — teleop lag degrades demo quality.
+- One dominant desk lamp > ambient light.
