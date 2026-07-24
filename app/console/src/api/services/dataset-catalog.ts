@@ -16,6 +16,8 @@ interface LocalMeta {
 
 export interface DatasetCatalogShape {
   readonly list: () => Effect.Effect<ReadonlyArray<DatasetInfo>>
+  /** Mark a repo as sim-recorded (sidecar; this module is the only owner of that file). */
+  readonly tagSim: (repoId: string) => Effect.Effect<void>
 }
 
 export class DatasetCatalog extends Context.Service<DatasetCatalog, DatasetCatalogShape>()(
@@ -64,14 +66,28 @@ export class DatasetCatalog extends Context.Service<DatasetCatalog, DatasetCatal
         return metas
       })
 
-      const loadSimSet = fs
-        .readFileString(`${process.cwd()}/.data/sim-datasets.json`)
-        .pipe(
-          Effect.map((raw) => new Set(JSON.parse(raw) as Array<string>)),
-          Effect.orElseSucceed(() => new Set<string>()),
-        )
+      const SIM_FILE = `${process.cwd()}/.data/sim-datasets.json`
+
+      const loadSimSet = fs.readFileString(SIM_FILE).pipe(
+        Effect.map((raw) => new Set(JSON.parse(raw) as Array<string>)),
+        Effect.orElseSucceed(() => new Set<string>()),
+      )
+
+      const tagSim = (repoId: string) =>
+        Effect.gen(function* () {
+          const existing = yield* loadSimSet
+          if (existing.has(repoId)) return
+          existing.add(repoId)
+          yield* fs
+            .makeDirectory(`${process.cwd()}/.data`, { recursive: true })
+            .pipe(
+              Effect.andThen(fs.writeFileString(SIM_FILE, JSON.stringify([...existing], null, 2))),
+              Effect.orDie,
+            )
+        })
 
       return {
+        tagSim,
         list: () =>
           Effect.gen(function* () {
             const [local, hubRepos, simSet] = yield* Effect.all(

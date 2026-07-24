@@ -142,6 +142,12 @@ export class DriverError extends Schema.TaggedErrorClass<DriverError>()('DriverE
   message: Schema.String,
 }) {}
 
+/** Setup problem the user can fix (not a hardware fault) — lists the failed gates. */
+export class PreflightError extends Schema.TaggedErrorClass<PreflightError>()('PreflightError', {
+  message: Schema.String,
+  gates: Schema.Array(Schema.String),
+}) {}
+
 export class RobotState extends Schema.Class<RobotState>('RobotState')(
   Schema.Struct({
     state: Schema.String, // disconnected | connected | teleop | recording
@@ -216,7 +222,7 @@ export const RecordGroup = HttpApiGroup.make('Record').add(
       resume: Schema.Boolean,
     }),
     success: RecordStatus,
-    error: DriverError,
+    error: Schema.Union([DriverError, PreflightError]),
   }),
   HttpApiEndpoint.post('control', '/record/control', {
     payload: Schema.Struct({ action: Schema.String }), // keep | rerecord | finish

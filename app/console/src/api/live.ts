@@ -1,21 +1,14 @@
 import { NodeFileSystem } from '@effect/platform-node'
-import { Effect, FileSystem, Layer, Path } from 'effect'
+import { Effect, Layer, Path } from 'effect'
 import { Etag, FetchHttpClient, HttpPlatform, HttpRouter } from 'effect/unstable/http'
 import { HttpApiBuilder, HttpApiScalar } from 'effect/unstable/httpapi'
-import {
-  Checkpoints,
-  DriverError,
-  HealthStatus,
-  HfStatus,
-  LabApi,
-  RecordStatus,
-  RobotState,
-} from './contract'
+import { Checkpoints, DriverError, HealthStatus, HfStatus, LabApi, RobotState } from './contract'
 import { RIG } from './rig'
 import { Cameras } from './services/cameras'
 import { DatasetCatalog } from './services/dataset-catalog'
 import { DriverManager } from './services/driver-manager'
 import { HfHub } from './services/hf-hub'
+import { Recorder } from './services/record'
 import { RunsRegistry } from './services/runs-registry'
 
 const HealthLive = HttpApiBuilder.group(LabApi, 'Health', (handlers) =>
@@ -55,6 +48,7 @@ const TrainingsLive = HttpApiBuilder.group(LabApi, 'Trainings', (handlers) =>
     .handle('checkpoints', ({ params }) =>
       Effect.flatMap(RunsRegistry, (r) => r.checkpoints(params.id)).pipe(
         Effect.map((c) => new Checkpoints(c)),
+        Effect.orDie,
       ),
     ),
 )
@@ -116,78 +110,15 @@ const RobotLive = HttpApiBuilder.group(LabApi, 'Robot', (handlers) =>
     .handle('estop', () => robotCmd('estop')),
 )
 
-const recordStatus = Effect.gen(function* () {
-  const driver = yield* DriverManager
-  const r = yield* driver.record()
-  return new RecordStatus(r)
-})
-
-const SIM_DATASETS_FILE = `${process.cwd()}/.data/sim-datasets.json`
-
 const RecordLive = HttpApiBuilder.group(LabApi, 'Record', (handlers) =>
   handlers
-    .handle('status', () => recordStatus)
-    .handle('start', ({ payload }) =>
-      Effect.gen(function* () {
-        const driver = yield* DriverManager
-        const fs = yield* FileSystem.FileSystem
-        const cameras = yield* Effect.flatMap(Cameras, (c) => c.status()).pipe(
-          Effect.map((s) => s.mapping),
-        )
-        const robot = yield* driver.robot()
-        const repoId = `${RIG.hfUser}/${payload.repoName}`
-
-        if (robot.backend === 'real' && (cameras.workspace === null || cameras.wrist === null)) {
-          return yield* Effect.fail(
-            new Error('cameras not confirmed — identify workspace/wrist on the Robot page first'),
-          )
-        }
-
-        yield* driver.rpc('record_start', {
-          repo_id: repoId,
-          task: payload.task,
-          num_episodes: payload.numEpisodes,
-          episode_time_s: payload.episodeS,
-          reset_time_s: payload.resetS,
-          fps: 30,
-          resume: payload.resume,
-          cameras:
-            robot.backend === 'real'
-              ? {
-                  workspace_cam: { index: cameras.workspace, width: 640, height: 480, fps: 30 },
-                  wrist_cam: { index: cameras.wrist, width: 640, height: 480, fps: 30 },
-                }
-              : {},
-        })
-
-        if (robot.backend === 'sim') {
-          const existing = yield* fs
-            .readFileString(SIM_DATASETS_FILE)
-            .pipe(Effect.map((raw) => JSON.parse(raw) as Array<string>), Effect.orElseSucceed(() => [] as Array<string>))
-          if (!existing.includes(repoId)) {
-            yield* fs
-              .makeDirectory(`${process.cwd()}/.data`, { recursive: true })
-              .pipe(
-                Effect.andThen(
-                  fs.writeFileString(SIM_DATASETS_FILE, JSON.stringify([...existing, repoId], null, 2)),
-                ),
-                Effect.orDie,
-              )
-          }
-        }
-        return yield* recordStatus
-      }).pipe(Effect.mapError(toDriverError)),
-    )
-    .handle('control', ({ payload }) =>
-      Effect.gen(function* () {
-        const driver = yield* DriverManager
-        yield* driver.rpc('record_control', { action: payload.action })
-        return yield* recordStatus
-      }).pipe(Effect.mapError(toDriverError)),
-    ),
+    .handle('status', () => Effect.flatMap(Recorder, (r) => r.status()))
+    .handle('start', ({ payload }) => Effect.flatMap(Recorder, (r) => r.start(payload)))
+    .handle('control', ({ payload }) => Effect.flatMap(Recorder, (r) => r.control(payload.action))),
 )
 
-const ServicesLayer = Layer.mergeAll(DatasetCatalog.layer, RunsRegistry.layer, Cameras.layer).pipe(
+const ServicesLayer = Layer.mergeAll(RunsRegistry.layer, Recorder.layer).pipe(
+  Layer.provideMerge(Layer.mergeAll(DatasetCatalog.layer, Cameras.layer)),
   Layer.provideMerge(HfHub.layer),
   Layer.provideMerge(DriverManager.layer),
   Layer.provideMerge(FetchHttpClient.layer),

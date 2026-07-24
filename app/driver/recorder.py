@@ -63,6 +63,7 @@ def run_session(robot, teleop, cfg: dict, events: dict, on_episode_start=None) -
         teleop.bus.write_calibration(teleop.calibration)
 
     saved, ep = 0, 1
+    failed: str | None = None
     common = dict(
         robot=robot,
         events=events,
@@ -104,6 +105,10 @@ def run_session(robot, teleop, cfg: dict, events: dict, on_episode_start=None) -
             record_loop(control_time_s=cfg["reset_time_s"], **common)
             if events.get("stop_recording"):
                 break
+    except Exception as exc:  # noqa: BLE001 — recorder owns the terminal record_state
+        failed = str(exc)
+        emit({"event": "error", "where": "record", "error": failed})
+        raise
     finally:
         for device, tag in ((robot, "robot"), (teleop, "teleop")):
             if device is None:
@@ -112,5 +117,5 @@ def run_session(robot, teleop, cfg: dict, events: dict, on_episode_start=None) -
                 device.disconnect()
             except Exception as exc:  # noqa: BLE001
                 log(f"recorder {tag} disconnect: {exc}")
-        state("done", ep, saved)
+        state("failed" if failed else "done", ep, saved)
     return saved

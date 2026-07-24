@@ -19,6 +19,7 @@ from pathlib import Path
 import cv2
 import mujoco
 import numpy as np
+from lerobot.teleoperators.teleoperator import Teleoperator
 
 from shared import BRIGHTNESS, FRAMES, LOCK, emit, log
 
@@ -318,78 +319,63 @@ class SimExpertConfig:
     calibration_dir: Path | None = None
 
 
-def _make_expert_base():
-    from lerobot.teleoperators.teleoperator import Teleoperator
+class SimExpert(Teleoperator):
+    """Scripted pick choreography as a genuine Teleoperator (record_loop isinstance-checks)."""
 
-    class _SimExpert(Teleoperator):
-        """Scripted pick choreography as a genuine Teleoperator (record_loop isinstance-checks)."""
+    name = "sim_expert"
+    config_class = SimExpertConfig
 
-        name = "sim_expert"
-        config_class = SimExpertConfig
+    def __init__(self, backend: SimBackend) -> None:
+        self.b = backend
+        self.id = "sim"
+        self.calibration_dir = None
+        self.calibration = None
+        self._t0 = time.time()
 
-        def __init__(self, backend: SimBackend) -> None:
-            self.b = backend
-            self.id = "sim"
-            self.calibration_dir = None
-            self.calibration = None
-            self._t0 = time.time()
+    def reset(self) -> None:
+        self._t0 = time.time()
 
-        def reset(self) -> None:
-            self._t0 = time.time()
+    @property
+    def action_features(self) -> dict:
+        return {f"{lname}.pos": float for lname, _ in JOINT_MAP}
 
-        @property
-        def action_features(self) -> dict:
-            return {f"{lname}.pos": float for lname, _ in JOINT_MAP}
+    @property
+    def feedback_features(self) -> dict:
+        return {}
 
-        @property
-        def feedback_features(self) -> dict:
-            return {}
+    @property
+    def is_connected(self) -> bool:
+        return True
 
-        @property
-        def is_connected(self) -> bool:
-            return True
+    def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
+        self._t0 = time.time()
 
-        def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
-            self._t0 = time.time()
+    @property
+    def is_calibrated(self) -> bool:
+        return True
 
-        @property
-        def is_calibrated(self) -> bool:
-            return True
+    def calibrate(self) -> None:
+        pass
 
-        def calibrate(self) -> None:
-            pass
+    def configure(self) -> None:
+        pass
 
-        def configure(self) -> None:
-            pass
+    def get_action(self) -> dict:
+        t = time.time() - self._t0
+        total = sum(d for _, d in KEYFRAMES)
+        t = t % total
+        prev = KEYFRAMES[0][0]
+        for target, dur in KEYFRAMES:
+            if t <= dur:
+                alpha = t / dur if dur > 0 else 1.0
+                rad = [p + (q - p) * alpha for p, q in zip(prev, target)]
+                return self.b.rad_to_lerobot(rad)
+            t -= dur
+            prev = target
+        return self.b.rad_to_lerobot(KEYFRAMES[-1][0])
 
-        def get_action(self) -> dict:
-            t = time.time() - self._t0
-            total = sum(d for _, d in KEYFRAMES)
-            t = t % total
-            prev = KEYFRAMES[0][0]
-            for target, dur in KEYFRAMES:
-                if t <= dur:
-                    alpha = t / dur if dur > 0 else 1.0
-                    rad = [p + (q - p) * alpha for p, q in zip(prev, target)]
-                    return self.b.rad_to_lerobot(rad)
-                t -= dur
-                prev = target
-            return self.b.rad_to_lerobot(KEYFRAMES[-1][0])
+    def send_feedback(self, feedback: dict) -> None:
+        pass
 
-        def send_feedback(self, feedback: dict) -> None:
-            pass
-
-        def disconnect(self) -> None:
-            pass
-
-    return _SimExpert
-
-
-_SimExpertClass = None
-
-
-def SimExpert(backend: SimBackend):
-    global _SimExpertClass
-    if _SimExpertClass is None:
-        _SimExpertClass = _make_expert_base()
-    return _SimExpertClass(backend)
+    def disconnect(self) -> None:
+        pass

@@ -113,7 +113,15 @@ function RecordPage() {
           >
             {start.isPending ? 'starting…' : `Start recording (${numEpisodes} eps)`}
           </button>
-          {start.isError && <p className="mt-2 text-sm text-red-500">{String(start.error)}</p>}
+          {start.isError && (
+            <p
+              className={`mt-2 text-sm ${
+                String(start.error).includes('PreflightError') ? 'text-amber-600' : 'text-red-500'
+              }`}
+            >
+              {String(start.error)}
+            </p>
+          )}
         </div>
       )}
 

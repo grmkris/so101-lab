@@ -34,7 +34,8 @@ class DriverProc {
   private proc: ChildProcess | null = null
   private nextId = 1
   private pending = new Map<number, Pending>()
-  readonly brightness: Record<string, number> = {}
+  brightness: Record<string, number> = {}
+  streams: ReadonlyArray<string> = []
   readonly joints: Record<string, number> = {}
   robotState = 'disconnected'
   backendName = 'real'
@@ -63,7 +64,10 @@ class DriverProc {
       this.proc = null
       this.readyPromise = null // next rpc() respawns lazily
       this.robotState = 'disconnected'
+      this.backendName = 'real'
       this.hasLeader = false
+      this.brightness = {}
+      this.streams = []
     })
 
     this.readyPromise = new Promise<void>((resolve, reject) => {
@@ -80,8 +84,9 @@ class DriverProc {
         if (msg.event === 'ready') {
           clearTimeout(timer)
           resolve()
-        } else if (msg.event === 'brightness') {
-          Object.assign(this.brightness, msg.values as Record<string, number>)
+        } else if (msg.event === 'status') {
+          this.brightness = msg.brightness as Record<string, number>
+          this.streams = msg.streams as ReadonlyArray<string>
         } else if (msg.event === 'joints') {
           Object.assign(this.joints, msg.values as Record<string, number>)
         } else if (msg.event === 'robot_state') {
@@ -151,6 +156,7 @@ if (!globalStore.__labDriverExitHook) {
 export interface DriverManagerShape {
   readonly rpc: <T>(cmd: string, extra?: Record<string, unknown>) => Effect.Effect<T, Error>
   readonly brightness: () => Effect.Effect<Record<string, number>>
+  readonly streams: () => Effect.Effect<ReadonlyArray<string>>
   readonly robot: () => Effect.Effect<{
     state: string
     backend: string
@@ -171,6 +177,7 @@ export class DriverManager extends Context.Service<DriverManager, DriverManagerS
         catch: (e) => (e instanceof Error ? e : new Error(String(e))),
       }),
     brightness: () => Effect.sync(() => ({ ...driverProc.brightness })),
+    streams: () => Effect.sync(() => driverProc.streams),
     robot: () =>
       Effect.sync(() => ({
         state: driverProc.robotState,

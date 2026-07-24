@@ -46,7 +46,7 @@ export interface RunsRegistryShape {
   readonly get: (id: string) => Effect.Effect<RunInfo, Error>
   readonly create: (input: RunCreate) => Effect.Effect<RunInfo>
   readonly update: (id: string, patch: RunPatch) => Effect.Effect<RunInfo, Error>
-  readonly checkpoints: (id: string) => Effect.Effect<{ hubModelId: string; steps: ReadonlyArray<string> }>
+  readonly checkpoints: (id: string) => Effect.Effect<{ hubModelId: string; steps: ReadonlyArray<string> }, Error>
 }
 
 export class RunsRegistry extends Context.Service<RunsRegistry, RunsRegistryShape>()(
@@ -157,10 +157,10 @@ export class RunsRegistry extends Context.Service<RunsRegistry, RunsRegistryShap
           }),
         checkpoints: (id) =>
           findRun(id).pipe(
-            Effect.map((r) => r.hubModelId),
-            Effect.orElseSucceed(() => `${HF_USER}/${id}`),
-            Effect.flatMap((hubModelId) =>
-              hub.checkpointSteps(hubModelId).pipe(Effect.map((steps) => ({ hubModelId, steps }))),
+            Effect.flatMap((r) =>
+              hub
+                .checkpointSteps(r.hubModelId)
+                .pipe(Effect.map((steps) => ({ hubModelId: r.hubModelId, steps }))),
             ),
           ),
       }

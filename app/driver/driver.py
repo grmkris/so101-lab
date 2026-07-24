@@ -187,11 +187,8 @@ def cmd_record_start(req: dict) -> dict:
         try:
             saved = recorder.run_session(robot, teleop, cfg, events, on_episode_start)
             log(f"record session done, saved={saved}")
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001 — recorder already emitted the failed state
             log(f"record session failed: {exc}")
-            emit({"event": "error", "where": "record", "error": str(exc)})
-            emit({"event": "record_state", "phase": "failed", "episode": 0, "saved": 0,
-                  "total": cfg["num_episodes"], "repoId": cfg["repo_id"]})
         finally:
             backend.after_record()
 
@@ -220,13 +217,14 @@ def cmd_record_control(action: str) -> dict:
 
 # ---------- housekeeping threads ----------
 
-def brightness_reporter() -> None:
+def status_reporter() -> None:
+    """1 Hz: brightness per stream + which streams are live (= FRAMES keys)."""
     while True:
         time.sleep(1)
         with LOCK:
-            values = dict(BRIGHTNESS)
-        if values:
-            emit({"event": "brightness", "values": values})
+            brightness = dict(BRIGHTNESS)
+            streams = sorted(FRAMES.keys())
+        emit({"event": "status", "brightness": brightness, "streams": streams})
 
 
 def orphan_watchdog() -> None:
@@ -248,7 +246,7 @@ def main() -> None:
 
     server = ThreadingHTTPServer(("127.0.0.1", args.mjpeg_port), MJPEGHandler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    threading.Thread(target=brightness_reporter, daemon=True).start()
+    threading.Thread(target=status_reporter, daemon=True).start()
     threading.Thread(target=orphan_watchdog, daemon=True).start()
 
     emit({"event": "ready", "mjpegPort": args.mjpeg_port})
