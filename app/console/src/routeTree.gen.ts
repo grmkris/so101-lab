@@ -16,6 +16,7 @@ import { Route as RobotRouteImport } from './routes/robot'
 import { Route as TrainingsIndexRouteImport } from './routes/trainings.index'
 import { Route as TrainingsRunIdRouteImport } from './routes/trainings.$runId'
 import { Route as TrainingsNewRouteImport } from './routes/trainings.new'
+import { Route as DatasetsOwnerNameRouteImport } from './routes/datasets_.$owner.$name'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const TrainingsNewRoute = TrainingsNewRouteImport.update({
   path: '/trainings/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DatasetsOwnerNameRoute = DatasetsOwnerNameRouteImport.update({
+  id: '/datasets_/$owner/$name',
+  path: '/datasets/$owner/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
   '/trainings/': typeof TrainingsIndexRoute
+  '/datasets/$owner/$name': typeof DatasetsOwnerNameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
   '/trainings': typeof TrainingsIndexRoute
+  '/datasets/$owner/$name': typeof DatasetsOwnerNameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
   '/trainings/': typeof TrainingsIndexRoute
+  '/datasets_/$owner/$name': typeof DatasetsOwnerNameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/trainings/$runId'
     | '/trainings/new'
     | '/trainings/'
+    | '/datasets/$owner/$name'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/trainings/$runId'
     | '/trainings/new'
     | '/trainings'
+    | '/datasets/$owner/$name'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/trainings/$runId'
     | '/trainings/new'
     | '/trainings/'
+    | '/datasets_/$owner/$name'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   TrainingsRunIdRoute: typeof TrainingsRunIdRoute
   TrainingsNewRoute: typeof TrainingsNewRoute
   TrainingsIndexRoute: typeof TrainingsIndexRoute
+  DatasetsOwnerNameRoute: typeof DatasetsOwnerNameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrainingsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/datasets_/$owner/$name': {
+      id: '/datasets_/$owner/$name'
+      path: '/datasets/$owner/$name'
+      fullPath: '/datasets/$owner/$name'
+      preLoaderRoute: typeof DatasetsOwnerNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrainingsRunIdRoute: TrainingsRunIdRoute,
   TrainingsNewRoute: TrainingsNewRoute,
   TrainingsIndexRoute: TrainingsIndexRoute,
+  DatasetsOwnerNameRoute: DatasetsOwnerNameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,24 +3,25 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { createRun, datasetsQuery } from "#/lib/queries";
 
-type NewTrainingSearch = { dataset?: string };
+type NewTrainingSearch = { dataset?: string; episodes?: string };
 
 export const Route = createFileRoute("/trainings/new")({
 	component: NewTrainingPage,
 	validateSearch: (search: Record<string, unknown>): NewTrainingSearch => ({
 		dataset: typeof search.dataset === "string" ? search.dataset : undefined,
+		episodes: typeof search.episodes === "string" ? search.episodes : undefined,
 	}),
 });
 
 function NewTrainingPage() {
-	const { dataset } = Route.useSearch();
+	const { dataset, episodes: episodesPrefill } = Route.useSearch();
 	const datasets = useQuery(datasetsQuery);
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 
 	const [name, setName] = useState("");
 	const [datasetRepoId, setDatasetRepoId] = useState(dataset ?? "");
-	const [episodes, setEpisodes] = useState("");
+	const [episodes, setEpisodes] = useState(episodesPrefill ?? "");
 	const [pretrainedPath, setPretrainedPath] = useState("");
 	const [steps, setSteps] = useState(40000);
 	const [batchSize, setBatchSize] = useState(16);

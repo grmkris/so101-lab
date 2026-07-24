@@ -43,9 +43,35 @@ export class DatasetInfo extends Schema.Class<DatasetInfo>("DatasetInfo")(
 	}),
 ) {}
 
+export class EpisodeInfo extends Schema.Class<EpisodeInfo>("EpisodeInfo")(
+	Schema.Struct({
+		index: Schema.Number,
+		frames: Schema.Number,
+		seconds: Schema.Number,
+		task: Schema.String,
+		flag: Schema.NullOr(Schema.String), // short | long (length outlier vs median)
+	}),
+) {}
+
+export class DatasetEpisodes extends Schema.Class<DatasetEpisodes>(
+	"DatasetEpisodes",
+)(
+	Schema.Struct({
+		repoId: Schema.String,
+		local: Schema.Boolean, // false -> not in the local cache, no episode meta
+		fps: Schema.NullOr(Schema.Number),
+		medianFrames: Schema.NullOr(Schema.Number),
+		episodes: Schema.Array(EpisodeInfo),
+	}),
+) {}
+
 export const DatasetsGroup = HttpApiGroup.make("Datasets").add(
 	HttpApiEndpoint.get("list", "/datasets", {
 		success: Schema.Array(DatasetInfo),
+	}),
+	HttpApiEndpoint.get("episodes", "/datasets/episodes", {
+		query: Schema.Struct({ repoId: Schema.String }),
+		success: DatasetEpisodes,
 	}),
 );
 

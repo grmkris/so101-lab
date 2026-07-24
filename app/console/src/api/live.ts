@@ -33,9 +33,15 @@ const HfLive = HttpApiBuilder.group(LabApi, "Hf", (handlers) =>
 );
 
 const DatasetsLive = HttpApiBuilder.group(LabApi, "Datasets", (handlers) =>
-	handlers.handle("list", () =>
-		Effect.flatMap(DatasetCatalog, (catalog) => catalog.list()),
-	),
+	handlers
+		.handle("list", () =>
+			Effect.flatMap(DatasetCatalog, (catalog) => catalog.list()),
+		)
+		.handle("episodes", ({ query }) =>
+			Effect.flatMap(DatasetCatalog, (catalog) =>
+				catalog.episodes(query.repoId),
+			),
+		),
 );
 
 const TrainingsLive = HttpApiBuilder.group(LabApi, "Trainings", (handlers) =>

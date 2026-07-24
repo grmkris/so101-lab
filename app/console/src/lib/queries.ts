@@ -19,6 +19,13 @@ export const datasetsQuery = queryOptions({
 	queryFn: () => runApi((client) => client.Datasets.list()),
 });
 
+export const datasetEpisodesQuery = (repoId: string) =>
+	queryOptions({
+		queryKey: ["datasets", "episodes", repoId],
+		queryFn: () =>
+			runApi((client) => client.Datasets.episodes({ query: { repoId } })),
+	});
+
 export const runsQuery = queryOptions({
 	queryKey: ["runs"],
 	queryFn: () => runApi((client) => client.Trainings.list()),

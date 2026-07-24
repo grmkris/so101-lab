@@ -1,6 +1,7 @@
 import * as os from "node:os";
 import { Context, Effect, FileSystem, Layer } from "effect";
-import { DatasetInfo } from "#/api/contract";
+import { asyncBufferFromFile, parquetReadObjects } from "hyparquet";
+import { DatasetEpisodes, DatasetInfo, EpisodeInfo } from "#/api/contract";
 import { HfHub } from "./hf-hub";
 
 const LEROBOT_CACHE = `${os.homedir()}/.cache/huggingface/lerobot`;
@@ -16,6 +17,8 @@ interface LocalMeta {
 
 export interface DatasetCatalogShape {
 	readonly list: () => Effect.Effect<ReadonlyArray<DatasetInfo>>;
+	/** Episode report card from local meta parquet (empty when not cached locally). */
+	readonly episodes: (repoId: string) => Effect.Effect<DatasetEpisodes>;
 	/** Mark a repo as sim-recorded (sidecar; this module is the only owner of that file). */
 	readonly tagSim: (repoId: string) => Effect.Effect<void>;
 }
@@ -94,8 +97,92 @@ export class DatasetCatalog extends Context.Service<
 						);
 				});
 
+			// v3 layout: meta/episodes/chunk-*/file-*.parquet with episode_index/length/tasks
+			const episodes = (repoId: string) =>
+				Effect.gen(function* () {
+					const root = `${LEROBOT_CACHE}/${repoId}`;
+					const meta = yield* fs.readFileString(`${root}/meta/info.json`).pipe(
+						Effect.map((raw) => JSON.parse(raw) as Record<string, unknown>),
+						Effect.orElseSucceed(() => null),
+					);
+					if (meta === null) {
+						return new DatasetEpisodes({
+							repoId,
+							local: false,
+							fps: null,
+							medianFrames: null,
+							episodes: [],
+						});
+					}
+					const fps = (meta.fps as number) ?? null;
+
+					const chunks = yield* fs
+						.readDirectory(`${root}/meta/episodes`)
+						.pipe(Effect.orElseSucceed(() => [] as Array<string>));
+					const files: Array<string> = [];
+					for (const chunk of chunks.sort()) {
+						const names = yield* fs
+							.readDirectory(`${root}/meta/episodes/${chunk}`)
+							.pipe(Effect.orElseSucceed(() => [] as Array<string>));
+						for (const name of names.sort()) {
+							if (name.endsWith(".parquet"))
+								files.push(`${root}/meta/episodes/${chunk}/${name}`);
+						}
+					}
+
+					const rows: Array<{ index: number; frames: number; task: string }> =
+						[];
+					for (const file of files) {
+						const parsed = yield* Effect.tryPromise(async () => {
+							const buf = await asyncBufferFromFile(file);
+							return parquetReadObjects({
+								file: buf,
+								columns: ["episode_index", "length", "tasks"],
+							});
+						}).pipe(Effect.orElseSucceed(() => []));
+						for (const row of parsed as Array<Record<string, unknown>>) {
+							rows.push({
+								index: Number(row.episode_index),
+								frames: Number(row.length),
+								task: Array.isArray(row.tasks)
+									? String(row.tasks[0] ?? "")
+									: String(row.tasks ?? ""),
+							});
+						}
+					}
+					rows.sort((a, b) => a.index - b.index);
+
+					const sorted = rows.map((r) => r.frames).sort((a, b) => a - b);
+					const median =
+						sorted.length > 0 ? sorted[Math.floor(sorted.length / 2)] : null;
+					const flag = (frames: number): string | null => {
+						if (median === null || rows.length < 5) return null;
+						if (frames < 0.6 * median) return "short";
+						if (frames > 1.8 * median) return "long";
+						return null;
+					};
+
+					return new DatasetEpisodes({
+						repoId,
+						local: true,
+						fps,
+						medianFrames: median,
+						episodes: rows.map(
+							(r) =>
+								new EpisodeInfo({
+									index: r.index,
+									frames: r.frames,
+									seconds: fps ? Math.round((r.frames / fps) * 10) / 10 : 0,
+									task: r.task,
+									flag: flag(r.frames),
+								}),
+						),
+					});
+				});
+
 			return {
 				tagSim,
+				episodes,
 				list: () =>
 					Effect.gen(function* () {
 						const [local, hubRepos, simSet] = yield* Effect.all(

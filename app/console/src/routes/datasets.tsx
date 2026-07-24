@@ -95,6 +95,20 @@ function DatasetsPage() {
 											</a>{" "}
 										</>
 									)}
+									{d.isLocal && (
+										<>
+											<Link
+												className="underline"
+												to="/datasets/$owner/$name"
+												params={{
+													owner: d.repoId.split("/")[0],
+													name: d.repoId.split("/")[1],
+												}}
+											>
+												report
+											</Link>{" "}
+										</>
+									)}
 									<Link
 										className="underline"
 										to="/trainings/new"
