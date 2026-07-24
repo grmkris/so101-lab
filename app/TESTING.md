@@ -46,6 +46,42 @@ Pre-flight (every session — macOS shuffles camera indexes on replug):
 
 Phone runbook details: `phone_teleop/README.md` (hotspot, firewall, B1/A3 mapping).
 
+## 3 — Remote teleop cluster (no hardware, two processes on one Mac)
+
+Simulates "my rig, her laptop, a cloud in between" without a cloud. The only
+difference from production is the value of `HUB_URL`.
+
+Two terminal tabs, both in `app/console`:
+
+```sh
+# tab 1 — the hub (this is what deploys to Railway)
+bun run sim:hub                                    # → :3001
+HUB_LATENCY_MS=120 HUB_DROP_RATE=0.05 bun run sim:hub   # …or impaired
+
+# tab 2 — the rig (your existing console + driver)
+bun run sim:rig                                    # → :3000
+```
+
+Then **open http://localhost:3000 once** — vite loads the server entry lazily, so
+the rig link only starts after the first request (in production it starts at
+boot). Look for `[rig-link] kris-sim -> http://localhost:3001` in tab 2.
+
+| # | Step | Expect |
+|---|------|--------|
+| 1 | `:3001/lobby` | `kris-sim` card, online, "no feed" (sim not connected yet) |
+| 2 | Open the card → **Take control** → **Connect SIM** | MuJoCo loads on the rig; both feeds appear within ~2 s |
+| 3 | **Start teleop (keys)** → click the jog pad → W/S/A/D/Q/E | arm moves in the hub's video; joints grid updates |
+| 4 | Release all keys | arm holds — the deadman fires because the hub does **not** replay input |
+| 5 | Second browser tab on the same rig | video plays, jog pad hidden, "someone else is driving" |
+| 6 | Take over from tab 2, then drive from tab 1 | tab 1 gets 403; one writer at a time |
+| 7 | Kill tab 2 (the rig) | lobby flips to offline within 5 s |
+| 8 | Restart the rig, then restart the hub | both re-register with no reconnect logic — that is a Railway redeploy |
+| 9 | Re-run with `HUB_LATENCY_MS=120 HUB_DROP_RATE=0.3` | still driveable; rig card shows link ≈125 ms; arm still holds on silence |
+
+Going remote for real: deploy the hub (`bun run build && bun run start`), then
+start the rig with `HUB_URL=https://<app>.up.railway.app RIG_NAME=kris-sim`.
+Nothing else changes.
+
 ## Regression suite (run after driver/console changes)
 
 ```sh

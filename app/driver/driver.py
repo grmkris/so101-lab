@@ -111,6 +111,26 @@ class MJPEGHandler(BaseHTTPRequestHandler):
         pass
 
     def do_GET(self) -> None:
+        # single frame — what the hub link pushes upstream (multipart is for the
+        # local <img>; parsing it back apart on the TS side would be silly)
+        if self.path.startswith("/snap/"):
+            name = self.path.rsplit("/", 1)[-1]
+            with LOCK:
+                data = FRAMES.get(name)
+            if not data:
+                self.send_response(404)
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            try:
+                self.wfile.write(data)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            return
         if self.path.startswith("/cam/"):
             name = self.path.rsplit("/", 1)[-1]
             self.send_response(200)

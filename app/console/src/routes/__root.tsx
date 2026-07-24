@@ -41,6 +41,7 @@ export const Route = createRootRoute({
 });
 
 const NAV = [
+	{ to: "/lobby", label: "Lobby" },
 	{ to: "/robot", label: "Robot" },
 	{ to: "/record", label: "Record" },
 	{ to: "/datasets", label: "Datasets" },

@@ -7,6 +7,9 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000",
+    "start": "bun dist/server/server.js",
+    "sim:hub": "LAB_MODE=hub vite dev --port 3001",
+    "sim:rig": "HUB_URL=http://localhost:3001 RIG_NAME=kris-sim vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",

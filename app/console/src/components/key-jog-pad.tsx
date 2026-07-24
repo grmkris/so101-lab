@@ -14,9 +14,19 @@ const KEY_AXES: Record<string, [string, number]> = {
 	c: ["gripper", -1],
 };
 
-export function KeyJogPad() {
+/**
+ * `onAxes` lets the same pad drive a remote rig through the hub; it defaults to
+ * the local driver so the Robot/Record pages are unchanged.
+ */
+export function KeyJogPad({
+	onAxes,
+}: {
+	onAxes?: (axes: Record<string, number>) => void;
+}) {
 	const pressed = useRef<Record<string, number>>({});
 	const [focused, setFocused] = useState(false);
+	const sink = useRef(onAxes);
+	sink.current = onAxes;
 
 	const send = useCallback(() => {
 		const axes: Record<string, number> = { x: 0, y: 0, z: 0, gripper: 0 };
@@ -25,7 +35,8 @@ export function KeyJogPad() {
 		}
 		for (const k of Object.keys(axes))
 			axes[k] = Math.max(-1, Math.min(1, axes[k]));
-		robotTeleopInput(axes).catch(() => {});
+		if (sink.current) sink.current(axes);
+		else robotTeleopInput(axes).catch(() => {});
 	}, []);
 
 	useEffect(() => {
