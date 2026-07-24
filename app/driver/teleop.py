@@ -8,15 +8,18 @@ same objects also serve record sessions.
 
 import threading
 import time
-from pathlib import Path
 
 from shared import emit, log
 
-URDF_PATH = str(
-    (Path(__file__).parent.parent.parent / "phone_teleop/SO101/so101_new_calib.urdf").resolve()
-)
-
 _state: dict = {"active": False, "source": None, "name": None, "thread": None}
+
+# input-driven source owned by an active record session (set_input routes here first)
+_record_source = None
+
+
+def set_record_source(source) -> None:
+    global _record_source
+    _record_source = source
 
 
 def is_active() -> bool:
@@ -39,11 +42,11 @@ def make_source(name: str, backend):
         expert = ScriptedExpert(backend, KEYFRAMES)
         expert.reset()
         return expert
-    if name == "keys":
-        from sources.keys import BrowserKeys
+    if name in ("keys", "phone"):
+        from sources.ee_chain import make_input_source
 
-        return BrowserKeys(
-            urdf_path=URDF_PATH,
+        return make_input_source(
+            name,
             motor_names=backend.lerobot_joint_names,
             seed_obs=backend.current_joints_pos(),
         )
@@ -118,7 +121,7 @@ def stop(wait: bool = False) -> dict:
 
 
 def set_input(req: dict) -> dict:
-    source = _state.get("source")
+    source = _record_source if _record_source is not None else _state.get("source")
     if source is None or not hasattr(source, "set_input"):
         raise ValueError("no input-driven teleop source active")
     source.set_input(req.get("axes") or {})

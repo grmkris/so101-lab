@@ -3,8 +3,7 @@
 lerobot's KeyboardEndEffectorTeleop with ONLY the input layer swapped: axis
 state arrives from the browser via the driver's `teleop_input` RPC instead of
 pynput (which needs macOS Accessibility permission). Everything downstream is
-lerobot's own chain: EEReferenceAndDelta -> EEBoundsAndSafety ->
-GripperVelocityToJoint -> InverseKinematicsEEToJoints (Placo IK).
+lerobot's own chain (see sources/ee_chain.py).
 
 Runs open-loop: the joint observation fed to the chain is the last action this
 source emitted (seeded from the backend's measured joints at start) — the
@@ -15,20 +14,9 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from lerobot.model.kinematics import RobotKinematics
-from lerobot.processor import (
-    RobotProcessorPipeline,
-    robot_action_observation_to_transition,
-    transition_to_robot_action,
-)
-from lerobot.robots.so_follower.robot_kinematic_processor import (
-    EEBoundsAndSafety,
-    EEReferenceAndDelta,
-    GripperVelocityToJoint,
-    InverseKinematicsEEToJoints,
-)
 from lerobot.teleoperators.teleoperator import Teleoperator
-from lerobot.types import RobotAction, RobotObservation
+
+from sources.ee_chain import build_ee_pipeline
 
 STALE_INPUT_S = 0.5  # deadman: browser silent for this long -> hold pose
 
@@ -43,40 +31,13 @@ class BrowserKeys(Teleoperator):
     name = "browser_keys"
     config_class = BrowserKeysConfig
 
-    def __init__(self, urdf_path: str, motor_names: list[str], seed_obs: dict[str, float]) -> None:
+    def __init__(self, motor_names: list[str], seed_obs: dict[str, float]) -> None:
         self.id = "browser"
         self.calibration_dir = None
         self.calibration = None
         self.motor_names = motor_names
-
-        kinematics = RobotKinematics(
-            urdf_path=urdf_path,
-            target_frame_name="gripper_frame_link",
-            joint_names=motor_names,
-        )
-        self.pipeline = RobotProcessorPipeline[tuple[RobotAction, RobotObservation], RobotAction](
-            steps=[
-                EEReferenceAndDelta(
-                    kinematics=kinematics,
-                    # per-frame jog step at 30 fps: 0.0025 m -> ~0.075 m/s at full deflection
-                    end_effector_step_sizes={"x": 0.0025, "y": 0.0025, "z": 0.0025},
-                    motor_names=motor_names,
-                    use_latched_reference=False,  # continuous jog against current pose
-                ),
-                EEBoundsAndSafety(
-                    end_effector_bounds={"min": [-0.5, -0.5, -0.1], "max": [0.5, 0.5, 0.5]},
-                    max_ee_step_m=0.08,
-                ),
-                GripperVelocityToJoint(speed_factor=30.0),
-                InverseKinematicsEEToJoints(
-                    kinematics=kinematics,
-                    motor_names=motor_names,
-                    initial_guess_current_joints=True,
-                ),
-            ],
-            to_transition=robot_action_observation_to_transition,
-            to_output=transition_to_robot_action,
-        )
+        # per-frame jog step at 30 fps: 0.0025 m -> ~0.075 m/s at full deflection
+        self.pipeline = build_ee_pipeline(motor_names)
 
         self.axes = {"x": 0.0, "y": 0.0, "z": 0.0, "gripper": 0.0}
         self.last_input = 0.0

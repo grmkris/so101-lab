@@ -156,15 +156,21 @@ class RealBackend:
     def prepare_record(self, cfg: dict):
         """Release held devices, build FRESH lerobot objects with cameras for the recorder.
 
-        Recording requires the leader arm (actions come from it).
+        Demos come from cfg["source"]: leader (needs the leader arm) or an
+        input-driven source (keys/phone — no leader required, clamped).
         Returns (robot, teleop, on_episode_start).
         """
         from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig
         from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
         from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
 
-        if not self._ports.get("leaderPort"):
+        source = cfg.get("source", "leader")
+        if source == "scripted":
+            raise ValueError("scripted source is sim-only")
+        if source == "leader" and not self._ports.get("leaderPort"):
             raise ValueError("recording needs the leader arm — reconnect with leader")
+        # seed for open-loop EE sources: read while we still hold the arm
+        seed_obs = self.current_joints_pos() if source != "leader" else None
 
         # recorder owns the serial ports + cameras from here
         self._safe_disconnect(self.robot)
@@ -187,9 +193,18 @@ class RealBackend:
                 port=self._ports["followerPort"], id=self._ports["robotId"], cameras=cameras
             )
         )
-        teleop = SO101Leader(
-            SO101LeaderConfig(port=self._ports["leaderPort"], id=self._ports["robotId"])
-        )
+        if source == "leader":
+            teleop = SO101Leader(
+                SO101LeaderConfig(port=self._ports["leaderPort"], id=self._ports["robotId"])
+            )
+        else:
+            from sources.ee_chain import make_input_source
+
+            # synthetic sources get a per-frame clamp; the leader is human-limited
+            robot.config.max_relative_target = 15.0
+            teleop = make_input_source(
+                source, motor_names=list(robot.bus.motors.keys()), seed_obs=seed_obs
+            )
         return robot, teleop, None
 
     def after_record(self) -> None:

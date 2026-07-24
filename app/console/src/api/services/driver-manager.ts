@@ -21,6 +21,7 @@ export interface RecordState {
 	saved: number;
 	total: number;
 	repoId: string | null;
+	source: string | null;
 }
 
 interface Pending {
@@ -50,6 +51,7 @@ class DriverProc {
 		saved: 0,
 		total: 0,
 		repoId: null,
+		source: null,
 	};
 	private readyPromise: Promise<void> | null = null;
 
@@ -119,6 +121,7 @@ class DriverProc {
 						saved: Number(msg.saved),
 						total: Number(msg.total),
 						repoId: String(msg.repoId),
+						source: msg.source ? String(msg.source) : null,
 					};
 				} else if (typeof msg.id === "number") {
 					const p = this.pending.get(msg.id);

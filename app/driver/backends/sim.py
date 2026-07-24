@@ -223,25 +223,46 @@ class SimBackend:
 
     # ---------- record ----------
 
-    def prepare_record(self, _cfg: dict):
+    def _jitter_cube(self) -> None:
+        """Cube jitter between episodes (coverage-ish variation). Caller holds no lock."""
+        with self.sim_lock:
+            self.data.qpos[self.cube_qpos + 0] = 0.22 + random.uniform(-0.03, 0.03)
+            self.data.qpos[self.cube_qpos + 1] = random.uniform(-0.04, 0.04)
+            self.data.qpos[self.cube_qpos + 2] = 0.016
+            mujoco.mj_forward(self.model, self.data)
+
+    def _reset_arm_home(self) -> None:
+        with self.sim_lock:
+            for i, q in enumerate(KEYFRAMES[0][0]):
+                self.data.qpos[self.joint_qpos[i]] = q
+                self.data.ctrl[self.actuator_ids[i]] = q
+            mujoco.mj_forward(self.model, self.data)
+
+    def prepare_record(self, cfg: dict):
+        source = cfg.get("source", "scripted")
+        if source == "leader":
+            raise ValueError("leader arm source needs the real backend")
         self.paused = False
         self.state = "recording"
         emit({"event": "robot_state", "state": self.state, "backend": self.name})
-        expert = ScriptedExpert(self, KEYFRAMES)
 
-        def on_episode_start() -> None:
-            with self.sim_lock:
-                # arm home + cube jitter (coverage-ish variation between episodes)
-                for i, q in enumerate(KEYFRAMES[0][0]):
-                    self.data.qpos[self.joint_qpos[i]] = q
-                    self.data.ctrl[self.actuator_ids[i]] = q
-                self.data.qpos[self.cube_qpos + 0] = 0.22 + random.uniform(-0.03, 0.03)
-                self.data.qpos[self.cube_qpos + 1] = random.uniform(-0.04, 0.04)
-                self.data.qpos[self.cube_qpos + 2] = 0.016
-                mujoco.mj_forward(self.model, self.data)
-            expert.reset()
+        if source == "scripted":
+            expert = ScriptedExpert(self, KEYFRAMES)
 
-        return SimArm(self), expert, on_episode_start
+            def on_episode_start() -> None:
+                self._reset_arm_home()
+                self._jitter_cube()
+                expert.reset()
+
+            return SimArm(self), expert, on_episode_start
+
+        from sources.ee_chain import make_input_source
+
+        teleop = make_input_source(
+            source, motor_names=self.lerobot_joint_names, seed_obs=self.current_joints_pos()
+        )
+        # human-driven: only the scene varies — the arm stays where the driver left it
+        return SimArm(self), teleop, self._jitter_cube
 
     def after_record(self) -> None:
         self.state = "connected"

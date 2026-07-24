@@ -246,6 +246,7 @@ export class RecordStatus extends Schema.Class<RecordStatus>("RecordStatus")(
 		saved: Schema.Number,
 		total: Schema.Number,
 		repoId: Schema.NullOr(Schema.String),
+		source: Schema.NullOr(Schema.String), // leader | scripted | keys | phone
 	}),
 ) {}
 
@@ -259,6 +260,7 @@ export const RecordGroup = HttpApiGroup.make("Record").add(
 			episodeS: Schema.Number,
 			resetS: Schema.Number,
 			resume: Schema.Boolean,
+			source: Schema.NullOr(Schema.String), // null -> backend default (leader/scripted)
 		}),
 		success: RecordStatus,
 		error: Schema.Union([DriverError, PreflightError]),

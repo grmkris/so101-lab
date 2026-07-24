@@ -12,6 +12,7 @@ export interface RecordStartInput {
 	readonly episodeS: number;
 	readonly resetS: number;
 	readonly resume: boolean;
+	readonly source: string | null;
 }
 
 export interface RecordShape {
@@ -77,6 +78,7 @@ export class Recorder extends Context.Service<Recorder, RecordShape>()(
 								reset_time_s: input.resetS,
 								fps: 30,
 								resume: input.resume,
+								source: input.source,
 								cameras:
 									robot.backend === "real"
 										? {

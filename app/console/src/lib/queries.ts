@@ -92,6 +92,7 @@ export const recordStatusQuery = queryOptions({
 });
 
 export const recordStart = (payload: {
+	source: string | null;
 	repoName: string;
 	task: string;
 	numEpisodes: number;

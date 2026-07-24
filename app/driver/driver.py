@@ -182,9 +182,12 @@ def cmd_record_start(req: dict) -> dict:
         "fps": int(req.get("fps", 30)),
         "resume": bool(req.get("resume", False)),
         "cameras": req.get("cameras") or {},
+        "source": req.get("source") or ("scripted" if backend.name == "sim" else "leader"),
     }
     robot, teleop_device, on_episode_start = backend.prepare_record(cfg)
     events = recorder.make_events()
+    if hasattr(teleop_device, "set_input"):
+        teleop.set_record_source(teleop_device)  # teleop_input RPC reaches the recording source
 
     def worker() -> None:
         try:
@@ -193,12 +196,13 @@ def cmd_record_start(req: dict) -> dict:
         except Exception as exc:  # noqa: BLE001 — recorder already emitted the failed state
             log(f"record session failed: {exc}")
         finally:
+            teleop.set_record_source(None)
             backend.after_record()
 
     RECORDING["events"] = events
     RECORDING["thread"] = threading.Thread(target=worker, name="record-session", daemon=True)
     RECORDING["thread"].start()
-    return {"started": True, "repo_id": cfg["repo_id"]}
+    return {"started": True, "repo_id": cfg["repo_id"], "source": cfg["source"]}
 
 
 def cmd_record_control(action: str) -> dict:

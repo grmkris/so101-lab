@@ -1,12 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { KeyJogPad } from "#/components/key-jog-pad";
 import {
 	recordControl,
 	recordStart,
 	recordStatusQuery,
 	robotStateQuery,
 } from "#/lib/queries";
+
+// demo source options per backend; first entry = the backend's default
+const SOURCES: Record<
+	string,
+	ReadonlyArray<{ value: string; label: string }>
+> = {
+	real: [
+		{ value: "leader", label: "Leader arm" },
+		{ value: "keys", label: "Keyboard (browser)" },
+		{ value: "phone", label: "Phone (HEBI)" },
+	],
+	sim: [
+		{ value: "scripted", label: "Scripted expert" },
+		{ value: "keys", label: "Keyboard (browser)" },
+		{ value: "phone", label: "Phone (HEBI)" },
+	],
+};
 
 export const Route = createFileRoute("/record")({ component: RecordPage });
 
@@ -31,6 +49,9 @@ function RecordPage() {
 	const [numEpisodes, setNumEpisodes] = useState(5);
 	const [episodeS, setEpisodeS] = useState(20);
 	const [resetS, setResetS] = useState(10);
+	const [source, setSource] = useState<string | null>(null); // null -> backend default
+	const sources = SOURCES[backend] ?? SOURCES.real;
+	const effectiveSource = source ?? sources[0].value;
 
 	const start = useMutation({
 		mutationFn: () =>
@@ -41,6 +62,7 @@ function RecordPage() {
 				episodeS,
 				resetS,
 				resume: false,
+				source: effectiveSource,
 			}),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["record"] }),
 	});
@@ -92,6 +114,20 @@ function RecordPage() {
 							onChange={(e) => setTask(e.target.value)}
 						/>
 					</label>
+					<label className={label}>
+						Demo source
+						<select
+							className={field}
+							value={effectiveSource}
+							onChange={(e) => setSource(e.target.value)}
+						>
+							{sources.map((s) => (
+								<option key={s.value} value={s.value}>
+									{s.label}
+								</option>
+							))}
+						</select>
+					</label>
 					<div className="flex gap-3">
 						<label className={label}>
 							Episodes
@@ -123,8 +159,10 @@ function RecordPage() {
 					</div>
 					{!isSim && (
 						<p className="mt-3 text-xs text-muted-foreground">
-							Real recording needs the leader arm connected and cameras
-							confirmed (Robot page). Episode saves on timeout or “keep”.
+							{effectiveSource === "leader"
+								? "Real recording with the leader arm needs it connected and cameras confirmed (Robot page)."
+								: "Synthetic sources are clamped to 15°/frame on the real arm; cameras must be confirmed (Robot page)."}{" "}
+							Episode saves on timeout or “keep”.
 						</p>
 					)}
 					<button
@@ -168,8 +206,11 @@ function RecordPage() {
 						</span>
 						<span className="font-mono text-sm text-muted-foreground">
 							{s.repoId}
+							{s.source ? ` · ${s.source}` : ""}
 						</span>
 					</div>
+
+					{s.source === "keys" && <KeyJogPad />}
 
 					<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 						{["workspace_cam", "wrist_cam"].map((cam) => (

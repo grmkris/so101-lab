@@ -33,6 +33,7 @@ def run_session(robot, teleop, cfg: dict, events: dict, on_episode_start=None) -
             "saved": saved,
             "total": cfg["num_episodes"],
             "repoId": cfg["repo_id"],
+            "source": cfg.get("source"),
         })
 
     if cfg.get("resume"):
