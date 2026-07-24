@@ -55,11 +55,17 @@ SCENE_XML = """<mujoco model="so101 lab scene">
       <freejoint name="cube_free"/>
       <geom type="box" size="0.015 0.015 0.015" rgba="0.92 0.92 0.97 1" mass="0.02"/>
     </body>
-    <camera name="workspace_cam" pos="0.45 -0.35 0.55" mode="targetbody" target="cube"/>
-    <camera name="wrist_cam" pos="0.12 0.30 0.25" mode="targetbody" target="cube"/>
+    <camera name="workspace_cam" pos="0.42 -0.34 0.46" mode="fixed"
+      xyaxes="0.5914 0.8064 0.0000 -0.6098 0.4472 0.6543" fovy="58"/>
   </worldbody>
 </mujoco>
 """
+
+# Wrist camera mount, solved at the home pose: offset to the side of the jaws so
+# the gripper body does not occlude, looking down the grasp axis.
+WRIST_CAM_BODY = "Fixed_Jaw"
+WRIST_CAM_POS = [-0.0029, 0.0373, 0.055]
+WRIST_CAM_QUAT = [0.77816, -0.57901, 0.19512, 0.14542]
 
 # scripted pick choreography: (rad targets in JOINT_MAP order, seconds to get there)
 KEYFRAMES = [
@@ -86,7 +92,16 @@ class SimBackend:
                 "&& cd app/driver/assets/mujoco_menagerie && git sparse-checkout set trs_so_arm100"
             )
         SCENE_FILE.write_text(SCENE_XML)
-        self.model = mujoco.MjModel.from_xml_path(str(SCENE_FILE))
+        # The wrist camera must hang off a body defined in the *included* arm
+        # model, which an XML <include> cannot reach into — so attach it through
+        # MjSpec. It then moves with the gripper, like the real Innomaker mount.
+        spec = mujoco.MjSpec.from_file(str(SCENE_FILE))
+        wrist = spec.body(WRIST_CAM_BODY).add_camera()
+        wrist.name = "wrist_cam"
+        wrist.pos = WRIST_CAM_POS
+        wrist.quat = WRIST_CAM_QUAT
+        wrist.fovy = 75
+        self.model = spec.compile()
         self.data = mujoco.MjData(self.model)
         self.sim_lock = threading.Lock()
 
