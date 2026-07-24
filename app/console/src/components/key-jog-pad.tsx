@@ -64,7 +64,7 @@ export function KeyJogPad() {
 				}
 			}}
 			className={`mt-3 cursor-pointer rounded border-2 p-4 text-sm outline-none ${
-				focused ? "border-blue-600 bg-blue-600/5" : "border-dashed"
+				focused ? "border-info bg-info/5" : "border-dashed"
 			}`}
 		>
 			<div className="font-medium">

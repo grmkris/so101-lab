@@ -3,8 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ArmPanel } from "#/components/arm-panel";
+import { CamFeed } from "#/components/cam-feed";
 import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { StatusBadge } from "#/components/status-badge";
+import { Button } from "#/components/ui/button";
+import { Spinner } from "#/components/ui/spinner";
 import { apiErrorMessage } from "#/lib/errors";
 import {
 	cameraStatusQuery,
@@ -59,32 +63,27 @@ function RobotPage() {
 			<ArmPanel />
 
 			<div className="mt-4 flex gap-2">
-				<button
-					type="button"
-					className="rounded border px-3 py-1.5 text-sm"
+				<Button
+					variant="outline"
 					disabled={probe.isPending}
 					onClick={() => probe.mutate()}
 				>
+					{probe.isPending && <Spinner />}
 					{probe.isPending ? "probing…" : "Probe cameras"}
-				</button>
+				</Button>
 				{probed && probed.length > 0 && (
-					<button
-						type="button"
-						className="rounded bg-foreground px-3 py-1.5 text-sm text-background"
+					<Button
 						disabled={preview.isPending}
 						onClick={() => preview.mutate(probed.map((c) => c.index))}
 					>
+						{preview.isPending && <Spinner />}
 						Start previews
-					</button>
+					</Button>
 				)}
 				{previewing.length > 0 && (
-					<button
-						type="button"
-						className="rounded border px-3 py-1.5 text-sm"
-						onClick={() => stop.mutate()}
-					>
+					<Button variant="outline" onClick={() => stop.mutate()}>
 						Stop previews
-					</button>
+					</Button>
 				)}
 			</div>
 
@@ -94,7 +93,7 @@ function RobotPage() {
 				</div>
 			)}
 			{probed && probed.length === 0 && (
-				<p className="mt-2 text-sm text-amber-600">
+				<p className="mt-2 text-sm text-warn">
 					no cameras found — are they plugged in / not held by another app?
 				</p>
 			)}
@@ -107,42 +106,34 @@ function RobotPage() {
 						const inBand =
 							bright !== undefined && bright >= band.min && bright <= band.max;
 						return (
-							<div key={name} className="rounded border p-3">
-								<div className="flex items-center justify-between text-sm">
-									<span className="font-mono">
-										{name}
-										{s?.mapping.workspace === index && " · workspace ✓"}
-										{s?.mapping.wrist === index && " · wrist ✓"}
-									</span>
-									{bright !== undefined && (
-										<span
-											className={inBand ? "text-green-600" : "text-amber-600"}
-										>
-											brightness {bright}{" "}
-											{inBand ? "✓" : `(band ${band.min}–${band.max})`}
-										</span>
-									)}
-								</div>
-								<img
+							<div key={name} className="flex flex-col gap-2">
+								<CamFeed
+									name={`${name}${s?.mapping.workspace === index ? " · workspace ✓" : ""}${s?.mapping.wrist === index ? " · wrist ✓" : ""}`}
 									src={`/api/cams/${name}`}
-									alt={name}
-									className="mt-2 w-full rounded bg-black"
+									statusLine={
+										bright !== undefined && (
+											<StatusBadge tone={inBand ? "success" : "warn"}>
+												brightness {bright}{" "}
+												{inBand ? "✓" : `(band ${band.min}–${band.max})`}
+											</StatusBadge>
+										)
+									}
 								/>
-								<div className="mt-2 flex gap-2 text-sm">
-									<button
-										type="button"
-										className={`rounded border px-2 py-1 ${workspace === index ? "bg-foreground text-background" : ""}`}
+								<div className="flex gap-2">
+									<Button
+										variant={workspace === index ? "default" : "outline"}
+										size="sm"
 										onClick={() => setWorkspace(index)}
 									>
 										this is workspace
-									</button>
-									<button
-										type="button"
-										className={`rounded border px-2 py-1 ${wrist === index ? "bg-foreground text-background" : ""}`}
+									</Button>
+									<Button
+										variant={wrist === index ? "default" : "outline"}
+										size="sm"
 										onClick={() => setWrist(index)}
 									>
 										this is wrist
-									</button>
+									</Button>
 								</div>
 							</div>
 						);
@@ -151,9 +142,8 @@ function RobotPage() {
 			)}
 
 			{previewing.length > 0 && (
-				<button
-					type="button"
-					className="mt-4 rounded bg-foreground px-4 py-2 text-sm text-background disabled:opacity-50"
+				<Button
+					className="mt-4"
 					disabled={
 						workspace === null ||
 						wrist === null ||
@@ -162,9 +152,10 @@ function RobotPage() {
 					}
 					onClick={() => confirm.mutate()}
 				>
+					{confirm.isPending && <Spinner />}
 					Confirm mapping (workspace=cam{workspace ?? "?"} wrist=cam
 					{wrist ?? "?"})
-				</button>
+				</Button>
 			)}
 		</div>
 	);
