@@ -4,6 +4,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { Button } from "#/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "#/components/ui/field";
+import { Input } from "#/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "#/components/ui/select";
+import { Spinner } from "#/components/ui/spinner";
 import { createRun, datasetsQuery } from "#/lib/queries";
 
 type NewTrainingSearch = { dataset?: string; episodes?: string };
@@ -15,6 +27,11 @@ export const Route = createFileRoute("/trainings/new")({
 		episodes: typeof search.episodes === "string" ? search.episodes : undefined,
 	}),
 });
+
+const toInt = (value: string, fallback: number) => {
+	const n = Number.parseInt(value, 10);
+	return Number.isFinite(n) && n > 0 ? n : fallback;
+};
 
 function NewTrainingPage() {
 	const { dataset, episodes: episodesPrefill } = Route.useSearch();
@@ -51,9 +68,6 @@ function NewTrainingPage() {
 		},
 	});
 
-	const field = "mt-1 w-full rounded border bg-transparent px-2 py-1.5 text-sm";
-	const label = "mt-4 block text-sm font-medium";
-
 	return (
 		<div className="max-w-xl">
 			<PageHeader
@@ -62,102 +76,118 @@ function NewTrainingPage() {
 				back={{ to: "/trainings", label: "Trainings" }}
 			/>
 
-			<label className={label}>
-				Dataset
-				<select
-					className={field}
-					value={datasetRepoId}
-					onChange={(e) => setDatasetRepoId(e.target.value)}
-				>
-					<option value="">select…</option>
-					{(datasets.data ?? [])
-						.filter((d) => d.onHub)
-						.map((d) => (
-							<option key={d.repoId} value={d.repoId}>
-								{d.repoId} {d.totalEpisodes ? `(${d.totalEpisodes} eps)` : ""}
-							</option>
-						))}
-				</select>
-			</label>
+			<FieldGroup>
+				<Field>
+					<FieldLabel htmlFor="nt-dataset">Dataset</FieldLabel>
+					<Select value={datasetRepoId} onValueChange={setDatasetRepoId}>
+						<SelectTrigger id="nt-dataset" className="w-full">
+							<SelectValue placeholder="select…" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								{(datasets.data ?? [])
+									.filter((d) => d.onHub)
+									.map((d) => (
+										<SelectItem key={d.repoId} value={d.repoId}>
+											{d.repoId}{" "}
+											{d.totalEpisodes ? `(${d.totalEpisodes} eps)` : ""}
+										</SelectItem>
+									))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</Field>
 
-			<label className={label}>
-				Model name (kris0/…)
-				<input
-					className={field}
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="act_wall_v4"
-				/>
-			</label>
-
-			<label className={label}>
-				Hypothesis (what will this run prove?)
-				<input
-					className={field}
-					value={hypothesis}
-					onChange={(e) => setHypothesis(e.target.value)}
-					placeholder="40k steps closes the ±45° gap at edges"
-				/>
-			</label>
-
-			<label className={label}>
-				Episodes include-list (optional, e.g. [0,1,…,56])
-				<input
-					className={field}
-					value={episodes}
-					onChange={(e) => setEpisodes(e.target.value)}
-					placeholder="leave empty for all episodes"
-				/>
-			</label>
-
-			<label className={label}>
-				Continue from checkpoint (optional pretrained path)
-				<input
-					className={field}
-					value={pretrainedPath}
-					onChange={(e) => setPretrainedPath(e.target.value)}
-					placeholder="leave empty to train from scratch (default at our scale)"
-				/>
-			</label>
-
-			<div className="flex gap-4">
-				<label className={label}>
-					Steps
-					<input
-						type="number"
-						className={field}
-						value={steps}
-						onChange={(e) => setSteps(Number(e.target.value))}
+				<Field>
+					<FieldLabel htmlFor="nt-name">Model name (kris0/…)</FieldLabel>
+					<Input
+						id="nt-name"
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						placeholder="act_wall_v4"
 					/>
-				</label>
-				<label className={label}>
-					Batch
-					<input
-						type="number"
-						className={field}
-						value={batchSize}
-						onChange={(e) => setBatchSize(Number(e.target.value))}
-					/>
-				</label>
-				<label className={label}>
-					Save every
-					<input
-						type="number"
-						className={field}
-						value={saveFreq}
-						onChange={(e) => setSaveFreq(Number(e.target.value))}
-					/>
-				</label>
-			</div>
+				</Field>
 
-			<button
-				type="button"
+				<Field>
+					<FieldLabel htmlFor="nt-hypothesis">
+						Hypothesis (what will this run prove?)
+					</FieldLabel>
+					<Input
+						id="nt-hypothesis"
+						value={hypothesis}
+						onChange={(e) => setHypothesis(e.target.value)}
+						placeholder="40k steps closes the ±45° gap at edges"
+					/>
+				</Field>
+
+				<Field>
+					<FieldLabel htmlFor="nt-episodes">
+						Episodes include-list (optional, e.g. [0,1,…,56])
+					</FieldLabel>
+					<Input
+						id="nt-episodes"
+						value={episodes}
+						onChange={(e) => setEpisodes(e.target.value)}
+						placeholder="leave empty for all episodes"
+					/>
+				</Field>
+
+				<Field>
+					<FieldLabel htmlFor="nt-pretrained">
+						Continue from checkpoint (optional pretrained path)
+					</FieldLabel>
+					<Input
+						id="nt-pretrained"
+						value={pretrainedPath}
+						onChange={(e) => setPretrainedPath(e.target.value)}
+						placeholder="leave empty to train from scratch (default at our scale)"
+					/>
+				</Field>
+
+				<div className="grid grid-cols-3 gap-4">
+					<Field>
+						<FieldLabel htmlFor="nt-steps">Steps</FieldLabel>
+						<Input
+							id="nt-steps"
+							type="number"
+							min={1}
+							step={1000}
+							value={steps}
+							onChange={(e) => setSteps(toInt(e.target.value, 40000))}
+						/>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="nt-batch">Batch</FieldLabel>
+						<Input
+							id="nt-batch"
+							type="number"
+							min={1}
+							value={batchSize}
+							onChange={(e) => setBatchSize(toInt(e.target.value, 16))}
+						/>
+					</Field>
+					<Field>
+						<FieldLabel htmlFor="nt-savefreq">Save every</FieldLabel>
+						<Input
+							id="nt-savefreq"
+							type="number"
+							min={1}
+							step={1000}
+							value={saveFreq}
+							onChange={(e) => setSaveFreq(toInt(e.target.value, 5000))}
+						/>
+					</Field>
+				</div>
+			</FieldGroup>
+
+			<Button
+				className="mt-6"
 				disabled={!name || !datasetRepoId || create.isPending}
 				onClick={() => create.mutate()}
-				className="mt-6 rounded bg-foreground px-4 py-2 text-sm text-background disabled:opacity-50"
 			>
+				{create.isPending && <Spinner />}
 				{create.isPending ? "creating…" : "Create run"}
-			</button>
+			</Button>
 			{create.isError && (
 				<div className="mt-3">
 					<ErrorNote error={create.error} />

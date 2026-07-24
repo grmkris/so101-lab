@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain } from "lucide-react";
 import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { StatusBadge, type StatusTone } from "#/components/status-badge";
 import { Button } from "#/components/ui/button";
 import {
 	Empty,
@@ -13,18 +14,26 @@ import {
 	EmptyTitle,
 } from "#/components/ui/empty";
 import { Skeleton } from "#/components/ui/skeleton";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "#/components/ui/table";
 import { runsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/trainings/")({
 	component: TrainingsPage,
 });
 
-const statusColor: Record<string, string> = {
-	draft: "text-muted-foreground",
-	launched: "text-blue-600",
-	imported: "text-muted-foreground",
-	done: "text-green-600",
-	failed: "text-red-500",
+const statusTone: Record<string, StatusTone> = {
+	draft: "neutral",
+	launched: "info",
+	imported: "neutral",
+	done: "success",
+	failed: "danger",
 };
 
 function TrainingsPage() {
@@ -70,21 +79,21 @@ function TrainingsPage() {
 					</EmptyContent>
 				</Empty>
 			) : (
-				<table className="mt-6 w-full text-sm">
-					<thead>
-						<tr className="border-b text-left text-muted-foreground">
-							<th className="py-2 pr-4">name</th>
-							<th className="py-2 pr-4">status</th>
-							<th className="py-2 pr-4">dataset</th>
-							<th className="py-2 pr-4">steps</th>
-							<th className="py-2 pr-4">created</th>
-							<th className="py-2">hypothesis</th>
-						</tr>
-					</thead>
-					<tbody>
+				<Table className="mt-2">
+					<TableHeader>
+						<TableRow>
+							<TableHead>name</TableHead>
+							<TableHead>status</TableHead>
+							<TableHead>dataset</TableHead>
+							<TableHead className="text-right">steps</TableHead>
+							<TableHead>created</TableHead>
+							<TableHead>hypothesis</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
 						{runs.data.map((r) => (
-							<tr key={r.id} className="border-b last:border-0">
-								<td className="py-2 pr-4 font-mono">
+							<TableRow key={r.id}>
+								<TableCell className="font-mono">
 									<Link
 										className="underline"
 										to="/trainings/$runId"
@@ -92,24 +101,29 @@ function TrainingsPage() {
 									>
 										{r.name}
 									</Link>
-								</td>
-								<td className={`py-2 pr-4 ${statusColor[r.status] ?? ""}`}>
-									{r.status}
-								</td>
-								<td className="py-2 pr-4 font-mono">
+								</TableCell>
+								<TableCell>
+									<StatusBadge tone={statusTone[r.status] ?? "neutral"}>
+										{r.status}
+									</StatusBadge>
+								</TableCell>
+								<TableCell className="font-mono">
 									{r.config?.datasetRepoId ?? "—"}
-								</td>
-								<td className="py-2 pr-4">{r.config?.steps ?? "—"}</td>
-								<td className="py-2 pr-4">
-									{r.createdAt?.slice(0, 10) ?? "—"}
-								</td>
-								<td className="py-2 max-w-md truncate">
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{r.config?.steps ?? "—"}
+								</TableCell>
+								<TableCell>{r.createdAt?.slice(0, 10) ?? "—"}</TableCell>
+								<TableCell
+									className="max-w-md truncate"
+									title={r.hypothesis ?? undefined}
+								>
 									{r.hypothesis ?? "—"}
-								</td>
-							</tr>
+								</TableCell>
+							</TableRow>
 						))}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			)}
 		</div>
 	);

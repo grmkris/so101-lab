@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Database } from "lucide-react";
+import { Brain, Database, ExternalLink, FileText, Play } from "lucide-react";
 import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { SimBadge, StatusBadge } from "#/components/status-badge";
 import { Button } from "#/components/ui/button";
 import {
 	Empty,
@@ -13,6 +14,14 @@ import {
 	EmptyTitle,
 } from "#/components/ui/empty";
 import { Skeleton } from "#/components/ui/skeleton";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "#/components/ui/table";
 import { datasetsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/datasets")({ component: DatasetsPage });
@@ -57,41 +66,43 @@ function DatasetsPage() {
 					</EmptyContent>
 				</Empty>
 			) : (
-				<table className="mt-6 w-full text-sm">
-					<thead>
-						<tr className="border-b text-left text-muted-foreground">
-							<th className="py-2 pr-4">repo</th>
-							<th className="py-2 pr-4">episodes</th>
-							<th className="py-2 pr-4">frames</th>
-							<th className="py-2 pr-4">fps</th>
-							<th className="py-2 pr-4">cameras</th>
-							<th className="py-2 pr-4">format</th>
-							<th className="py-2 pr-4">where</th>
-							<th className="py-2">links</th>
-						</tr>
-					</thead>
-					<tbody>
+				<Table className="mt-2">
+					<TableHeader>
+						<TableRow>
+							<TableHead>repo</TableHead>
+							<TableHead className="text-right">episodes</TableHead>
+							<TableHead className="text-right">frames</TableHead>
+							<TableHead className="text-right">fps</TableHead>
+							<TableHead>cameras</TableHead>
+							<TableHead>format</TableHead>
+							<TableHead>where</TableHead>
+							<TableHead>actions</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
 						{datasets.data.map((d) => (
-							<tr key={d.repoId} className="border-b last:border-0">
-								<td className="py-2 pr-4 font-mono">
-									{d.repoId}
-									{d.sim && (
-										<span className="ml-2 rounded bg-purple-600 px-1.5 py-0.5 text-xs font-bold text-white">
-											SIM
-										</span>
-									)}
-								</td>
-								<td className="py-2 pr-4">{d.totalEpisodes ?? "—"}</td>
-								<td className="py-2 pr-4">{d.totalFrames ?? "—"}</td>
-								<td className="py-2 pr-4">{d.fps ?? "—"}</td>
-								<td className="py-2 pr-4">{d.cameras.join(", ") || "—"}</td>
-								<td className="py-2 pr-4">
+							<TableRow key={d.repoId}>
+								<TableCell className="font-mono">
+									<span className="flex items-center gap-2">
+										{d.repoId}
+										{d.sim && <SimBadge />}
+									</span>
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{d.totalEpisodes ?? "—"}
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{d.totalFrames ?? "—"}
+								</TableCell>
+								<TableCell className="text-right tabular-nums">
+									{d.fps ?? "—"}
+								</TableCell>
+								<TableCell>{d.cameras.join(", ") || "—"}</TableCell>
+								<TableCell>
 									{d.codebaseVersion ? (
-										<span
-											className={
-												d.codebaseVersion === STACK_VERSION
-													? "text-green-600"
-													: "text-amber-600"
+										<StatusBadge
+											tone={
+												d.codebaseVersion === STACK_VERSION ? "success" : "warn"
 											}
 											title={
 												d.codebaseVersion === STACK_VERSION
@@ -100,63 +111,90 @@ function DatasetsPage() {
 											}
 										>
 											{d.codebaseVersion}
-										</span>
+										</StatusBadge>
 									) : (
 										"—"
 									)}
-								</td>
-								<td className="py-2 pr-4">
+								</TableCell>
+								<TableCell className="text-muted-foreground">
 									{[d.isLocal ? "local" : null, d.onHub ? "hub" : null]
 										.filter(Boolean)
 										.join(" + ")}
-								</td>
-								<td className="py-2">
-									{d.onHub && (
-										<>
-											<a
-												className="underline"
-												target="_blank"
-												rel="noreferrer"
-												href={`https://huggingface.co/datasets/${d.repoId}`}
+								</TableCell>
+								<TableCell>
+									<span className="flex items-center gap-1">
+										{d.onHub && (
+											<>
+												<Button
+													asChild
+													variant="ghost"
+													size="sm"
+													className="text-muted-foreground"
+												>
+													<a
+														target="_blank"
+														rel="noreferrer"
+														href={`https://huggingface.co/datasets/${d.repoId}`}
+														title="open on the Hub"
+													>
+														hub
+														<ExternalLink />
+													</a>
+												</Button>
+												<Button
+													asChild
+													variant="ghost"
+													size="sm"
+													className="text-muted-foreground"
+												>
+													<a
+														target="_blank"
+														rel="noreferrer"
+														href={`https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=${encodeURIComponent(d.repoId)}`}
+														title="lerobot dataset visualizer"
+													>
+														<Play />
+														visualize
+													</a>
+												</Button>
+											</>
+										)}
+										{d.isLocal && (
+											<Button
+												asChild
+												variant="ghost"
+												size="sm"
+												className="text-muted-foreground"
 											>
-												hub
-											</a>{" "}
-											<a
-												className="underline"
-												target="_blank"
-												rel="noreferrer"
-												href={`https://huggingface.co/spaces/lerobot/visualize_dataset?dataset=${encodeURIComponent(d.repoId)}`}
-											>
-												visualize
-											</a>{" "}
-										</>
-									)}
-									{d.isLocal && (
-										<>
+												<Link
+													to="/datasets/$owner/$name"
+													params={{
+														owner: d.repoId.split("/")[0],
+														name: d.repoId.split("/")[1],
+													}}
+													title="report card + exclude builder"
+												>
+													<FileText />
+													report
+												</Link>
+											</Button>
+										)}
+										<Button asChild variant="outline" size="sm">
 											<Link
-												className="underline"
-												to="/datasets/$owner/$name"
-												params={{
-													owner: d.repoId.split("/")[0],
-													name: d.repoId.split("/")[1],
-												}}
+												to="/trainings/new"
+												search={{ dataset: d.repoId }}
+												title="new training on this dataset"
 											>
-												report
-											</Link>{" "}
-										</>
-									)}
-									<Link
-										className="underline"
-										to="/trainings/new"
-										search={{ dataset: d.repoId }}
-									>
-										train
-									</Link>
-								</td>
-							</tr>
+												<Brain />
+												train
+											</Link>
+										</Button>
+									</span>
+								</TableCell>
+							</TableRow>
 						))}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			)}
 		</div>
 	);
