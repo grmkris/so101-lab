@@ -97,6 +97,156 @@ class MJPEGHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 
+# ---------- robot (crib: lelab/teleoperate.py — worker owns disconnect) ----------
+
+ROBOT: dict = {"robot": None, "teleop": None, "state": "disconnected", "teleop_active": False}
+JOINTS: dict[str, float] = {}
+
+
+def _emit_robot_state() -> None:
+    emit({"event": "robot_state", "state": ROBOT["state"]})
+
+
+def _safe_disconnect(device) -> None:
+    if device is None:
+        return
+    try:
+        device.disconnect()
+    except Exception as exc:  # noqa: BLE001
+        log(f"disconnect error (ignored): {exc}")
+
+
+def cmd_connect(req: dict) -> dict:
+    if ROBOT["state"] != "disconnected":
+        raise ValueError(f"already {ROBOT['state']} — disconnect first")
+
+    from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
+    from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
+
+    robot_id = req.get("robotId", "arm")
+    robot = None
+    teleop = None
+    try:
+        robot = SO101Follower(SO101FollowerConfig(port=req["followerPort"], id=robot_id))
+        try:
+            robot.bus.connect()
+        except Exception as exc:
+            raise RuntimeError(
+                f"Could not connect to the follower arm on {req['followerPort']}. "
+                "Plugged in, powered, and not held by LeLab/CLI?"
+            ) from exc
+        robot.bus.write_calibration(robot.calibration)
+        robot.configure()
+
+        if req.get("leaderPort"):
+            teleop = SO101Leader(SO101LeaderConfig(port=req["leaderPort"], id=robot_id))
+            try:
+                teleop.bus.connect()
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Could not connect to the leader arm on {req['leaderPort']}. "
+                    "Plugged in, powered, and not held by LeLab/CLI?"
+                ) from exc
+            teleop.bus.write_calibration(teleop.calibration)
+            teleop.configure()
+
+        ROBOT.update(robot=robot, teleop=teleop, state="connected")
+        _emit_robot_state()
+        return {"state": "connected", "leader": teleop is not None}
+    except Exception:
+        _safe_disconnect(robot)
+        _safe_disconnect(teleop)
+        ROBOT.update(robot=None, teleop=None, state="disconnected")
+        raise
+
+
+def cmd_disconnect() -> dict:
+    ROBOT["teleop_active"] = False
+    time.sleep(0.1)
+    _safe_disconnect(ROBOT["robot"])
+    _safe_disconnect(ROBOT["teleop"])
+    ROBOT.update(robot=None, teleop=None, state="disconnected")
+    JOINTS.clear()
+    _emit_robot_state()
+    return {"state": "disconnected"}
+
+
+def cmd_torque(on: bool) -> dict:
+    robot = ROBOT["robot"]
+    if robot is None:
+        raise ValueError("not connected")
+    if on:
+        robot.bus.enable_torque()
+    else:
+        robot.bus.disable_torque()
+    return {"torque": on}
+
+
+def cmd_estop() -> dict:
+    """Torque kill. Arm goes limp — hold it if it's raised."""
+    ROBOT["teleop_active"] = False
+    robot = ROBOT["robot"]
+    if robot is not None:
+        try:
+            robot.bus.disable_torque()
+        except Exception as exc:  # noqa: BLE001
+            log(f"estop disable_torque error: {exc}")
+    ROBOT["state"] = "connected" if robot is not None else "disconnected"
+    _emit_robot_state()
+    return {"estopped": True}
+
+
+def _read_joints(robot) -> dict[str, float]:
+    obs = robot.get_observation()
+    return {k.removesuffix(".pos"): round(float(v), 2) for k, v in obs.items() if k.endswith(".pos")}
+
+
+def cmd_get_joints() -> dict:
+    robot = ROBOT["robot"]
+    if robot is None:
+        raise ValueError("not connected")
+    return _read_joints(robot)
+
+
+def teleop_worker() -> None:
+    robot, teleop = ROBOT["robot"], ROBOT["teleop"]
+    last_emit = 0.0
+    try:
+        while ROBOT["teleop_active"]:
+            action = teleop.get_action()
+            robot.send_action(action)
+            now = time.time()
+            if now - last_emit >= 0.1:
+                JOINTS.update(_read_joints(robot))
+                emit({"event": "joints", "values": dict(JOINTS)})
+                last_emit = now
+            time.sleep(0.001)
+    except Exception as exc:  # noqa: BLE001
+        log(f"teleop loop error: {exc}")
+        emit({"event": "error", "where": "teleop", "error": str(exc)})
+    finally:
+        ROBOT["teleop_active"] = False
+        ROBOT["state"] = "connected"
+        _emit_robot_state()
+
+
+def cmd_teleop_start() -> dict:
+    if ROBOT["robot"] is None or ROBOT["teleop"] is None:
+        raise ValueError("connect with a leader arm first")
+    if ROBOT["teleop_active"]:
+        raise ValueError("teleop already active")
+    ROBOT["teleop_active"] = True
+    ROBOT["state"] = "teleop"
+    threading.Thread(target=teleop_worker, name="teleop-worker", daemon=True).start()
+    _emit_robot_state()
+    return {"state": "teleop"}
+
+
+def cmd_teleop_stop() -> dict:
+    ROBOT["teleop_active"] = False
+    return {"state": "connected"}
+
+
 def cmd_list_cameras() -> list[dict]:
     stop_previews()  # macOS: only one owner per device
     found = []
@@ -194,6 +344,20 @@ def main() -> None:
             elif cmd == "preview_stop":
                 stop_previews()
                 result = {"stopped": True}
+            elif cmd == "connect":
+                result = cmd_connect(req)
+            elif cmd == "disconnect":
+                result = cmd_disconnect()
+            elif cmd == "torque":
+                result = cmd_torque(bool(req.get("on")))
+            elif cmd == "estop":
+                result = cmd_estop()
+            elif cmd == "teleop_start":
+                result = cmd_teleop_start()
+            elif cmd == "teleop_stop":
+                result = cmd_teleop_stop()
+            elif cmd == "get_joints":
+                result = cmd_get_joints()
             else:
                 raise ValueError(f"unknown cmd: {cmd}")
             emit({"id": rid, "ok": True, "result": result})

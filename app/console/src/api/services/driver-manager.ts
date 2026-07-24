@@ -22,6 +22,9 @@ class DriverProc {
   private nextId = 1
   private pending = new Map<number, Pending>()
   readonly brightness: Record<string, number> = {}
+  readonly joints: Record<string, number> = {}
+  robotState = 'disconnected'
+  hasLeader = false
   private readyPromise: Promise<void> | null = null
 
   private start(): Promise<void> {
@@ -37,6 +40,8 @@ class DriverProc {
       this.pending.clear()
       this.proc = null
       this.readyPromise = null // next rpc() respawns lazily
+      this.robotState = 'disconnected'
+      this.hasLeader = false
     })
 
     this.readyPromise = new Promise<void>((resolve, reject) => {
@@ -55,6 +60,10 @@ class DriverProc {
           resolve()
         } else if (msg.event === 'brightness') {
           Object.assign(this.brightness, msg.values as Record<string, number>)
+        } else if (msg.event === 'joints') {
+          Object.assign(this.joints, msg.values as Record<string, number>)
+        } else if (msg.event === 'robot_state') {
+          this.robotState = String(msg.state)
         } else if (typeof msg.id === 'number') {
           const p = this.pending.get(msg.id)
           if (p) {
@@ -109,6 +118,12 @@ if (!globalStore.__labDriverExitHook) {
 export interface DriverManagerShape {
   readonly rpc: <T>(cmd: string, extra?: Record<string, unknown>) => Effect.Effect<T, Error>
   readonly brightness: () => Effect.Effect<Record<string, number>>
+  readonly robot: () => Effect.Effect<{
+    state: string
+    leader: boolean
+    joints: Record<string, number>
+  }>
+  readonly setLeader: (leader: boolean) => Effect.Effect<void>
 }
 
 export class DriverManager extends Context.Service<DriverManager, DriverManagerShape>()(
@@ -121,5 +136,15 @@ export class DriverManager extends Context.Service<DriverManager, DriverManagerS
         catch: (e) => (e instanceof Error ? e : new Error(String(e))),
       }),
     brightness: () => Effect.sync(() => ({ ...driverProc.brightness })),
+    robot: () =>
+      Effect.sync(() => ({
+        state: driverProc.robotState,
+        leader: driverProc.hasLeader,
+        joints: { ...driverProc.joints },
+      })),
+    setLeader: (leader: boolean) =>
+      Effect.sync(() => {
+        driverProc.hasLeader = leader
+      }),
   })
 }

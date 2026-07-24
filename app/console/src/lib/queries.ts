@@ -56,5 +56,20 @@ export const stopPreview = () => runApi((client) => client.Cameras.previewStop()
 export const confirmCameras = (payload: { workspace: number | null; wrist: number | null }) =>
   runApi((client) => client.Cameras.confirm({ payload }))
 
+export const robotStateQuery = queryOptions({
+  queryKey: ['robot', 'state'],
+  queryFn: () => runApi((client) => client.Robot.state()),
+  refetchInterval: 1_000,
+})
+
+export const robotConnect = (withLeader: boolean) =>
+  runApi((client) => client.Robot.connect({ payload: { withLeader } }))
+export const robotDisconnect = () => runApi((client) => client.Robot.disconnect())
+export const robotTorque = (on: boolean) =>
+  runApi((client) => client.Robot.torque({ payload: { on } }))
+export const robotTeleopStart = () => runApi((client) => client.Robot.teleopStart())
+export const robotTeleopStop = () => runApi((client) => client.Robot.teleopStop())
+export const robotEstop = () => runApi((client) => client.Robot.estop())
+
 export const patchRun = (id: string, payload: typeof RunPatch.Type) =>
   runApi((client) => client.Trainings.update({ params: { id }, payload }))

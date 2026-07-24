@@ -2,7 +2,8 @@ import { NodeFileSystem } from '@effect/platform-node'
 import { Effect, Layer, Path } from 'effect'
 import { Etag, FetchHttpClient, HttpPlatform, HttpRouter } from 'effect/unstable/http'
 import { HttpApiBuilder, HttpApiScalar } from 'effect/unstable/httpapi'
-import { Checkpoints, HealthStatus, HfStatus, LabApi } from './contract'
+import { Checkpoints, DriverError, HealthStatus, HfStatus, LabApi, RobotState } from './contract'
+import { RIG } from './rig'
 import { Cameras } from './services/cameras'
 import { DatasetCatalog } from './services/dataset-catalog'
 import { DriverManager } from './services/driver-manager'
@@ -63,6 +64,48 @@ const CamerasLive = HttpApiBuilder.group(LabApi, 'Cameras', (handlers) =>
     .handle('confirm', ({ payload }) => Effect.flatMap(Cameras, (c) => c.confirm(payload))),
 )
 
+const robotState = Effect.gen(function* () {
+  const driver = yield* DriverManager
+  const r = yield* driver.robot()
+  return new RobotState({
+    state: r.state,
+    leader: r.leader,
+    joints: r.joints,
+    rig: { followerPort: RIG.followerPort, leaderPort: RIG.leaderPort, robotId: RIG.robotId },
+  })
+})
+
+const toDriverError = (e: Error) => new DriverError({ message: e.message })
+
+const robotCmd = (cmd: string, extra: Record<string, unknown> = {}) =>
+  Effect.gen(function* () {
+    const driver = yield* DriverManager
+    yield* driver.rpc(cmd, extra)
+    return yield* robotState
+  }).pipe(Effect.mapError(toDriverError))
+
+const RobotLive = HttpApiBuilder.group(LabApi, 'Robot', (handlers) =>
+  handlers
+    .handle('state', () => robotState)
+    .handle('connect', ({ payload }) =>
+      Effect.gen(function* () {
+        const driver = yield* DriverManager
+        yield* driver.rpc('connect', {
+          followerPort: RIG.followerPort,
+          leaderPort: payload.withLeader ? RIG.leaderPort : null,
+          robotId: RIG.robotId,
+        })
+        yield* driver.setLeader(payload.withLeader)
+        return yield* robotState
+      }).pipe(Effect.mapError(toDriverError)),
+    )
+    .handle('disconnect', () => robotCmd('disconnect'))
+    .handle('torque', ({ payload }) => robotCmd('torque', { on: payload.on }))
+    .handle('teleopStart', () => robotCmd('teleop_start'))
+    .handle('teleopStop', () => robotCmd('teleop_stop'))
+    .handle('estop', () => robotCmd('estop')),
+)
+
 const ServicesLayer = Layer.mergeAll(DatasetCatalog.layer, RunsRegistry.layer, Cameras.layer).pipe(
   Layer.provideMerge(HfHub.layer),
   Layer.provideMerge(DriverManager.layer),
@@ -70,7 +113,14 @@ const ServicesLayer = Layer.mergeAll(DatasetCatalog.layer, RunsRegistry.layer, C
   Layer.provideMerge(NodeFileSystem.layer),
 )
 
-const GroupsLayer = Layer.mergeAll(HealthLive, HfLive, DatasetsLive, TrainingsLive, CamerasLive)
+const GroupsLayer = Layer.mergeAll(
+  HealthLive,
+  HfLive,
+  DatasetsLive,
+  TrainingsLive,
+  CamerasLive,
+  RobotLive,
+)
 
 const PlatformLayer = Layer.mergeAll(Path.layer, Etag.layerWeak, HttpPlatform.layer).pipe(
   Layer.provideMerge(NodeFileSystem.layer),

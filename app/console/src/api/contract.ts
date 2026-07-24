@@ -136,6 +136,51 @@ export const CamerasGroup = HttpApiGroup.make('Cameras').add(
   }),
 )
 
+/** Driver/hardware failure surfaced with its actionable message (port busy hints etc). */
+export class DriverError extends Schema.TaggedErrorClass<DriverError>()('DriverError', {
+  message: Schema.String,
+}) {}
+
+export class RobotState extends Schema.Class<RobotState>('RobotState')(
+  Schema.Struct({
+    state: Schema.String, // disconnected | connected | teleop
+    leader: Schema.Boolean,
+    joints: Schema.Record(Schema.String, Schema.Number),
+    rig: Schema.Struct({
+      followerPort: Schema.String,
+      leaderPort: Schema.String,
+      robotId: Schema.String,
+    }),
+  }),
+) {}
+
+export const RobotGroup = HttpApiGroup.make('Robot').add(
+  HttpApiEndpoint.get('state', '/robot/state', { success: RobotState }),
+  HttpApiEndpoint.post('connect', '/robot/connect', {
+    payload: Schema.Struct({ withLeader: Schema.Boolean }),
+    success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('disconnect', '/robot/disconnect', {
+    success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('torque', '/robot/torque', {
+    payload: Schema.Struct({ on: Schema.Boolean }),
+    success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('teleopStart', '/robot/teleop/start', {
+    success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('teleopStop', '/robot/teleop/stop', {
+    success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('estop', '/robot/estop', { success: RobotState, error: DriverError }),
+)
+
 const runId = { id: Schema.String }
 
 export const TrainingsGroup = HttpApiGroup.make('Trainings').add(
@@ -152,4 +197,5 @@ export const LabApi = HttpApi.make('LabConsole')
   .add(DatasetsGroup)
   .add(TrainingsGroup)
   .add(CamerasGroup)
+  .add(RobotGroup)
   .prefix('/api')

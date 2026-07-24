@@ -5,11 +5,162 @@ import {
   cameraStatusQuery,
   confirmCameras,
   probeCameras,
+  robotConnect,
+  robotDisconnect,
+  robotEstop,
+  robotStateQuery,
+  robotTeleopStart,
+  robotTeleopStop,
+  robotTorque,
   startPreview,
   stopPreview,
 } from '#/lib/queries'
 
 export const Route = createFileRoute('/robot')({ component: RobotPage })
+
+function ArmPanel() {
+  const state = useQuery(robotStateQuery)
+  const queryClient = useQueryClient()
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['robot'] })
+  const [lastError, setLastError] = useState<string | null>(null)
+
+  const useAct = (fn: () => Promise<unknown>) =>
+    useMutation({
+      mutationFn: fn,
+      onSuccess: () => {
+        setLastError(null)
+        invalidate()
+      },
+      onError: (e) => setLastError(String(e)),
+    })
+
+  const connect = useAct(() => robotConnect(true))
+  const connectSolo = useAct(() => robotConnect(false))
+  const disconnect = useAct(robotDisconnect)
+  const torqueOff = useAct(() => robotTorque(false))
+  const torqueOn = useAct(() => robotTorque(true))
+  const teleopStart = useAct(robotTeleopStart)
+  const teleopStop = useAct(robotTeleopStop)
+  const estop = useAct(robotEstop)
+
+  const s = state.data
+  const busy =
+    connect.isPending || connectSolo.isPending || disconnect.isPending || teleopStart.isPending
+
+  return (
+    <div className="mt-8 rounded border p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold">
+            Arm{' '}
+            <span
+              className={
+                s?.state === 'teleop'
+                  ? 'text-blue-600'
+                  : s?.state === 'connected'
+                    ? 'text-green-600'
+                    : 'text-muted-foreground'
+              }
+            >
+              · {s?.state ?? '…'}
+            </span>
+          </h2>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+            follower {s?.rig.followerPort} · leader {s?.rig.leaderPort} · id {s?.rig.robotId}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="rounded bg-red-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
+          disabled={s?.state === 'disconnected'}
+          onClick={() => estop.mutate()}
+          title="Torque kill — arm goes limp, hold it if raised"
+        >
+          E-STOP
+        </button>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2 text-sm">
+        {s?.state === 'disconnected' ? (
+          <>
+            <button
+              type="button"
+              className="rounded bg-foreground px-3 py-1.5 text-background disabled:opacity-50"
+              disabled={busy}
+              onClick={() => connect.mutate()}
+            >
+              {connect.isPending ? 'connecting…' : 'Connect (leader + follower)'}
+            </button>
+            <button
+              type="button"
+              className="rounded border px-3 py-1.5 disabled:opacity-50"
+              disabled={busy}
+              onClick={() => connectSolo.mutate()}
+            >
+              Follower only
+            </button>
+          </>
+        ) : (
+          <>
+            {s?.state === 'connected' && s.leader && (
+              <button
+                type="button"
+                className="rounded bg-foreground px-3 py-1.5 text-background disabled:opacity-50"
+                disabled={busy}
+                onClick={() => teleopStart.mutate()}
+              >
+                Start teleop
+              </button>
+            )}
+            {s?.state === 'teleop' && (
+              <button
+                type="button"
+                className="rounded border px-3 py-1.5"
+                onClick={() => teleopStop.mutate()}
+              >
+                Stop teleop
+              </button>
+            )}
+            <button
+              type="button"
+              className="rounded border px-3 py-1.5"
+              onClick={() => torqueOn.mutate()}
+            >
+              Torque on
+            </button>
+            <button
+              type="button"
+              className="rounded border px-3 py-1.5"
+              onClick={() => torqueOff.mutate()}
+            >
+              Torque off
+            </button>
+            <button
+              type="button"
+              className="rounded border px-3 py-1.5"
+              onClick={() => disconnect.mutate()}
+            >
+              Disconnect
+            </button>
+          </>
+        )}
+      </div>
+
+      {lastError && <p className="mt-2 text-sm text-red-500">{lastError}</p>}
+
+      {s && Object.keys(s.joints).length > 0 && (
+        <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs md:grid-cols-6">
+          {Object.entries(s.joints).map(([joint, pos]) => (
+            <div key={joint} className="rounded bg-muted p-2">
+              <div className="text-muted-foreground">{joint}</div>
+              <div>{pos.toFixed(1)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function RobotPage() {
   const status = useQuery(cameraStatusQuery)
@@ -43,9 +194,10 @@ function RobotPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold">Robot</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Cameras first — arm control lands next. macOS shuffles camera indexes on replug:
-        verify every session.
+        macOS shuffles camera indexes on replug: verify every session.
       </p>
+
+      <ArmPanel />
 
       <div className="mt-4 flex gap-2">
         <button
