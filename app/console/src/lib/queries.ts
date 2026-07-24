@@ -62,14 +62,32 @@ export const robotStateQuery = queryOptions({
   refetchInterval: 1_000,
 })
 
-export const robotConnect = (withLeader: boolean) =>
-  runApi((client) => client.Robot.connect({ payload: { withLeader } }))
+export const robotConnect = (withLeader: boolean, backend: 'real' | 'sim' = 'real') =>
+  runApi((client) => client.Robot.connect({ payload: { withLeader, backend } }))
 export const robotDisconnect = () => runApi((client) => client.Robot.disconnect())
 export const robotTorque = (on: boolean) =>
   runApi((client) => client.Robot.torque({ payload: { on } }))
 export const robotTeleopStart = () => runApi((client) => client.Robot.teleopStart())
 export const robotTeleopStop = () => runApi((client) => client.Robot.teleopStop())
 export const robotEstop = () => runApi((client) => client.Robot.estop())
+
+export const recordStatusQuery = queryOptions({
+  queryKey: ['record', 'status'],
+  queryFn: () => runApi((client) => client.Record.status()),
+  refetchInterval: 1_000,
+})
+
+export const recordStart = (payload: {
+  repoName: string
+  task: string
+  numEpisodes: number
+  episodeS: number
+  resetS: number
+  resume: boolean
+}) => runApi((client) => client.Record.start({ payload }))
+
+export const recordControl = (action: 'keep' | 'rerecord' | 'finish') =>
+  runApi((client) => client.Record.control({ payload: { action } }))
 
 export const patchRun = (id: string, payload: typeof RunPatch.Type) =>
   runApi((client) => client.Trainings.update({ params: { id }, payload }))

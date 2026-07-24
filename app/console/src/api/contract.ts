@@ -35,6 +35,7 @@ export class DatasetInfo extends Schema.Class<DatasetInfo>('DatasetInfo')(
     cameras: Schema.Array(Schema.String),
     codebaseVersion: Schema.NullOr(Schema.String),
     hubLastModified: Schema.NullOr(Schema.String),
+    sim: Schema.Boolean,
   }),
 ) {}
 
@@ -143,7 +144,8 @@ export class DriverError extends Schema.TaggedErrorClass<DriverError>()('DriverE
 
 export class RobotState extends Schema.Class<RobotState>('RobotState')(
   Schema.Struct({
-    state: Schema.String, // disconnected | connected | teleop
+    state: Schema.String, // disconnected | connected | teleop | recording
+    backend: Schema.String, // real | sim
     leader: Schema.Boolean,
     joints: Schema.Record(Schema.String, Schema.Number),
     rig: Schema.Struct({
@@ -157,7 +159,7 @@ export class RobotState extends Schema.Class<RobotState>('RobotState')(
 export const RobotGroup = HttpApiGroup.make('Robot').add(
   HttpApiEndpoint.get('state', '/robot/state', { success: RobotState }),
   HttpApiEndpoint.post('connect', '/robot/connect', {
-    payload: Schema.Struct({ withLeader: Schema.Boolean }),
+    payload: Schema.Struct({ withLeader: Schema.Boolean, backend: Schema.String }),
     success: RobotState,
     error: DriverError,
   }),
@@ -191,6 +193,38 @@ export const TrainingsGroup = HttpApiGroup.make('Trainings').add(
   HttpApiEndpoint.get('checkpoints', '/runs/:id/checkpoints', { params: runId, success: Checkpoints }),
 )
 
+export class RecordStatus extends Schema.Class<RecordStatus>('RecordStatus')(
+  Schema.Struct({
+    active: Schema.Boolean,
+    phase: Schema.String, // idle | recording | resetting | done | failed
+    episode: Schema.Number,
+    saved: Schema.Number,
+    total: Schema.Number,
+    repoId: Schema.NullOr(Schema.String),
+  }),
+) {}
+
+export const RecordGroup = HttpApiGroup.make('Record').add(
+  HttpApiEndpoint.get('status', '/record/status', { success: RecordStatus }),
+  HttpApiEndpoint.post('start', '/record/start', {
+    payload: Schema.Struct({
+      repoName: Schema.String,
+      task: Schema.String,
+      numEpisodes: Schema.Number,
+      episodeS: Schema.Number,
+      resetS: Schema.Number,
+      resume: Schema.Boolean,
+    }),
+    success: RecordStatus,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('control', '/record/control', {
+    payload: Schema.Struct({ action: Schema.String }), // keep | rerecord | finish
+    success: RecordStatus,
+    error: DriverError,
+  }),
+)
+
 export const LabApi = HttpApi.make('LabConsole')
   .add(HealthGroup)
   .add(HfGroup)
@@ -198,4 +232,5 @@ export const LabApi = HttpApi.make('LabConsole')
   .add(TrainingsGroup)
   .add(CamerasGroup)
   .add(RobotGroup)
+  .add(RecordGroup)
   .prefix('/api')

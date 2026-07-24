@@ -1,12 +1,25 @@
 import { type ChildProcess, spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import * as os from 'node:os'
 import * as readline from 'node:readline'
 import { Context, Effect, Layer } from 'effect'
 
+const DRIVER_DIR = new URL('../../../../driver', import.meta.url).pathname
+const VENV_PYTHON = `${DRIVER_DIR}/.venv/bin/python`
 const PYTHON =
-  process.env.LAB_DRIVER_PYTHON ?? `${os.homedir()}/.local/share/uv/tools/lelab/bin/python`
-const DRIVER_SCRIPT = new URL('../../../../driver/driver.py', import.meta.url).pathname
+  process.env.LAB_DRIVER_PYTHON ??
+  (existsSync(VENV_PYTHON) ? VENV_PYTHON : `${os.homedir()}/.local/share/uv/tools/lelab/bin/python`)
+const DRIVER_SCRIPT = `${DRIVER_DIR}/driver.py`
 export const MJPEG_PORT = 8765
+
+export interface RecordState {
+  active: boolean
+  phase: string
+  episode: number
+  saved: number
+  total: number
+  repoId: string | null
+}
 
 interface Pending {
   resolve: (value: unknown) => void
@@ -24,7 +37,16 @@ class DriverProc {
   readonly brightness: Record<string, number> = {}
   readonly joints: Record<string, number> = {}
   robotState = 'disconnected'
+  backendName = 'real'
   hasLeader = false
+  recordState: RecordState = {
+    active: false,
+    phase: 'idle',
+    episode: 0,
+    saved: 0,
+    total: 0,
+    repoId: null,
+  }
   private readyPromise: Promise<void> | null = null
 
   private start(): Promise<void> {
@@ -64,6 +86,17 @@ class DriverProc {
           Object.assign(this.joints, msg.values as Record<string, number>)
         } else if (msg.event === 'robot_state') {
           this.robotState = String(msg.state)
+          if (msg.backend) this.backendName = String(msg.backend)
+        } else if (msg.event === 'record_state') {
+          const phase = String(msg.phase)
+          this.recordState = {
+            active: phase === 'recording' || phase === 'resetting',
+            phase,
+            episode: Number(msg.episode),
+            saved: Number(msg.saved),
+            total: Number(msg.total),
+            repoId: String(msg.repoId),
+          }
         } else if (typeof msg.id === 'number') {
           const p = this.pending.get(msg.id)
           if (p) {
@@ -120,9 +153,11 @@ export interface DriverManagerShape {
   readonly brightness: () => Effect.Effect<Record<string, number>>
   readonly robot: () => Effect.Effect<{
     state: string
+    backend: string
     leader: boolean
     joints: Record<string, number>
   }>
+  readonly record: () => Effect.Effect<RecordState>
   readonly setLeader: (leader: boolean) => Effect.Effect<void>
 }
 
@@ -139,9 +174,11 @@ export class DriverManager extends Context.Service<DriverManager, DriverManagerS
     robot: () =>
       Effect.sync(() => ({
         state: driverProc.robotState,
+        backend: driverProc.backendName,
         leader: driverProc.hasLeader,
         joints: { ...driverProc.joints },
       })),
+    record: () => Effect.sync(() => ({ ...driverProc.recordState })),
     setLeader: (leader: boolean) =>
       Effect.sync(() => {
         driverProc.hasLeader = leader

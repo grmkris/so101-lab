@@ -36,6 +36,7 @@ function ArmPanel() {
 
   const connect = useAct(() => robotConnect(true))
   const connectSolo = useAct(() => robotConnect(false))
+  const connectSim = useAct(() => robotConnect(false, 'sim'))
   const disconnect = useAct(robotDisconnect)
   const torqueOff = useAct(() => robotTorque(false))
   const torqueOn = useAct(() => robotTorque(true))
@@ -53,6 +54,11 @@ function ArmPanel() {
         <div>
           <h2 className="text-lg font-semibold">
             Arm{' '}
+            {s?.backend === 'sim' && (
+              <span className="mr-1 rounded bg-purple-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                SIM
+              </span>
+            )}
             <span
               className={
                 s?.state === 'teleop'
@@ -98,6 +104,14 @@ function ArmPanel() {
               onClick={() => connectSolo.mutate()}
             >
               Follower only
+            </button>
+            <button
+              type="button"
+              className="rounded border border-purple-600 px-3 py-1.5 text-purple-600 disabled:opacity-50"
+              disabled={busy}
+              onClick={() => connectSim.mutate()}
+            >
+              {connectSim.isPending ? 'loading MuJoCo…' : 'Connect SIM (MuJoCo)'}
             </button>
           </>
         ) : (

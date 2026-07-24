@@ -46,6 +46,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <Link to="/robot" className="text-muted-foreground hover:text-foreground">
               Robot
             </Link>
+            <Link to="/record" className="text-muted-foreground hover:text-foreground">
+              Record
+            </Link>
             <Link to="/datasets" className="text-muted-foreground hover:text-foreground">
               Datasets
             </Link>

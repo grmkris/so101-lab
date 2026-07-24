@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DatasetsRouteImport } from './routes/datasets'
+import { Route as RecordRouteImport } from './routes/record'
 import { Route as RobotRouteImport } from './routes/robot'
 import { Route as TrainingsIndexRouteImport } from './routes/trainings.index'
 import { Route as TrainingsRunIdRouteImport } from './routes/trainings.$runId'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const DatasetsRoute = DatasetsRouteImport.update({
   id: '/datasets',
   path: '/datasets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecordRoute = RecordRouteImport.update({
+  id: '/record',
+  path: '/record',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotRoute = RobotRouteImport.update({
@@ -50,6 +56,7 @@ const TrainingsNewRoute = TrainingsNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/datasets': typeof DatasetsRoute
+  '/record': typeof RecordRoute
   '/robot': typeof RobotRoute
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/datasets': typeof DatasetsRoute
+  '/record': typeof RecordRoute
   '/robot': typeof RobotRoute
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/datasets': typeof DatasetsRoute
+  '/record': typeof RecordRoute
   '/robot': typeof RobotRoute
   '/trainings/$runId': typeof TrainingsRunIdRoute
   '/trainings/new': typeof TrainingsNewRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/datasets'
+    | '/record'
     | '/robot'
     | '/trainings/$runId'
     | '/trainings/new'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/datasets'
+    | '/record'
     | '/robot'
     | '/trainings/$runId'
     | '/trainings/new'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/datasets'
+    | '/record'
     | '/robot'
     | '/trainings/$runId'
     | '/trainings/new'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DatasetsRoute: typeof DatasetsRoute
+  RecordRoute: typeof RecordRoute
   RobotRoute: typeof RobotRoute
   TrainingsRunIdRoute: typeof TrainingsRunIdRoute
   TrainingsNewRoute: typeof TrainingsNewRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/datasets'
       fullPath: '/datasets'
       preLoaderRoute: typeof DatasetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/record': {
+      id: '/record'
+      path: '/record'
+      fullPath: '/record'
+      preLoaderRoute: typeof RecordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robot': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DatasetsRoute: DatasetsRoute,
+  RecordRoute: RecordRoute,
   RobotRoute: RobotRoute,
   TrainingsRunIdRoute: TrainingsRunIdRoute,
   TrainingsNewRoute: TrainingsNewRoute,

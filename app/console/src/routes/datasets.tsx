@@ -37,7 +37,14 @@ function DatasetsPage() {
           <tbody>
             {datasets.data.map((d) => (
               <tr key={d.repoId} className="border-b last:border-0">
-                <td className="py-2 pr-4 font-mono">{d.repoId}</td>
+                <td className="py-2 pr-4 font-mono">
+                  {d.repoId}
+                  {d.sim && (
+                    <span className="ml-2 rounded bg-purple-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                      SIM
+                    </span>
+                  )}
+                </td>
                 <td className="py-2 pr-4">{d.totalEpisodes ?? '—'}</td>
                 <td className="py-2 pr-4">{d.totalFrames ?? '—'}</td>
                 <td className="py-2 pr-4">{d.fps ?? '—'}</td>

@@ -64,12 +64,20 @@ export class DatasetCatalog extends Context.Service<DatasetCatalog, DatasetCatal
         return metas
       })
 
+      const loadSimSet = fs
+        .readFileString(`${process.cwd()}/.data/sim-datasets.json`)
+        .pipe(
+          Effect.map((raw) => new Set(JSON.parse(raw) as Array<string>)),
+          Effect.orElseSucceed(() => new Set<string>()),
+        )
+
       return {
         list: () =>
           Effect.gen(function* () {
-            const [local, hubRepos] = yield* Effect.all([scanLocal, hub.listDatasets()], {
-              concurrency: 2,
-            })
+            const [local, hubRepos, simSet] = yield* Effect.all(
+              [scanLocal, hub.listDatasets(), loadSimSet],
+              { concurrency: 3 },
+            )
             const hubById = new Map(hubRepos.map((r) => [r.id, r]))
             const localIds = new Set(local.map((m) => m.repoId))
 
@@ -80,6 +88,7 @@ export class DatasetCatalog extends Context.Service<DatasetCatalog, DatasetCatal
                   isLocal: true,
                   onHub: hubById.has(m.repoId),
                   hubLastModified: hubById.get(m.repoId)?.lastModified ?? null,
+                  sim: simSet.has(m.repoId),
                 }),
             )
             for (const r of hubRepos) {
@@ -95,6 +104,7 @@ export class DatasetCatalog extends Context.Service<DatasetCatalog, DatasetCatal
                   cameras: [],
                   codebaseVersion: null,
                   hubLastModified: r.lastModified,
+                  sim: simSet.has(r.id),
                 }),
               )
             }
