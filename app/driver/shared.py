@@ -10,11 +10,16 @@ LOCK = threading.Lock()
 
 _EMIT_LOCK = threading.Lock()  # emit happens from worker threads too
 
+# The protocol stream is captured at import time; driver.main() then points
+# sys.stdout at stderr so stray library print()s (hebi warnings, lerobot
+# calibration prompts) can never corrupt the ndjson protocol.
+_PROTO = sys.stdout
+
 
 def emit(obj) -> None:
     with _EMIT_LOCK:
-        sys.stdout.write(json.dumps(obj) + "\n")
-        sys.stdout.flush()
+        _PROTO.write(json.dumps(obj) + "\n")
+        _PROTO.flush()
 
 
 def log(msg: str) -> None:

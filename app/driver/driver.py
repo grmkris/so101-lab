@@ -29,7 +29,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import cv2
 
 import recorder
-import teleop
+import teleop_loop
 from shared import BRIGHTNESS, FRAMES, LOCK, emit, log
 
 BACKEND = None  # RealBackend | SimBackend | None
@@ -158,7 +158,7 @@ def cmd_connect(req: dict) -> dict:
 
 def cmd_disconnect() -> dict:
     global BACKEND
-    teleop.stop(wait=True)
+    teleop_loop.stop(wait=True)
     if BACKEND is None:
         return {"state": "disconnected"}
     result = BACKEND.disconnect()
@@ -170,7 +170,7 @@ def cmd_record_start(req: dict) -> dict:
     if RECORDING["thread"] is not None and RECORDING["thread"].is_alive():
         raise ValueError("recording already active")
     backend = require_backend()
-    teleop.stop(wait=True)  # recorder owns the arm — a live teleop loop must end first
+    teleop_loop.stop(wait=True)  # recorder owns the arm — a live teleop loop must end first
     stop_previews()  # recorder owns the cameras (real backend)
 
     cfg = {
@@ -187,7 +187,7 @@ def cmd_record_start(req: dict) -> dict:
     robot, teleop_device, on_episode_start = backend.prepare_record(cfg)
     events = recorder.make_events()
     if hasattr(teleop_device, "set_input"):
-        teleop.set_record_source(teleop_device)  # teleop_input RPC reaches the recording source
+        teleop_loop.set_record_source(teleop_device)  # teleop_input RPC reaches the recording source
 
     def worker() -> None:
         try:
@@ -196,7 +196,7 @@ def cmd_record_start(req: dict) -> dict:
         except Exception as exc:  # noqa: BLE001 — recorder already emitted the failed state
             log(f"record session failed: {exc}")
         finally:
-            teleop.set_record_source(None)
+            teleop_loop.set_record_source(None)
             backend.after_record()
 
     RECORDING["events"] = events
@@ -247,6 +247,9 @@ def orphan_watchdog() -> None:
 def main() -> None:
     import json
 
+    # protocol stream already captured by shared._PROTO; stray print()s -> stderr
+    sys.stdout = sys.stderr
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--mjpeg-port", type=int, default=8765)
     args = parser.parse_args()
@@ -286,18 +289,18 @@ def main() -> None:
             elif cmd == "torque":
                 result = require_backend().torque(bool(req.get("on")))
             elif cmd == "estop":
-                teleop.stop()
+                teleop_loop.stop()
                 result = require_backend().estop()
             elif cmd == "teleop_start":
-                result = teleop.start(
+                result = teleop_loop.start(
                     req,
                     require_backend(),
                     RECORDING["thread"] is not None and RECORDING["thread"].is_alive(),
                 )
             elif cmd == "teleop_stop":
-                result = teleop.stop()
+                result = teleop_loop.stop()
             elif cmd == "teleop_input":
-                result = teleop.set_input(req)
+                result = teleop_loop.set_input(req)
             elif cmd == "get_joints":
                 result = require_backend().get_joints()
             elif cmd == "record_start":

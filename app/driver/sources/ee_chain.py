@@ -32,6 +32,7 @@ def build_ee_pipeline(
     step_size_m: float = 0.0025,
     gripper_speed: float = 30.0,
     use_latched_reference: bool = False,
+    front_steps: tuple = (),
 ) -> RobotProcessorPipeline:
     kinematics = RobotKinematics(
         urdf_path=URDF_PATH,
@@ -40,6 +41,7 @@ def build_ee_pipeline(
     )
     return RobotProcessorPipeline[tuple[RobotAction, RobotObservation], RobotAction](
         steps=[
+            *front_steps,
             EEReferenceAndDelta(
                 kinematics=kinematics,
                 end_effector_step_sizes={"x": step_size_m, "y": step_size_m, "z": step_size_m},

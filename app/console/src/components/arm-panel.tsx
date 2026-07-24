@@ -140,6 +140,7 @@ export function ArmPanel() {
 										<option value="scripted">scripted expert</option>
 									)}
 									<option value="keys">keyboard (EE jog)</option>
+									<option value="phone">phone (HEBI, hold B1)</option>
 								</select>
 								<button
 									type="button"
