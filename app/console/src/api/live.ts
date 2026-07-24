@@ -3,7 +3,9 @@ import { Effect, Layer, Path } from 'effect'
 import { Etag, FetchHttpClient, HttpPlatform, HttpRouter } from 'effect/unstable/http'
 import { HttpApiBuilder, HttpApiScalar } from 'effect/unstable/httpapi'
 import { Checkpoints, HealthStatus, HfStatus, LabApi } from './contract'
+import { Cameras } from './services/cameras'
 import { DatasetCatalog } from './services/dataset-catalog'
+import { DriverManager } from './services/driver-manager'
 import { HfHub } from './services/hf-hub'
 import { RunsRegistry } from './services/runs-registry'
 
@@ -48,13 +50,27 @@ const TrainingsLive = HttpApiBuilder.group(LabApi, 'Trainings', (handlers) =>
     ),
 )
 
-const ServicesLayer = Layer.mergeAll(DatasetCatalog.layer, RunsRegistry.layer).pipe(
+const CamerasLive = HttpApiBuilder.group(LabApi, 'Cameras', (handlers) =>
+  handlers
+    .handle('probe', () => Effect.flatMap(Cameras, (c) => c.probe()).pipe(Effect.orDie))
+    .handle('previewStart', ({ payload }) =>
+      Effect.flatMap(Cameras, (c) => c.previewStart(payload.indexes)).pipe(Effect.orDie),
+    )
+    .handle('previewStop', () =>
+      Effect.flatMap(Cameras, (c) => c.previewStop()).pipe(Effect.orDie),
+    )
+    .handle('status', () => Effect.flatMap(Cameras, (c) => c.status()))
+    .handle('confirm', ({ payload }) => Effect.flatMap(Cameras, (c) => c.confirm(payload))),
+)
+
+const ServicesLayer = Layer.mergeAll(DatasetCatalog.layer, RunsRegistry.layer, Cameras.layer).pipe(
   Layer.provideMerge(HfHub.layer),
+  Layer.provideMerge(DriverManager.layer),
   Layer.provideMerge(FetchHttpClient.layer),
   Layer.provideMerge(NodeFileSystem.layer),
 )
 
-const GroupsLayer = Layer.mergeAll(HealthLive, HfLive, DatasetsLive, TrainingsLive)
+const GroupsLayer = Layer.mergeAll(HealthLive, HfLive, DatasetsLive, TrainingsLive, CamerasLive)
 
 const PlatformLayer = Layer.mergeAll(Path.layer, Etag.layerWeak, HttpPlatform.layer).pipe(
   Layer.provideMerge(NodeFileSystem.layer),

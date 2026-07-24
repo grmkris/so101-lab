@@ -96,6 +96,46 @@ export class Checkpoints extends Schema.Class<Checkpoints>('Checkpoints')(
   }),
 ) {}
 
+export class ProbedCamera extends Schema.Class<ProbedCamera>('ProbedCamera')(
+  Schema.Struct({
+    index: Schema.Number,
+    width: Schema.Number,
+    height: Schema.Number,
+  }),
+) {}
+
+export class CameraMapping extends Schema.Class<CameraMapping>('CameraMapping')(
+  Schema.Struct({
+    workspace: Schema.NullOr(Schema.Number),
+    wrist: Schema.NullOr(Schema.Number),
+  }),
+) {}
+
+export class CameraStatus extends Schema.Class<CameraStatus>('CameraStatus')(
+  Schema.Struct({
+    previewing: Schema.Array(Schema.String),
+    brightness: Schema.Record(Schema.String, Schema.Number),
+    mapping: CameraMapping,
+    brightnessBand: Schema.Struct({ min: Schema.Number, max: Schema.Number }),
+  }),
+) {}
+
+export const CamerasGroup = HttpApiGroup.make('Cameras').add(
+  HttpApiEndpoint.get('probe', '/cameras/probe', { success: Schema.Array(ProbedCamera) }),
+  HttpApiEndpoint.post('previewStart', '/cameras/preview/start', {
+    payload: Schema.Struct({ indexes: Schema.Array(Schema.Number) }),
+    success: Schema.Struct({ started: Schema.Array(Schema.String) }),
+  }),
+  HttpApiEndpoint.post('previewStop', '/cameras/preview/stop', {
+    success: Schema.Struct({ stopped: Schema.Boolean }),
+  }),
+  HttpApiEndpoint.get('status', '/cameras/status', { success: CameraStatus }),
+  HttpApiEndpoint.post('confirm', '/cameras/confirm', {
+    payload: CameraMapping,
+    success: CameraMapping,
+  }),
+)
+
 const runId = { id: Schema.String }
 
 export const TrainingsGroup = HttpApiGroup.make('Trainings').add(
@@ -111,4 +151,5 @@ export const LabApi = HttpApi.make('LabConsole')
   .add(HfGroup)
   .add(DatasetsGroup)
   .add(TrainingsGroup)
+  .add(CamerasGroup)
   .prefix('/api')

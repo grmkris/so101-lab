@@ -40,5 +40,21 @@ export const checkpointsQuery = (id: string) =>
 export const createRun = (payload: typeof RunCreate.Type) =>
   runApi((client) => client.Trainings.create({ payload }))
 
+export const cameraStatusQuery = queryOptions({
+  queryKey: ['cameras', 'status'],
+  queryFn: () => runApi((client) => client.Cameras.status()),
+  refetchInterval: 2_000,
+})
+
+export const probeCameras = () => runApi((client) => client.Cameras.probe())
+
+export const startPreview = (indexes: ReadonlyArray<number>) =>
+  runApi((client) => client.Cameras.previewStart({ payload: { indexes } }))
+
+export const stopPreview = () => runApi((client) => client.Cameras.previewStop())
+
+export const confirmCameras = (payload: { workspace: number | null; wrist: number | null }) =>
+  runApi((client) => client.Cameras.confirm({ payload }))
+
 export const patchRun = (id: string, payload: typeof RunPatch.Type) =>
   runApi((client) => client.Trainings.update({ params: { id }, payload }))

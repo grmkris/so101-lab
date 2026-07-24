@@ -43,6 +43,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <Link to="/" className="font-semibold">
               Lab Console
             </Link>
+            <Link to="/robot" className="text-muted-foreground hover:text-foreground">
+              Robot
+            </Link>
             <Link to="/datasets" className="text-muted-foreground hover:text-foreground">
               Datasets
             </Link>
