@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
 import { createRun, datasetsQuery } from "#/lib/queries";
 
@@ -44,6 +46,7 @@ function NewTrainingPage() {
 			}),
 		onSuccess: (run) => {
 			queryClient.invalidateQueries({ queryKey: ["runs"] });
+			toast.success(`run ${run.name} registered`);
 			navigate({ to: "/trainings/$runId", params: { runId: run.id } });
 		},
 	});
@@ -156,7 +159,9 @@ function NewTrainingPage() {
 				{create.isPending ? "creating…" : "Create run"}
 			</button>
 			{create.isError && (
-				<p className="mt-2 text-sm text-red-500">{String(create.error)}</p>
+				<div className="mt-3">
+					<ErrorNote error={create.error} />
+				</div>
 			)}
 		</div>
 	);

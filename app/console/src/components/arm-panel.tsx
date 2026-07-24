@@ -9,6 +9,7 @@ import {
 	robotTeleopStop,
 	robotTorque,
 } from "#/lib/queries";
+import { ErrorNote } from "./error-note";
 import { KeyJogPad } from "./key-jog-pad";
 
 export function ArmPanel() {
@@ -16,7 +17,7 @@ export function ArmPanel() {
 	const queryClient = useQueryClient();
 	const invalidate = () =>
 		queryClient.invalidateQueries({ queryKey: ["robot"] });
-	const [lastError, setLastError] = useState<string | null>(null);
+	const [lastError, setLastError] = useState<unknown>(null);
 
 	const useAct = (fn: () => Promise<unknown>) =>
 		useMutation({
@@ -25,7 +26,7 @@ export function ArmPanel() {
 				setLastError(null);
 				invalidate();
 			},
-			onError: (e) => setLastError(String(e)),
+			onError: (e) => setLastError(e),
 		});
 
 	const [source, setSource] = useState<string>("");
@@ -186,7 +187,11 @@ export function ArmPanel() {
 				)}
 			</div>
 
-			{lastError && <p className="mt-2 text-sm text-red-500">{lastError}</p>}
+			{lastError != null && (
+				<div className="mt-3">
+					<ErrorNote error={lastError} />
+				</div>
+			)}
 
 			{s?.state === "teleop" && s.source === "keys" && <KeyJogPad />}
 

@@ -1,6 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Database } from "lucide-react";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { Button } from "#/components/ui/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "#/components/ui/empty";
+import { Skeleton } from "#/components/ui/skeleton";
 import { datasetsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/datasets")({ component: DatasetsPage });
@@ -18,9 +30,32 @@ function DatasetsPage() {
 			/>
 
 			{datasets.isPending ? (
-				<p className="mt-6 text-muted-foreground">scanning…</p>
+				<div className="mt-6 flex flex-col gap-3">
+					{[0, 1, 2].map((i) => (
+						<Skeleton key={i} className="h-8 w-full" />
+					))}
+				</div>
 			) : datasets.isError ? (
-				<p className="mt-6 text-red-500">failed: {String(datasets.error)}</p>
+				<div className="mt-6">
+					<ErrorNote error={datasets.error} />
+				</div>
+			) : datasets.data.length === 0 ? (
+				<Empty className="mt-6 border">
+					<EmptyHeader>
+						<EmptyMedia variant="icon">
+							<Database />
+						</EmptyMedia>
+						<EmptyTitle>No datasets yet</EmptyTitle>
+						<EmptyDescription>
+							Nothing in the local cache or on the Hub.
+						</EmptyDescription>
+					</EmptyHeader>
+					<EmptyContent>
+						<Button asChild>
+							<Link to="/record">Record a session</Link>
+						</Button>
+					</EmptyContent>
+				</Empty>
 			) : (
 				<table className="mt-6 w-full text-sm">
 					<thead>

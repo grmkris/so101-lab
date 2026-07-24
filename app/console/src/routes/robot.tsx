@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ArmPanel } from "#/components/arm-panel";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { apiErrorMessage } from "#/lib/errors";
 import {
 	cameraStatusQuery,
 	confirmCameras,
@@ -35,7 +38,11 @@ function RobotPage() {
 	});
 	const confirm = useMutation({
 		mutationFn: () => confirmCameras({ workspace, wrist }),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cameras"] }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["cameras"] });
+			toast.success("mapping saved to rig");
+		},
+		onError: (e) => toast.error(apiErrorMessage(e)),
 	});
 
 	const s = status.data;
@@ -82,7 +89,9 @@ function RobotPage() {
 			</div>
 
 			{probe.isError && (
-				<p className="mt-2 text-sm text-red-500">{String(probe.error)}</p>
+				<div className="mt-3">
+					<ErrorNote error={probe.error} />
+				</div>
 			)}
 			{probed && probed.length === 0 && (
 				<p className="mt-2 text-sm text-amber-600">
@@ -156,9 +165,6 @@ function RobotPage() {
 					Confirm mapping (workspace=cam{workspace ?? "?"} wrist=cam
 					{wrist ?? "?"})
 				</button>
-			)}
-			{confirm.isSuccess && (
-				<p className="mt-2 text-sm text-green-600">mapping saved to rig</p>
 			)}
 		</div>
 	);

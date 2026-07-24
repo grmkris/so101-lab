@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
 import { datasetEpisodesQuery } from "#/lib/queries";
 
@@ -23,8 +25,7 @@ function DatasetReportPage() {
 
 	if (report.isPending)
 		return <p className="text-muted-foreground">reading meta…</p>;
-	if (report.isError)
-		return <p className="text-red-500">failed: {String(report.error)}</p>;
+	if (report.isError) return <ErrorNote error={report.error} />;
 	const r = report.data;
 
 	const kept = r.episodes.map((e) => e.index).filter((i) => !excluded.has(i));
@@ -122,11 +123,12 @@ function DatasetReportPage() {
 								<button
 									type="button"
 									className="rounded border px-3 py-1"
-									onClick={() =>
+									onClick={() => {
 										navigator.clipboard.writeText(
 											`--dataset.episodes "${episodesArg}"`,
-										)
-									}
+										);
+										toast.success("flag copied");
+									}}
 								>
 									copy flag
 								</button>

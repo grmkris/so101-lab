@@ -1,7 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Brain } from "lucide-react";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
 import { Button } from "#/components/ui/button";
+import {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "#/components/ui/empty";
+import { Skeleton } from "#/components/ui/skeleton";
 import { runsQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/trainings/")({
@@ -32,9 +43,32 @@ function TrainingsPage() {
 			/>
 
 			{runs.isPending ? (
-				<p className="mt-6 text-muted-foreground">loading…</p>
+				<div className="mt-6 flex flex-col gap-3">
+					{[0, 1, 2].map((i) => (
+						<Skeleton key={i} className="h-8 w-full" />
+					))}
+				</div>
 			) : runs.isError ? (
-				<p className="mt-6 text-red-500">failed: {String(runs.error)}</p>
+				<div className="mt-6">
+					<ErrorNote error={runs.error} />
+				</div>
+			) : runs.data.length === 0 ? (
+				<Empty className="mt-6 border">
+					<EmptyHeader>
+						<EmptyMedia variant="icon">
+							<Brain />
+						</EmptyMedia>
+						<EmptyTitle>No training runs yet</EmptyTitle>
+						<EmptyDescription>
+							Runs registered here track Hub checkpoints automatically.
+						</EmptyDescription>
+					</EmptyHeader>
+					<EmptyContent>
+						<Button asChild>
+							<Link to="/trainings/new">New training</Link>
+						</Button>
+					</EmptyContent>
+				</Empty>
 			) : (
 				<table className="mt-6 w-full text-sm">
 					<thead>

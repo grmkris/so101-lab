@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ErrorNote } from "#/components/error-note";
 import { PageHeader } from "#/components/page-header";
+import { apiErrorMessage } from "#/lib/errors";
 import { checkpointsQuery, patchRun, runQuery } from "#/lib/queries";
 
 export const Route = createFileRoute("/trainings/$runId")({
@@ -18,18 +21,25 @@ function RunPage() {
 	const saveFinding = useMutation({
 		mutationFn: (value: string) =>
 			patchRun(runId, { status: null, hypothesis: null, finding: value }),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["runs"] }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["runs"] });
+			toast.success("finding saved");
+		},
+		onError: (e) => toast.error(apiErrorMessage(e)),
 	});
 
 	const markLaunched = useMutation({
 		mutationFn: () =>
 			patchRun(runId, { status: "launched", hypothesis: null, finding: null }),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["runs"] }),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["runs"] });
+			toast.success("marked launched — checkpoint polling active");
+		},
+		onError: (e) => toast.error(apiErrorMessage(e)),
 	});
 
 	if (run.isPending) return <p className="text-muted-foreground">loading…</p>;
-	if (run.isError)
-		return <p className="text-red-500">failed: {String(run.error)}</p>;
+	if (run.isError) return <ErrorNote error={run.error} />;
 	const r = run.data;
 
 	const targetSteps = r.config?.steps ?? null;
@@ -142,9 +152,10 @@ function RunPage() {
 							<button
 								type="button"
 								className="rounded border px-3 py-1"
-								onClick={() =>
-									navigator.clipboard.writeText(r.colabCell as string)
-								}
+								onClick={() => {
+									navigator.clipboard.writeText(r.colabCell as string);
+									toast.success("Colab cell copied");
+								}}
 							>
 								copy
 							</button>

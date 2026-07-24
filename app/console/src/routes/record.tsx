@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ErrorNote, PreflightGateList } from "#/components/error-note";
 import { KeyJogPad } from "#/components/key-jog-pad";
 import { PageHeader } from "#/components/page-header";
+import { isPreflightError } from "#/lib/errors";
 import {
 	recordControl,
 	recordStart,
@@ -181,15 +183,13 @@ function RecordPage() {
 							: `Start recording (${numEpisodes} eps)`}
 					</button>
 					{start.isError && (
-						<p
-							className={`mt-2 text-sm ${
-								String(start.error).includes("PreflightError")
-									? "text-amber-600"
-									: "text-red-500"
-							}`}
-						>
-							{String(start.error)}
-						</p>
+						<div className="mt-3">
+							{isPreflightError(start.error) ? (
+								<PreflightGateList error={start.error} />
+							) : (
+								<ErrorNote error={start.error} />
+							)}
+						</div>
 					)}
 				</div>
 			)}
