@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Cpu, Radio } from "lucide-react";
 import { ErrorNote } from "#/components/error-note";
+import { HubTokenGate } from "#/components/hub-token-gate";
 import { PageHeader } from "#/components/page-header";
 import { SimBadge, StatusBadge } from "#/components/status-badge";
 import { Button } from "#/components/ui/button";
@@ -45,7 +46,11 @@ export function LobbyPage() {
 					<Skeleton className="h-64 w-full" />
 				</div>
 			) : rigs.isError ? (
-				<ErrorNote error={rigs.error} />
+				rigs.error.message === "unauthorized" ? (
+					<HubTokenGate />
+				) : (
+					<ErrorNote error={rigs.error} />
+				)
 			) : rigs.data.length === 0 ? (
 				<Empty className="border">
 					<EmptyHeader>

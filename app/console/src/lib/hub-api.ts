@@ -26,13 +26,36 @@ export const clientId = ((): string => {
 	return id;
 })();
 
+/**
+ * Hub shared secret, entered once in the lobby. localStorage feeds the
+ * fetch header; the cookie exists for what cannot set headers — <img>
+ * MJPEG streams and the lease-release sendBeacon.
+ */
+export const hubToken = {
+	get: (): string =>
+		typeof window === "undefined"
+			? ""
+			: (localStorage.getItem("lab-hub-token") ?? ""),
+	set: (token: string): void => {
+		localStorage.setItem("lab-hub-token", token);
+		const secure = location.protocol === "https:" ? "; Secure" : "";
+		document.cookie = `lab_hub_token=${encodeURIComponent(token)}; path=/; max-age=31536000; SameSite=Lax${secure}`;
+	},
+};
+
+const authHeaders = (): Record<string, string> => {
+	const token = hubToken.get();
+	return token ? { authorization: `Bearer ${token}` } : {};
+};
+
 const post = async (path: string, body: Record<string, unknown> = {}) => {
 	const res = await fetch(path, {
 		method: "POST",
-		headers: { "content-type": "application/json" },
+		headers: { "content-type": "application/json", ...authHeaders() },
 		body: JSON.stringify({ clientId, ...body }),
 	});
 	const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+	if (res.status === 401) throw new Error("unauthorized");
 	if (!res.ok) throw new Error(String(json.error ?? res.statusText));
 	return json;
 };
@@ -56,7 +79,8 @@ export const modeQuery = queryOptions({
 export const rigsQuery = queryOptions({
 	queryKey: ["hub", "rigs"],
 	queryFn: async (): Promise<ReadonlyArray<RigSummary>> => {
-		const res = await fetch("/api/hub/rigs");
+		const res = await fetch("/api/hub/rigs", { headers: authHeaders() });
+		if (res.status === 401) throw new Error("unauthorized");
 		if (!res.ok) throw new Error("hub unreachable");
 		return res.json();
 	},
@@ -67,7 +91,10 @@ export const rigQuery = (name: string) =>
 	queryOptions({
 		queryKey: ["hub", "rigs", name],
 		queryFn: async (): Promise<RigSummary> => {
-			const res = await fetch(`/api/hub/rigs/${encodeURIComponent(name)}`);
+			const res = await fetch(`/api/hub/rigs/${encodeURIComponent(name)}`, {
+				headers: authHeaders(),
+			});
+			if (res.status === 401) throw new Error("unauthorized");
 			if (!res.ok) throw new Error("rig not registered on this hub");
 			return res.json();
 		},
@@ -77,7 +104,7 @@ export const rigQuery = (name: string) =>
 export const impairmentQuery = queryOptions({
 	queryKey: ["hub", "impairment"],
 	queryFn: async (): Promise<{ latencyMs: number; dropRate: number }> => {
-		const res = await fetch("/api/hub/impairment");
+		const res = await fetch("/api/hub/impairment", { headers: authHeaders() });
 		return res.json();
 	},
 	staleTime: 60_000,

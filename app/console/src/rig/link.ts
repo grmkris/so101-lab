@@ -49,9 +49,14 @@ export const startRigLink = (opts: {
 	/** "sim" | "real" — bring the backend up on boot so the rig appears in the
 	 * lobby already streaming, instead of waiting for someone to click Connect. */
 	autoConnect?: string;
+	/** Hub shared secret (HUB_TOKEN) — sent as a bearer header on every call. */
+	token?: string;
 }): void => {
-	const { hubUrl, rigName, autoConnect } = opts;
+	const { hubUrl, rigName, autoConnect, token } = opts;
 	const base = hubUrl.replace(/\/$/, "");
+	const auth: Record<string, string> = token
+		? { authorization: `Bearer ${token}` }
+		: {};
 	let cams: string[] = [];
 	let previewing: ReadonlyArray<string> = [];
 	let linkMs = 0;
@@ -89,7 +94,7 @@ export const startRigLink = (opts: {
 		try {
 			const res = await fetch(`${base}/api/hub/link`, {
 				method: "POST",
-				headers: { "content-type": "application/json" },
+				headers: { "content-type": "application/json", ...auth },
 				body: JSON.stringify({
 					name: rigName,
 					backend: robot?.backend ?? "real",
@@ -184,7 +189,7 @@ export const startRigLink = (opts: {
 					`${base}/api/hub/frame?rig=${encodeURIComponent(rigName)}&cam=${encodeURIComponent(cam)}`,
 					{
 						method: "POST",
-						headers: { "content-type": "image/jpeg" },
+						headers: { "content-type": "image/jpeg", ...auth },
 						body: buf,
 					},
 				);

@@ -69,6 +69,18 @@ class DriverProc {
 		proc.stderr?.on("data", (chunk: Buffer) =>
 			console.error(chunk.toString().trimEnd()),
 		);
+		// Without this, a missing python binary is an uncaught ChildProcess
+		// 'error' event — it kills the whole server, not just the request.
+		proc.on("error", (err) => {
+			console.error(`[driver-manager] driver spawn failed: ${String(err)}`);
+			this.lastError = `driver spawn failed: ${String(err)}`;
+			for (const p of this.pending.values())
+				p.reject(new Error(`driver spawn failed: ${String(err)}`));
+			this.pending.clear();
+			this.proc = null;
+			this.readyPromise = null;
+			this.robotState = "disconnected";
+		});
 		proc.on("exit", (code) => {
 			console.error(`[driver-manager] driver exited (${code})`);
 			for (const p of this.pending.values())
