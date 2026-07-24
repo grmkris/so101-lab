@@ -12,7 +12,6 @@ const PYTHON =
 		? VENV_PYTHON
 		: `${os.homedir()}/.local/share/uv/tools/lelab/bin/python`);
 const DRIVER_SCRIPT = `${DRIVER_DIR}/driver.py`;
-export const MJPEG_PORT = 8765;
 
 export interface RecordState {
 	active: boolean;
@@ -37,6 +36,8 @@ class DriverProc {
 	private proc: ChildProcess | null = null;
 	private nextId = 1;
 	private pending = new Map<number, Pending>();
+	/** OS-assigned, reported back in `ready` — several rigs can share a machine. */
+	mjpegPort = 0;
 	brightness: Record<string, number> = {};
 	streams: ReadonlyArray<string> = [];
 	readonly joints: Record<string, number> = {};
@@ -61,13 +62,9 @@ class DriverProc {
 	private start(): Promise<void> {
 		if (this.readyPromise && this.proc && this.proc.exitCode === null)
 			return this.readyPromise;
-		const proc = spawn(
-			PYTHON,
-			[DRIVER_SCRIPT, "--mjpeg-port", String(MJPEG_PORT)],
-			{
-				stdio: ["pipe", "pipe", "pipe"],
-			},
-		);
+		const proc = spawn(PYTHON, [DRIVER_SCRIPT, "--mjpeg-port", "0"], {
+			stdio: ["pipe", "pipe", "pipe"],
+		});
 		this.proc = proc;
 		proc.stderr?.on("data", (chunk: Buffer) =>
 			console.error(chunk.toString().trimEnd()),
@@ -104,6 +101,7 @@ class DriverProc {
 					return;
 				}
 				if (msg.event === "ready") {
+					this.mjpegPort = Number(msg.mjpegPort) || 0;
 					clearTimeout(timer);
 					resolve();
 				} else if (msg.event === "status") {
@@ -158,6 +156,11 @@ class DriverProc {
 		return result as Promise<T>;
 	}
 
+	/** Frame URL base, or null until the driver has reported its port. */
+	mjpegBase(): string | null {
+		return this.mjpegPort ? `http://127.0.0.1:${this.mjpegPort}` : null;
+	}
+
 	kill(): void {
 		this.proc?.kill();
 		this.proc = null;
@@ -173,6 +176,9 @@ if (!globalStore.__labDriverProc) {
 	globalStore.__labDriverProc = new DriverProc();
 }
 const driverProc = globalStore.__labDriverProc;
+
+/** Where this process's driver serves frames (null before it is ready). */
+export const mjpegBase = (): string | null => driverProc.mjpegBase();
 
 if (!globalStore.__labDriverExitHook) {
 	globalStore.__labDriverExitHook = true;

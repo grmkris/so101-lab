@@ -8,16 +8,16 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "start": "bun dist/server/server.js",
-    "sim:hub": "LAB_MODE=hub vite dev --port 3001",
-    "sim:rig": "HUB_URL=http://localhost:3001 RIG_NAME=kris-sim vite dev --port 3000",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "sim:rig:viewer": "LAB_SIM_VIEWER=1 LAB_DRIVER_PYTHON=../driver/.venv/bin/mjpython HUB_URL=http://localhost:3001 RIG_NAME=kris-sim vite dev --port 3000",
-    "rig:real": "HUB_URL=http://localhost:3001 RIG_NAME=kris-arm vite dev --port 3000"
+    "rig:real": "HUB_URL=http://localhost:3001 RIG_NAME=kris-arm LAB_AUTOCONNECT=real vite dev --port 3002",
+    "hub": "LAB_MODE=hub vite dev --port 3001",
+    "rig:sim": "HUB_URL=http://localhost:3001 RIG_NAME=kris-sim LAB_AUTOCONNECT=sim vite dev --port 3000",
+    "rig:sim:viewer": "LAB_SIM_VIEWER=1 LAB_DRIVER_PYTHON=../driver/.venv/bin/mjpython HUB_URL=http://localhost:3001 RIG_NAME=kris-sim LAB_AUTOCONNECT=sim vite dev --port 3000"
   },
   "dependencies": {
     "@effect/platform-node": "4.0.0-beta.101",

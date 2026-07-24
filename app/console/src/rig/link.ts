@@ -8,11 +8,13 @@
  * is debuggable with curl. One request carries telemetry up and control down.
  */
 import { apiHandler } from "#/api/live";
-import { MJPEG_PORT } from "#/api/services/driver-manager";
+import { mjpegBase } from "#/api/services/driver-manager";
 
 const LINK_MS = 50; // 20 Hz control
 const FRAME_MS = 125; // 8 fps preview — the recording stays full-rate locally
-const CANDIDATE_CAMS = ["workspace_cam", "wrist_cam"];
+// sim renders to these fixed names; a real rig names them cam0/cam1 and only
+// knows which exist once previews are running, so the list is discovered
+const SIM_CAMS = ["workspace_cam", "wrist_cam"];
 
 /** Call the rig's own API in-process — reuses all existing validation. */
 const localApi = async (
@@ -44,23 +46,45 @@ interface RobotState {
 export const startRigLink = (opts: {
 	hubUrl: string;
 	rigName: string;
+	/** "sim" | "real" — bring the backend up on boot so the rig appears in the
+	 * lobby already streaming, instead of waiting for someone to click Connect. */
+	autoConnect?: string;
 }): void => {
-	const { hubUrl, rigName } = opts;
+	const { hubUrl, rigName, autoConnect } = opts;
 	const base = hubUrl.replace(/\/$/, "");
 	let cams: string[] = [];
+	let previewing: ReadonlyArray<string> = [];
 	let linkMs = 0;
 	let warned = false;
 
+	let autoConnectTried = false;
 	const link = async () => {
 		const started = Date.now();
 		const robot = (await localApi("/api/robot/state")) as RobotState | null;
+
+		if (autoConnect && !autoConnectTried && robot?.state === "disconnected") {
+			autoConnectTried = true; // one attempt — never fight a human disconnect
+			console.error(`[rig-link] auto-connecting backend=${autoConnect}`);
+			await localApi("/api/robot/connect", {
+				method: "POST",
+				body: JSON.stringify({ withLeader: true, backend: autoConnect }),
+			});
+			if (autoConnect === "real") {
+				const cams = (await localApi("/api/cameras/probe")) as Array<{
+					index: number;
+				}> | null;
+				if (cams?.length)
+					await localApi("/api/cameras/preview/start", {
+						method: "POST",
+						body: JSON.stringify({ indexes: cams.map((c) => c.index) }),
+					});
+			}
+		}
 		const cameras = (await localApi("/api/cameras/status")) as {
 			previewing?: string[];
 		} | null;
-		const advertised =
-			cameras?.previewing && cameras.previewing.length > 0
-				? cameras.previewing
-				: cams;
+		previewing = cameras?.previewing ?? [];
+		const advertised = cams.length > 0 ? cams : previewing;
 
 		try {
 			const res = await fetch(`${base}/api/hub/link`, {
@@ -147,13 +171,16 @@ export const startRigLink = (opts: {
 
 	const pushFrames = async () => {
 		const found: string[] = [];
-		for (const cam of CANDIDATE_CAMS) {
+		const candidates = [...new Set([...previewing, ...SIM_CAMS])];
+		for (const cam of candidates) {
 			try {
-				const snap = await fetch(`http://127.0.0.1:${MJPEG_PORT}/snap/${cam}`);
+				const mjpeg = mjpegBase(); // NOT `base` — that is the hub URL
+				if (!mjpeg) break;
+				const snap = await fetch(`${mjpeg}/snap/${cam}`);
 				if (!snap.ok) continue;
 				found.push(cam);
 				const buf = await snap.arrayBuffer();
-				await fetch(
+				const res = await fetch(
 					`${base}/api/hub/frame?rig=${encodeURIComponent(rigName)}&cam=${encodeURIComponent(cam)}`,
 					{
 						method: "POST",
@@ -161,8 +188,14 @@ export const startRigLink = (opts: {
 						body: buf,
 					},
 				);
-			} catch {
-				// driver not up, or hub down — the link loop reports it
+				if (!res.ok)
+					console.error(
+						`[rig-link] hub rejected frame ${cam}: ${res.status} ${await res.text()}`,
+					);
+			} catch (err) {
+				console.error(
+					`[rig-link] frame push failed for ${cam}: ${String(err)}`,
+				);
 			}
 		}
 		cams = found;

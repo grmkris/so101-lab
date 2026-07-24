@@ -61,7 +61,10 @@ function DrivePage() {
 				);
 		};
 		window.addEventListener("pagehide", drop);
-		return () => window.removeEventListener("pagehide", drop);
+		return () => {
+			window.removeEventListener("pagehide", drop);
+			drop(); // client-side nav away: hand the rig back immediately
+		};
 	}, [iAmDriving, rigName]);
 
 	// Hold the slot with a lease renewal that carries NO axes. Renewing via the

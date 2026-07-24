@@ -3,7 +3,7 @@ import {
 	defaultStreamHandler,
 } from "@tanstack/react-start/server";
 import { apiHandler } from "#/api/live";
-import { MJPEG_PORT } from "#/api/services/driver-manager";
+import { mjpegBase } from "#/api/services/driver-manager";
 import { handleHubRequest } from "#/hub/routes";
 import { startRigLink } from "#/rig/link";
 
@@ -19,7 +19,11 @@ const IS_HUB = process.env.LAB_MODE === "hub";
 const boot = globalThis as unknown as { __labRigLinkStarted?: boolean };
 if (HUB_URL && process.env.LAB_MODE !== "hub" && !boot.__labRigLinkStarted) {
 	boot.__labRigLinkStarted = true;
-	startRigLink({ hubUrl: HUB_URL, rigName: RIG_NAME });
+	startRigLink({
+		hubUrl: HUB_URL,
+		rigName: RIG_NAME,
+		autoConnect: process.env.LAB_AUTOCONNECT,
+	});
 }
 
 export default {
@@ -46,12 +50,21 @@ export default {
 			return handleHubRequest(request, url);
 		}
 
+		// A hub has no arm, no cameras and no lerobot cache. Gate the hardware
+		// routes rather than let them spawn a driver that cannot exist there.
+		if (IS_HUB && /^\/api\/(robot|cameras|record|cams)\b/.test(url.pathname)) {
+			return new Response(
+				JSON.stringify({ error: "this is a hub — no robot attached" }),
+				{ status: 404, headers: { "content-type": "application/json" } },
+			);
+		}
+
 		// MJPEG passthrough — outside the typed contract (infinite multipart stream)
 		if (url.pathname.startsWith("/api/cams/")) {
 			const name = url.pathname.split("/").at(-1);
-			const upstream = await fetch(
-				`http://127.0.0.1:${MJPEG_PORT}/cam/${name}`,
-			);
+			const base = mjpegBase();
+			if (!base) return new Response("driver not ready", { status: 503 });
+			const upstream = await fetch(`${base}/cam/${name}`);
 			return new Response(upstream.body, {
 				headers: {
 					"content-type":

@@ -271,16 +271,19 @@ def main() -> None:
     sys.stdout = sys.stderr
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mjpeg-port", type=int, default=8765)
+    # 0 = let the OS pick a free port; the real one goes back in `ready`, so
+    # several rigs can share a machine with nothing to configure
+    parser.add_argument("--mjpeg-port", type=int, default=0)
     args = parser.parse_args()
 
     server = ThreadingHTTPServer(("127.0.0.1", args.mjpeg_port), MJPEGHandler)
+    mjpeg_port = server.server_address[1]
     threading.Thread(target=server.serve_forever, daemon=True).start()
     threading.Thread(target=status_reporter, daemon=True).start()
     threading.Thread(target=orphan_watchdog, daemon=True).start()
 
-    emit({"event": "ready", "mjpegPort": args.mjpeg_port})
-    log(f"ready, mjpeg on :{args.mjpeg_port}")
+    emit({"event": "ready", "mjpegPort": mjpeg_port})
+    log(f"ready, mjpeg on :{mjpeg_port}")
 
     for line in sys.stdin:
         line = line.strip()
