@@ -39,6 +39,7 @@ class DriverProc {
   readonly joints: Record<string, number> = {}
   robotState = 'disconnected'
   backendName = 'real'
+  sourceName: string | null = null
   hasLeader = false
   recordState: RecordState = {
     active: false,
@@ -65,6 +66,7 @@ class DriverProc {
       this.readyPromise = null // next rpc() respawns lazily
       this.robotState = 'disconnected'
       this.backendName = 'real'
+      this.sourceName = null
       this.hasLeader = false
       this.brightness = {}
       this.streams = []
@@ -92,6 +94,7 @@ class DriverProc {
         } else if (msg.event === 'robot_state') {
           this.robotState = String(msg.state)
           if (msg.backend) this.backendName = String(msg.backend)
+          this.sourceName = msg.source ? String(msg.source) : null
         } else if (msg.event === 'record_state') {
           const phase = String(msg.phase)
           this.recordState = {
@@ -160,6 +163,7 @@ export interface DriverManagerShape {
   readonly robot: () => Effect.Effect<{
     state: string
     backend: string
+    source: string | null
     leader: boolean
     joints: Record<string, number>
   }>
@@ -182,6 +186,7 @@ export class DriverManager extends Context.Service<DriverManager, DriverManagerS
       Effect.sync(() => ({
         state: driverProc.robotState,
         backend: driverProc.backendName,
+        source: driverProc.sourceName,
         leader: driverProc.hasLeader,
         joints: { ...driverProc.joints },
       })),

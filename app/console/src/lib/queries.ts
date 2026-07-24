@@ -67,8 +67,11 @@ export const robotConnect = (withLeader: boolean, backend: 'real' | 'sim' = 'rea
 export const robotDisconnect = () => runApi((client) => client.Robot.disconnect())
 export const robotTorque = (on: boolean) =>
   runApi((client) => client.Robot.torque({ payload: { on } }))
-export const robotTeleopStart = () => runApi((client) => client.Robot.teleopStart())
+export const robotTeleopStart = (source: string | null = null) =>
+  runApi((client) => client.Robot.teleopStart({ payload: { source } }))
 export const robotTeleopStop = () => runApi((client) => client.Robot.teleopStop())
+export const robotTeleopInput = (axes: Record<string, number>) =>
+  runApi((client) => client.Robot.teleopInput({ payload: { axes } }))
 export const robotEstop = () => runApi((client) => client.Robot.estop())
 
 export const recordStatusQuery = queryOptions({

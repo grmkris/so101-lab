@@ -2,7 +2,6 @@
 Connect/teleop structure cribbed from LeLab's teleoperate.py (worker owns disconnect).
 """
 
-import threading
 import time
 
 from shared import emit, log
@@ -129,40 +128,35 @@ class RealBackend:
             raise ValueError("not connected")
         return self._read_joints()
 
-    def _teleop_worker(self) -> None:
-        last_emit = 0.0
-        try:
-            while self.teleop_active:
-                action = self.teleop.get_action()
-                self.robot.send_action(action)
-                now = time.time()
-                if now - last_emit >= 0.1:
-                    self.joints.update(self._read_joints())
-                    emit({"event": "joints", "values": dict(self.joints)})
-                    last_emit = now
-                time.sleep(0.001)
-        except Exception as exc:  # noqa: BLE001
-            log(f"teleop loop error: {exc}")
-            emit({"event": "error", "where": "teleop", "error": str(exc)})
-        finally:
-            self.teleop_active = False
-            self.state = "connected"
-            self._emit_state()
+    # ---------- uniform surface for the driver's unified teleop loop ----------
 
-    def teleop_start(self) -> dict:
-        if self.robot is None or self.teleop is None:
-            raise ValueError("connect with a leader arm first")
-        if self.teleop_active:
-            raise ValueError("teleop already active")
-        self.teleop_active = True
-        self.state = "teleop"
-        threading.Thread(target=self._teleop_worker, name="teleop-worker", daemon=True).start()
-        self._emit_state()
-        return {"state": "teleop"}
+    @property
+    def lerobot_joint_names(self) -> list[str]:
+        if self.robot is None:
+            raise ValueError("not connected")
+        return list(self.robot.bus.motors.keys())
 
-    def teleop_stop(self) -> dict:
-        self.teleop_active = False
-        return {"state": "connected"}
+    def current_joints_pos(self) -> dict[str, float]:
+        """Observation-shaped joints: {"<name>.pos": value} in lerobot units."""
+        if self.robot is None:
+            raise ValueError("not connected")
+        return {k: float(v) for k, v in self.robot.get_observation().items() if k.endswith(".pos")}
+
+    def apply_action(self, action: dict) -> None:
+        self.robot.send_action(action)
+
+    def teleop_ready(self, source: str) -> None:
+        """Called by the driver before its unified teleop loop starts."""
+        if self.robot is None:
+            raise ValueError("not connected")
+        if source == "leader" and self.teleop is None:
+            raise ValueError("connect with the leader arm first")
+        # synthetic sources get a per-frame clamp; the leader is human-limited
+        self.robot.config.max_relative_target = None if source == "leader" else 15.0
+
+    def teleop_done(self) -> None:
+        if self.robot is not None:
+            self.robot.config.max_relative_target = None
 
     # ---------- record ----------
 

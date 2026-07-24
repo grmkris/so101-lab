@@ -72,6 +72,7 @@ const robotState = Effect.gen(function* () {
   return new RobotState({
     state: r.state,
     backend: r.backend,
+    source: r.source,
     leader: r.leader,
     joints: r.joints,
     rig: { followerPort: RIG.followerPort, leaderPort: RIG.leaderPort, robotId: RIG.robotId },
@@ -105,8 +106,14 @@ const RobotLive = HttpApiBuilder.group(LabApi, 'Robot', (handlers) =>
     )
     .handle('disconnect', () => robotCmd('disconnect'))
     .handle('torque', ({ payload }) => robotCmd('torque', { on: payload.on }))
-    .handle('teleopStart', () => robotCmd('teleop_start'))
+    .handle('teleopStart', ({ payload }) => robotCmd('teleop_start', { source: payload.source }))
     .handle('teleopStop', () => robotCmd('teleop_stop'))
+    .handle('teleopInput', ({ payload }) =>
+      Effect.flatMap(DriverManager, (d) => d.rpc('teleop_input', { axes: payload.axes })).pipe(
+        Effect.as({ ok: true }),
+        Effect.mapError(toDriverError),
+      ),
+    )
     .handle('estop', () => robotCmd('estop')),
 )
 

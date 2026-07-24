@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Lab Console robot driver — real (serial/OpenCV) and sim (MuJoCo) backends behind one ndjson-RPC protocol"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "lerobot[feetech,dataset]==0.6.0",
+    "lerobot[feetech,dataset,kinematics]==0.6.0",
     "mujoco>=3.2",
     "opencv-python>=4.9",
 ]

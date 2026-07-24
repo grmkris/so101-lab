@@ -13,15 +13,14 @@ real lerobot Teleoperator because record_loop isinstance-checks its teleop.
 import random
 import threading
 import time
-from dataclasses import dataclass
 from pathlib import Path
 
 import cv2
 import mujoco
 import numpy as np
-from lerobot.teleoperators.teleoperator import Teleoperator
 
 from shared import BRIGHTNESS, FRAMES, LOCK, emit, log
+from sources.scripted import ScriptedExpert
 
 MENAGERIE_DIR = Path(__file__).parent.parent / "assets/mujoco_menagerie/trs_so_arm100"
 SCENE_FILE = MENAGERIE_DIR / "lab_scene.xml"
@@ -108,8 +107,6 @@ class SimBackend:
 
         self.state = "connected"
         self.paused = False
-        self.teleop_active = False
-        self.expert = SimExpert(self)
         self._alive = True
         threading.Thread(target=self._physics_loop, name="sim-physics", daemon=True).start()
         threading.Thread(target=self._render_loop, name="sim-render", daemon=True).start()
@@ -140,6 +137,15 @@ class SimBackend:
 
     def _qpos_rad(self) -> list[float]:
         return [float(self.data.qpos[adr]) for adr in self.joint_qpos]
+
+    @property
+    def lerobot_joint_names(self) -> list[str]:
+        return [lname for lname, _ in JOINT_MAP]
+
+    def current_joints_pos(self) -> dict[str, float]:
+        """Observation-shaped joints: {"<name>.pos": value} in lerobot units."""
+        with self.sim_lock:
+            return self.rad_to_lerobot(self._qpos_rad())
 
     def get_joints(self) -> dict[str, float]:
         with self.sim_lock:
@@ -183,18 +189,6 @@ class SimBackend:
             n += 1
             time.sleep(1 / 15)
 
-    def _teleop_loop(self) -> None:
-        last_emit = 0.0
-        while self.teleop_active:
-            self.apply_action(self.expert.get_action())
-            now = time.time()
-            if now - last_emit >= 0.1:
-                emit({"event": "joints", "values": self.get_joints()})
-                last_emit = now
-            time.sleep(1 / 30)
-        self.state = "connected"
-        emit({"event": "robot_state", "state": self.state, "backend": self.name})
-
     # ---------- protocol commands ----------
 
     def connect(self, _req: dict) -> dict:
@@ -202,7 +196,6 @@ class SimBackend:
         return {"state": self.state, "leader": True}  # scripted expert plays the leader
 
     def disconnect(self) -> dict:
-        self.teleop_active = False
         self._alive = False
         self.state = "disconnected"
         with LOCK:
@@ -217,35 +210,24 @@ class SimBackend:
 
     def estop(self) -> dict:
         """Sim E-stop = pause physics (muscle memory parity with the real button)."""
-        self.teleop_active = False
         self.paused = True
         self.state = "connected"
         emit({"event": "robot_state", "state": self.state, "backend": self.name})
         return {"estopped": True}
 
-    def teleop_start(self) -> dict:
-        if self.teleop_active:
-            raise ValueError("teleop already active")
+    def teleop_ready(self, source: str) -> None:
+        """Called by the driver before its unified teleop loop starts."""
+        if source == "leader":
+            raise ValueError("leader arm source needs the real backend")
         self.paused = False
-        self.expert.reset()
-        self.teleop_active = True
-        self.state = "teleop"
-        threading.Thread(target=self._teleop_loop, name="sim-teleop", daemon=True).start()
-        emit({"event": "robot_state", "state": self.state, "backend": self.name})
-        return {"state": "teleop"}
-
-    def teleop_stop(self) -> dict:
-        self.teleop_active = False
-        return {"state": "connected"}
 
     # ---------- record ----------
 
     def prepare_record(self, _cfg: dict):
-        self.teleop_active = False
         self.paused = False
         self.state = "recording"
         emit({"event": "robot_state", "state": self.state, "backend": self.name})
-        expert = SimExpert(self)
+        expert = ScriptedExpert(self, KEYFRAMES)
 
         def on_episode_start() -> None:
             with self.sim_lock:
@@ -311,71 +293,3 @@ class SimArm:
     def send_action(self, action: dict) -> dict:
         self.b.apply_action(action)
         return action
-
-
-@dataclass
-class SimExpertConfig:
-    id: str | None = "sim"
-    calibration_dir: Path | None = None
-
-
-class SimExpert(Teleoperator):
-    """Scripted pick choreography as a genuine Teleoperator (record_loop isinstance-checks)."""
-
-    name = "sim_expert"
-    config_class = SimExpertConfig
-
-    def __init__(self, backend: SimBackend) -> None:
-        self.b = backend
-        self.id = "sim"
-        self.calibration_dir = None
-        self.calibration = None
-        self._t0 = time.time()
-
-    def reset(self) -> None:
-        self._t0 = time.time()
-
-    @property
-    def action_features(self) -> dict:
-        return {f"{lname}.pos": float for lname, _ in JOINT_MAP}
-
-    @property
-    def feedback_features(self) -> dict:
-        return {}
-
-    @property
-    def is_connected(self) -> bool:
-        return True
-
-    def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
-        self._t0 = time.time()
-
-    @property
-    def is_calibrated(self) -> bool:
-        return True
-
-    def calibrate(self) -> None:
-        pass
-
-    def configure(self) -> None:
-        pass
-
-    def get_action(self) -> dict:
-        t = time.time() - self._t0
-        total = sum(d for _, d in KEYFRAMES)
-        t = t % total
-        prev = KEYFRAMES[0][0]
-        for target, dur in KEYFRAMES:
-            if t <= dur:
-                alpha = t / dur if dur > 0 else 1.0
-                rad = [p + (q - p) * alpha for p, q in zip(prev, target)]
-                return self.b.rad_to_lerobot(rad)
-            t -= dur
-            prev = target
-        return self.b.rad_to_lerobot(KEYFRAMES[-1][0])
-
-    def send_feedback(self, feedback: dict) -> None:
-        pass
-
-    def disconnect(self) -> None:
-        pass

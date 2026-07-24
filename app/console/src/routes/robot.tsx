@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   cameraStatusQuery,
   confirmCameras,
@@ -9,6 +9,7 @@ import {
   robotDisconnect,
   robotEstop,
   robotStateQuery,
+  robotTeleopInput,
   robotTeleopStart,
   robotTeleopStop,
   robotTorque,
@@ -17,6 +18,86 @@ import {
 } from '#/lib/queries'
 
 export const Route = createFileRoute('/robot')({ component: RobotPage })
+
+// browser-side key → EE axis map (lerobot units downstream; no pynput, no OS permissions)
+const KEY_AXES: Record<string, [string, number]> = {
+  w: ['x', 1],
+  s: ['x', -1],
+  a: ['y', 1],
+  d: ['y', -1],
+  q: ['z', 1],
+  e: ['z', -1],
+  o: ['gripper', 1],
+  c: ['gripper', -1],
+}
+
+function KeyJogPad() {
+  const pressed = useRef<Record<string, number>>({})
+  const [focused, setFocused] = useState(false)
+
+  const send = () => {
+    const axes: Record<string, number> = { x: 0, y: 0, z: 0, gripper: 0 }
+    for (const [key, [axis, sign]] of Object.entries(KEY_AXES)) {
+      if (pressed.current[key]) axes[axis] += sign
+    }
+    for (const k of Object.keys(axes)) axes[k] = Math.max(-1, Math.min(1, axes[k]))
+    robotTeleopInput(axes).catch(() => {})
+  }
+
+  useEffect(() => {
+    // heartbeat keeps the driver's deadman fed while keys are held
+    const interval = setInterval(() => {
+      if (Object.values(pressed.current).some(Boolean)) send()
+    }, 200)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: intentional key-capture surface
+    <div
+      tabIndex={0}
+      onFocus={() => setFocused(true)}
+      onBlur={() => {
+        setFocused(false)
+        pressed.current = {}
+        send()
+      }}
+      onKeyDown={(e) => {
+        const key = e.key.toLowerCase()
+        if (key in KEY_AXES) {
+          e.preventDefault()
+          if (!pressed.current[key]) {
+            pressed.current[key] = 1
+            send()
+          }
+        }
+      }}
+      onKeyUp={(e) => {
+        const key = e.key.toLowerCase()
+        if (key in KEY_AXES) {
+          pressed.current[key] = 0
+          send()
+        }
+      }}
+      className={`mt-3 cursor-pointer rounded border-2 p-4 text-sm outline-none ${
+        focused ? 'border-blue-600 bg-blue-600/5' : 'border-dashed'
+      }`}
+    >
+      <div className="font-medium">
+        {focused ? '⌨ capturing keys — arm is live' : 'click here to grab the keyboard'}
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-1 font-mono text-xs text-muted-foreground md:grid-cols-4">
+        <span>W/S forward · back</span>
+        <span>A/D left · right</span>
+        <span>Q/E up · down</span>
+        <span>O/C gripper open · close</span>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        release all keys (or click away) → arm holds pose (0.5&nbsp;s deadman)
+      </p>
+    </div>
+  )
+}
 
 function ArmPanel() {
   const state = useQuery(robotStateQuery)
@@ -34,13 +115,14 @@ function ArmPanel() {
       onError: (e) => setLastError(String(e)),
     })
 
+  const [source, setSource] = useState<string>('')
   const connect = useAct(() => robotConnect(true))
   const connectSolo = useAct(() => robotConnect(false))
   const connectSim = useAct(() => robotConnect(false, 'sim'))
   const disconnect = useAct(robotDisconnect)
   const torqueOff = useAct(() => robotTorque(false))
   const torqueOn = useAct(() => robotTorque(true))
-  const teleopStart = useAct(robotTeleopStart)
+  const teleopStart = useAct(() => robotTeleopStart(source === '' ? null : source))
   const teleopStop = useAct(robotTeleopStop)
   const estop = useAct(robotEstop)
 
@@ -116,15 +198,29 @@ function ArmPanel() {
           </>
         ) : (
           <>
-            {s?.state === 'connected' && s.leader && (
-              <button
-                type="button"
-                className="rounded bg-foreground px-3 py-1.5 text-background disabled:opacity-50"
-                disabled={busy}
-                onClick={() => teleopStart.mutate()}
-              >
-                Start teleop
-              </button>
+            {s?.state === 'connected' && (
+              <>
+                <select
+                  className="rounded border bg-transparent px-2 py-1.5"
+                  value={source}
+                  onChange={(e) => setSource(e.target.value)}
+                >
+                  <option value="">
+                    {s.backend === 'sim' ? 'scripted (default)' : 'leader (default)'}
+                  </option>
+                  {s.backend === 'real' && <option value="leader">leader arm</option>}
+                  {s.backend === 'sim' && <option value="scripted">scripted expert</option>}
+                  <option value="keys">keyboard (EE jog)</option>
+                </select>
+                <button
+                  type="button"
+                  className="rounded bg-foreground px-3 py-1.5 text-background disabled:opacity-50"
+                  disabled={busy}
+                  onClick={() => teleopStart.mutate()}
+                >
+                  Start teleop
+                </button>
+              </>
             )}
             {s?.state === 'teleop' && (
               <button
@@ -161,6 +257,8 @@ function ArmPanel() {
       </div>
 
       {lastError && <p className="mt-2 text-sm text-red-500">{lastError}</p>}
+
+      {s?.state === 'teleop' && s.source === 'keys' && <KeyJogPad />}
 
       {s && Object.keys(s.joints).length > 0 && (
         <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs md:grid-cols-6">

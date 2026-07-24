@@ -152,6 +152,7 @@ export class RobotState extends Schema.Class<RobotState>('RobotState')(
   Schema.Struct({
     state: Schema.String, // disconnected | connected | teleop | recording
     backend: Schema.String, // real | sim
+    source: Schema.NullOr(Schema.String), // leader | scripted | keys | phone (while teleop)
     leader: Schema.Boolean,
     joints: Schema.Record(Schema.String, Schema.Number),
     rig: Schema.Struct({
@@ -179,11 +180,17 @@ export const RobotGroup = HttpApiGroup.make('Robot').add(
     error: DriverError,
   }),
   HttpApiEndpoint.post('teleopStart', '/robot/teleop/start', {
+    payload: Schema.Struct({ source: Schema.NullOr(Schema.String) }),
     success: RobotState,
     error: DriverError,
   }),
   HttpApiEndpoint.post('teleopStop', '/robot/teleop/stop', {
     success: RobotState,
+    error: DriverError,
+  }),
+  HttpApiEndpoint.post('teleopInput', '/robot/teleop/input', {
+    payload: Schema.Struct({ axes: Schema.Record(Schema.String, Schema.Number) }),
+    success: Schema.Struct({ ok: Schema.Boolean }),
     error: DriverError,
   }),
   HttpApiEndpoint.post('estop', '/robot/estop', { success: RobotState, error: DriverError }),
