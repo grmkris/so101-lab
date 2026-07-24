@@ -10,33 +10,80 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DatasetsRouteImport } from './routes/datasets'
+import { Route as TrainingsIndexRouteImport } from './routes/trainings.index'
+import { Route as TrainingsRunIdRouteImport } from './routes/trainings.$runId'
+import { Route as TrainingsNewRouteImport } from './routes/trainings.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DatasetsRoute = DatasetsRouteImport.update({
+  id: '/datasets',
+  path: '/datasets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainingsIndexRoute = TrainingsIndexRouteImport.update({
+  id: '/trainings/',
+  path: '/trainings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainingsRunIdRoute = TrainingsRunIdRouteImport.update({
+  id: '/trainings/$runId',
+  path: '/trainings/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrainingsNewRoute = TrainingsNewRouteImport.update({
+  id: '/trainings/new',
+  path: '/trainings/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/datasets': typeof DatasetsRoute
+  '/trainings/$runId': typeof TrainingsRunIdRoute
+  '/trainings/new': typeof TrainingsNewRoute
+  '/trainings/': typeof TrainingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/datasets': typeof DatasetsRoute
+  '/trainings/$runId': typeof TrainingsRunIdRoute
+  '/trainings/new': typeof TrainingsNewRoute
+  '/trainings': typeof TrainingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/datasets': typeof DatasetsRoute
+  '/trainings/$runId': typeof TrainingsRunIdRoute
+  '/trainings/new': typeof TrainingsNewRoute
+  '/trainings/': typeof TrainingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/datasets' | '/trainings/$runId' | '/trainings/new' | '/trainings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/datasets' | '/trainings/$runId' | '/trainings/new' | '/trainings'
+  id:
+    | '__root__'
+    | '/'
+    | '/datasets'
+    | '/trainings/$runId'
+    | '/trainings/new'
+    | '/trainings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DatasetsRoute: typeof DatasetsRoute
+  TrainingsRunIdRoute: typeof TrainingsRunIdRoute
+  TrainingsNewRoute: typeof TrainingsNewRoute
+  TrainingsIndexRoute: typeof TrainingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +95,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/datasets': {
+      id: '/datasets'
+      path: '/datasets'
+      fullPath: '/datasets'
+      preLoaderRoute: typeof DatasetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainings/': {
+      id: '/trainings/'
+      path: '/trainings'
+      fullPath: '/trainings/'
+      preLoaderRoute: typeof TrainingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainings/$runId': {
+      id: '/trainings/$runId'
+      path: '/trainings/$runId'
+      fullPath: '/trainings/$runId'
+      preLoaderRoute: typeof TrainingsRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trainings/new': {
+      id: '/trainings/new'
+      path: '/trainings/new'
+      fullPath: '/trainings/new'
+      preLoaderRoute: typeof TrainingsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DatasetsRoute: DatasetsRoute,
+  TrainingsRunIdRoute: TrainingsRunIdRoute,
+  TrainingsNewRoute: TrainingsNewRoute,
+  TrainingsIndexRoute: TrainingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
