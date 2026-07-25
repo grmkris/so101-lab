@@ -22,10 +22,6 @@ def set_record_source(source) -> None:
     _record_source = source
 
 
-def is_active() -> bool:
-    return bool(_state["active"])
-
-
 def make_source(name: str, backend):
     if name == "leader":
         # Works on sim too: the leader's get_action() is already lerobot-space

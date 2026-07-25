@@ -8,12 +8,6 @@ export const healthQuery = queryOptions({
 	refetchInterval: 30_000,
 });
 
-export const hfStatusQuery = queryOptions({
-	queryKey: ["hf-status"],
-	queryFn: () => runApi((client) => client.Hf.status()),
-	staleTime: 5 * 60_000,
-});
-
 export const datasetsQuery = queryOptions({
 	queryKey: ["datasets"],
 	queryFn: () => runApi((client) => client.Datasets.list()),

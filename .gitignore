@@ -2,3 +2,14 @@ sim/.venv/
 sim/model/assets/
 __pycache__/
 *.local
+
+# machine-local agent/MCP tooling — the app itself lives in app/ (bun);
+# the root npm tree exists only to back the shadcn MCP server
+/node_modules/
+/package.json
+/package-lock.json
+/.mcp.json
+/.claude/
+/.agents/
+/skills-lock.json
+/.agent-sources/

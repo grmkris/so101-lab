@@ -13,7 +13,7 @@ const tagOf = (e: unknown): string | null =>
 export const isPreflightError = (e: unknown): e is PreflightError =>
 	tagOf(e) === "PreflightError";
 
-export const isDriverError = (e: unknown): e is DriverError =>
+const isDriverError = (e: unknown): e is DriverError =>
 	tagOf(e) === "DriverError";
 
 /** Short, human message — never a stack wall. */

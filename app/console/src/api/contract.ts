@@ -13,19 +13,8 @@ export class HealthStatus extends Schema.Class<HealthStatus>("HealthStatus")(
 	}),
 ) {}
 
-export const HealthGroup = HttpApiGroup.make("Health").add(
+const HealthGroup = HttpApiGroup.make("Health").add(
 	HttpApiEndpoint.get("status", "/health", { success: HealthStatus }),
-);
-
-export class HfStatus extends Schema.Class<HfStatus>("HfStatus")(
-	Schema.Struct({
-		authenticated: Schema.Boolean,
-		user: Schema.NullOr(Schema.String),
-	}),
-) {}
-
-export const HfGroup = HttpApiGroup.make("Hf").add(
-	HttpApiEndpoint.get("status", "/hf/status", { success: HfStatus }),
 );
 
 export class DatasetInfo extends Schema.Class<DatasetInfo>("DatasetInfo")(
@@ -65,7 +54,7 @@ export class DatasetEpisodes extends Schema.Class<DatasetEpisodes>(
 	}),
 ) {}
 
-export const DatasetsGroup = HttpApiGroup.make("Datasets").add(
+const DatasetsGroup = HttpApiGroup.make("Datasets").add(
 	HttpApiEndpoint.get("list", "/datasets", {
 		success: Schema.Array(DatasetInfo),
 	}),
@@ -153,7 +142,7 @@ export class CameraStatus extends Schema.Class<CameraStatus>("CameraStatus")(
 	}),
 ) {}
 
-export const CamerasGroup = HttpApiGroup.make("Cameras").add(
+const CamerasGroup = HttpApiGroup.make("Cameras").add(
 	HttpApiEndpoint.get("probe", "/cameras/probe", {
 		success: Schema.Array(ProbedCamera),
 	}),
@@ -206,7 +195,7 @@ export class RobotState extends Schema.Class<RobotState>("RobotState")(
 	}),
 ) {}
 
-export const RobotGroup = HttpApiGroup.make("Robot").add(
+const RobotGroup = HttpApiGroup.make("Robot").add(
 	HttpApiEndpoint.get("state", "/robot/state", { success: RobotState }),
 	HttpApiEndpoint.post("connect", "/robot/connect", {
 		payload: Schema.Struct({
@@ -252,7 +241,7 @@ export const RobotGroup = HttpApiGroup.make("Robot").add(
 
 const runId = { id: Schema.String };
 
-export const TrainingsGroup = HttpApiGroup.make("Trainings").add(
+const TrainingsGroup = HttpApiGroup.make("Trainings").add(
 	HttpApiEndpoint.get("list", "/runs", { success: Schema.Array(RunInfo) }),
 	HttpApiEndpoint.get("get", "/runs/:id", { params: runId, success: RunInfo }),
 	HttpApiEndpoint.post("create", "/runs", {
@@ -282,7 +271,7 @@ export class RecordStatus extends Schema.Class<RecordStatus>("RecordStatus")(
 	}),
 ) {}
 
-export const RecordGroup = HttpApiGroup.make("Record").add(
+const RecordGroup = HttpApiGroup.make("Record").add(
 	HttpApiEndpoint.get("status", "/record/status", { success: RecordStatus }),
 	HttpApiEndpoint.post("start", "/record/start", {
 		payload: Schema.Struct({
@@ -306,7 +295,6 @@ export const RecordGroup = HttpApiGroup.make("Record").add(
 
 export const LabApi = HttpApi.make("LabConsole")
 	.add(HealthGroup)
-	.add(HfGroup)
 	.add(DatasetsGroup)
 	.add(TrainingsGroup)
 	.add(CamerasGroup)

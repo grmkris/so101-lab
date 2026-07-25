@@ -1,7 +1,8 @@
 """Smoke test: wiggle the SO-101 follower around its current pose.
 
-Run:  cd ~/Code/github-com/LeRobot/lerobot && source .venv/bin/activate
-      python ../wiggle.py
+Run (from repo root, uses the driver's pinned lerobot env):
+      app/driver/.venv/bin/python scripts/wiggle.py
+Port defaults to Kristjan's follower — edit PORT below for another arm.
 """
 
 import math

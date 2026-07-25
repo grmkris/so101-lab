@@ -1,8 +1,8 @@
 import * as os from "node:os";
 import { Context, Effect, FileSystem, Layer } from "effect";
 import { HttpClient, HttpClientRequest } from "effect/unstable/http";
+import { RIG } from "#/api/rig";
 
-export const HF_USER = "kris0";
 const HF_API = "https://huggingface.co/api";
 
 export interface HubRepo {
@@ -11,10 +11,6 @@ export interface HubRepo {
 }
 
 export interface HfHubShape {
-	readonly status: () => Effect.Effect<{
-		authenticated: boolean;
-		user: string | null;
-	}>;
 	readonly listDatasets: () => Effect.Effect<ReadonlyArray<HubRepo>>;
 	readonly listModels: () => Effect.Effect<ReadonlyArray<HubRepo>>;
 	/** Directory names under `checkpoints/` of a model repo ([] if none/unreachable). */
@@ -53,7 +49,7 @@ export class HfHub extends Context.Service<HfHub, HfHubShape>()("app/HfHub") {
 				});
 
 			const listRepos = (kind: "datasets" | "models") =>
-				getJson(`${HF_API}/${kind}?author=${HF_USER}&limit=100`).pipe(
+				getJson(`${HF_API}/${kind}?author=${RIG.hfUser}&limit=100`).pipe(
 					Effect.map((body) =>
 						(body as Array<{ id: string; lastModified?: string }>).map((r) => ({
 							id: r.id,
@@ -64,14 +60,6 @@ export class HfHub extends Context.Service<HfHub, HfHubShape>()("app/HfHub") {
 				);
 
 			return {
-				status: () =>
-					getJson(`${HF_API}/whoami-v2`).pipe(
-						Effect.map((body) => ({
-							authenticated: true,
-							user: (body as { name?: string }).name ?? null,
-						})),
-						Effect.orElseSucceed(() => ({ authenticated: false, user: null })),
-					),
 				listDatasets: () => listRepos("datasets"),
 				listModels: () => listRepos("models"),
 				checkpointSteps: (repoId: string) =>

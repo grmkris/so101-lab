@@ -6,7 +6,8 @@ import {
 	RunInfo,
 	type RunPatch,
 } from "#/api/contract";
-import { HF_USER, HfHub } from "./hf-hub";
+import { RIG } from "#/api/rig";
+import { HfHub } from "./hf-hub";
 
 const DATA_DIR = `${process.cwd()}/.data`;
 const RUNS_FILE = `${DATA_DIR}/runs.json`;
@@ -150,7 +151,7 @@ export class RunsRegistry extends Context.Service<
 							batchSize: input.batchSize,
 							saveFreq: input.saveFreq,
 						});
-						const hubModelId = `${HF_USER}/${input.name}`;
+						const hubModelId = `${RIG.hfUser}/${input.name}`;
 						const run = new RunInfo({
 							id: crypto.randomUUID().slice(0, 8),
 							name: input.name,

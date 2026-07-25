@@ -7,7 +7,8 @@ import {
 	HttpRouter,
 } from "effect/unstable/http";
 import { HttpApiBuilder, HttpApiScalar } from "effect/unstable/httpapi";
-import { Checkpoints, HealthStatus, HfStatus, LabApi } from "./contract";
+import { Checkpoints, HealthStatus, LabApi } from "./contract";
+import { RIG } from "./rig";
 import { Cameras } from "./services/cameras";
 import { DatasetCatalog } from "./services/dataset-catalog";
 import { DriverManager } from "./services/driver-manager";
@@ -19,15 +20,7 @@ import { RunsRegistry } from "./services/runs-registry";
 const HealthLive = HttpApiBuilder.group(LabApi, "Health", (handlers) =>
 	handlers.handle("status", () =>
 		Effect.succeed(
-			new HealthStatus({ ok: true, hfUser: "kris0", version: "0.1.0" }),
-		),
-	),
-);
-
-const HfLive = HttpApiBuilder.group(LabApi, "Hf", (handlers) =>
-	handlers.handle("status", () =>
-		Effect.flatMap(HfHub, (hub) => hub.status()).pipe(
-			Effect.map((s) => new HfStatus(s)),
+			new HealthStatus({ ok: true, hfUser: RIG.hfUser, version: "0.1.0" }),
 		),
 	),
 );
@@ -138,7 +131,6 @@ const ServicesLayer = Layer.mergeAll(
 
 const GroupsLayer = Layer.mergeAll(
 	HealthLive,
-	HfLive,
 	DatasetsLive,
 	TrainingsLive,
 	CamerasLive,
