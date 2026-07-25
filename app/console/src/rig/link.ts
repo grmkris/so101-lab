@@ -109,7 +109,10 @@ export const startRigLink = (opts: {
 			linkMs = Date.now() - started;
 			if (!res.ok) return;
 			const body = (await res.json()) as {
-				input: Record<string, number> | null;
+				input: {
+					axes?: Record<string, number>;
+					joints?: Record<string, number>;
+				} | null;
 				commands: Array<{ verb: string }>;
 			};
 			warned = false;
@@ -117,7 +120,7 @@ export const startRigLink = (opts: {
 			if (body.input) {
 				await localApi("/api/robot/teleop/input", {
 					method: "POST",
-					body: JSON.stringify({ axes: body.input }),
+					body: JSON.stringify(body.input),
 				});
 			}
 			for (const cmd of body.commands ?? []) {
@@ -158,6 +161,13 @@ export const startRigLink = (opts: {
 				await localApi("/api/robot/teleop/start", {
 					method: "POST",
 					body: JSON.stringify({ source: "leader" }),
+				});
+				break;
+			case "teleop_start_remote":
+				// joint targets stream in from the operator's own leader arm
+				await localApi("/api/robot/teleop/start", {
+					method: "POST",
+					body: JSON.stringify({ source: "remote" }),
 				});
 				break;
 			case "teleop_stop":

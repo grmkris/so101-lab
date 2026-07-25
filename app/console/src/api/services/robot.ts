@@ -14,9 +14,10 @@ export interface RobotShape {
 		cmd: string,
 		extra?: Record<string, unknown>,
 	) => Effect.Effect<RobotState, DriverError>;
-	readonly input: (
-		axes: Record<string, number>,
-	) => Effect.Effect<{ ok: boolean }, DriverError>;
+	readonly input: (payload: {
+		axes?: Record<string, number> | undefined;
+		joints?: Record<string, number> | undefined;
+	}) => Effect.Effect<{ ok: boolean }, DriverError>;
 }
 
 export class RobotSvc extends Context.Service<RobotSvc, RobotShape>()(
@@ -67,9 +68,9 @@ export class RobotSvc extends Context.Service<RobotSvc, RobotShape>()(
 						yield* driver.setLeader(backend === "sim" ? true : withLeader);
 						return yield* state();
 					}).pipe(Effect.mapError(toDriverError)),
-				input: (axes) =>
+				input: (payload) =>
 					driver
-						.rpc("teleop_input", { axes })
+						.rpc("teleop_input", payload)
 						.pipe(Effect.as({ ok: true }), Effect.mapError(toDriverError)),
 			};
 		}),

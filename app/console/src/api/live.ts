@@ -108,7 +108,7 @@ const RobotLive = HttpApiBuilder.group(LabApi, "Robot", (handlers) =>
 			Effect.flatMap(RobotSvc, (r) => r.command("teleop_stop")),
 		)
 		.handle("teleopInput", ({ payload }) =>
-			Effect.flatMap(RobotSvc, (r) => r.input(payload.axes)),
+			Effect.flatMap(RobotSvc, (r) => r.input(payload)),
 		)
 		.handle("estop", () => Effect.flatMap(RobotSvc, (r) => r.command("estop"))),
 );

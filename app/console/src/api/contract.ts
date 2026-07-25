@@ -235,8 +235,11 @@ export const RobotGroup = HttpApiGroup.make("Robot").add(
 		error: DriverError,
 	}),
 	HttpApiEndpoint.post("teleopInput", "/robot/teleop/input", {
+		// axes = EE jog (keys source); joints = full joint targets from a
+		// remote leader arm (remote source). Exactly one is expected.
 		payload: Schema.Struct({
-			axes: Schema.Record(Schema.String, Schema.Number),
+			axes: Schema.optional(Schema.Record(Schema.String, Schema.Number)),
+			joints: Schema.optional(Schema.Record(Schema.String, Schema.Number)),
 		}),
 		success: Schema.Struct({ ok: Schema.Boolean }),
 		error: DriverError,

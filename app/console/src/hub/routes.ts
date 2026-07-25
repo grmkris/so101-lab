@@ -35,6 +35,7 @@ const ALLOWED_VERBS = new Set([
 	"connect_real",
 	"teleop_start",
 	"teleop_start_leader",
+	"teleop_start_remote",
 	"teleop_stop",
 	"estop",
 	"disconnect",
@@ -127,7 +128,7 @@ export const handleHubRequest = async (
 		rig.input = null;
 		const fresh = pending !== null && Date.now() - pending.at < 500;
 		return json({
-			input: fresh ? pending.axes : null,
+			input: fresh ? { axes: pending.axes, joints: pending.joints } : null,
 			commands,
 			holder: leaseHolder(rig),
 		});
@@ -187,7 +188,9 @@ export const handleHubRequest = async (
 				await impair();
 				// dropped input is never resent — same as a lost UDP packet
 				if (!shouldDrop())
-					rig.input = { axes: body.axes ?? {}, at: Date.now() };
+					rig.input = body.joints
+						? { joints: body.joints, at: Date.now() }
+						: { axes: body.axes ?? {}, at: Date.now() };
 				return json({ ok: true });
 			}
 			if (action === "/command") {

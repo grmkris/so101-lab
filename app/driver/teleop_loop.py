@@ -50,6 +50,14 @@ def make_source(name: str, backend):
             motor_names=backend.lerobot_joint_names,
             seed_obs=backend.current_joints_pos(),
         )
+    if name == "remote":
+        # joint targets from an operator's leader arm, arriving via the hub
+        from sources.remote import RemoteJoints
+
+        return RemoteJoints(
+            motor_names=backend.lerobot_joint_names,
+            seed_obs=backend.current_joints_pos(),
+        )
     raise ValueError(f"unknown teleop source: {name}")
 
 
@@ -122,6 +130,11 @@ def stop(wait: bool = False) -> dict:
 
 def set_input(req: dict) -> dict:
     source = _record_source if _record_source is not None else _state.get("source")
+    if req.get("joints") is not None:
+        if source is None or not hasattr(source, "set_joints"):
+            raise ValueError("no remote-joints teleop source active")
+        source.set_joints(req["joints"])
+        return {"ok": True}
     if source is None or not hasattr(source, "set_input"):
         raise ValueError("no input-driven teleop source active")
     source.set_input(req.get("axes") or {})

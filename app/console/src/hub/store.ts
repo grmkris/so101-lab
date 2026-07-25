@@ -25,8 +25,13 @@ export interface Rig {
 	lastError: string | null;
 	lastSeen: number;
 	frames: Map<string, RigFrame>;
-	/** latest-wins: a dropped input packet is corrected by the next one */
-	input: { axes: Record<string, number>; at: number } | null;
+	/** latest-wins: a dropped input packet is corrected by the next one.
+	 * axes = browser EE jog; joints = a remote leader arm's joint targets. */
+	input: {
+		axes?: Record<string, number>;
+		joints?: Record<string, number>;
+		at: number;
+	} | null;
 	pending: RigCommand[];
 	lease: { holder: string; expiresAt: number } | null;
 	/** round-trip of the rig's own link loop, measured hub-side */
