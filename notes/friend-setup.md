@@ -1,4 +1,9 @@
-# Friend setup — put your SO-101 follower on the hub
+# Friend setup — SO-101 + the hub
+
+Two independent things you can do; each works without the other:
+
+- **A. Drive Kristjan's sim with YOUR leader arm** — needs only steps 0–1 + "A" below.
+- **B. Put your follower on the hub** so others can drive it — steps 0–5.
 
 Your Mac runs a small headless agent; it dials OUT to the hub, so no port
 forwarding, no firewall changes, nothing exposed. Kristjan (or anyone with the
@@ -23,7 +28,33 @@ cd so101-lab/app/console && bun install
 cd ../driver && uv sync        # installs lerobot 0.6.0 + opencv (+ mujoco)
 ```
 
-## 2. Plug in the follower, find its port
+## A. Drive Kristjan's sim with your leader arm
+
+Plug in your LEADER arm (the small one, no gearing). Find its port
+(`ls /dev/tty.usbmodem*`) and calibrate it once (from `app/driver`):
+
+```sh
+.venv/bin/lerobot-calibrate --teleop.type=so101_leader \
+  --teleop.port=/dev/tty.usbmodemXXXX --teleop.id=arm
+```
+
+Then check `kris-sim` is online in the lobby and:
+
+```sh
+.venv/bin/python controller.py \
+  --hub https://hub-production-3903.up.railway.app \
+  --rig kris-sim \
+  --port /dev/tty.usbmodemXXXX
+```
+
+Move your leader — the simulated arm at
+https://hub-production-3903.up.railway.app/drive/kris-sim follows (open it
+for the camera view; you'll be "driving", video stays live). Ctrl-C releases
+the rig. Notes: motion is clamped to 15°/tick on the rig side; if the wrist
+roll sits at a odd angle, that's the known cross-device wrist_roll zero
+offset — recalibrate the leader holding the wrist how you want "zero" to be.
+
+## 2. (Track B) Plug in the follower, find its port
 
 Follower arm on USB + its power supply. Then:
 
