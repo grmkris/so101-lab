@@ -1,6 +1,12 @@
 # sim/ — MuJoCo learning track for the SO-101
 
-**Purpose: learning + prototyping (RL mechanics, IK, reward design). NOT a sim2real path** —
+> **This is NOT the production sim.** The console's live sim backend is
+> `app/driver/backends/sim.py` (MuJoCo Menagerie `trs_so_arm100`) — it records
+> LeRobot datasets, streams cameras to the hub, and a real leader arm can
+> drive it (that shipped via the console, not so101-nexus). This directory is
+> the parallel *learning* track: RL mechanics, IK, reward design exercises.
+
+**Purpose: learning + prototyping. NOT a sim2real path** —
 ggando's pixel-RL agent hit 100% in sim and completely failed on the real arm
 (see journal.md 2026-07-24). Real-world reliability work stays on the IL track.
 
@@ -26,7 +32,8 @@ cd sim
 `MuJoCoPickAndPlace-v1`, `MuJoCoTouch-v1`, `MuJoCoLookAt-v1`, `MuJoCoMove-v1`.
 Default obs is 24-dim **state** (not pixels); action = 6 joint targets (radians).
 
-**Leader-teleop-into-sim** (UNTESTED — arms were disconnected on setup day):
+**Leader-teleop-into-sim via nexus** (never adopted — the console's own sim
+backend does this now; kept for reference):
 ```bash
 .venv/bin/so101-nexus teleop --leader-port /dev/tty.usbmodem5AE60538411 --leader-id arm
 ```

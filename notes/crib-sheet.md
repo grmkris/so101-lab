@@ -1,5 +1,11 @@
 # Command crib sheet (LeLab / lerobot 0.6.0 stack)
 
+> **Console note:** the Lab Console (`app/`) now covers teleop, record, cameras
+> and remote driving itself — see `app/TESTING.md` and `notes/friend-setup.md`.
+> This sheet remains the CLI track (replay/train/eval and anything the console
+> doesn't do yet). A second pinned lerobot env exists at `app/driver/.venv/`
+> (same 0.6.0 — `app/driver/.venv/bin/lerobot-calibrate` works when LeLab isn't installed).
+
 **Env:** all `lerobot-*` binaries live in the LeLab uv tool env. Prefix so the rerun viewer is on PATH:
 ```bash
 export PATH="$HOME/.local/share/uv/tools/lelab/bin:$PATH"
@@ -8,7 +14,7 @@ export PATH="$HOME/.local/share/uv/tools/lelab/bin:$PATH"
 
 **Ports:** follower `/dev/tty.usbmodem5AE60832001`, leader `/dev/tty.usbmodem5AE60538411`.
 **IDs:** both `arm` (LeLab calibration name). **HF user:** `kris0`.
-**Cameras (640×480@30):** ⚠️ macOS shuffles indexes on replug — VERIFY before every session with `curl -s http://localhost:8000/available-cameras`. Typical: overhead C922 = 0, wrist Innomaker = 1, but they SWAP.
+**Cameras (640×480@30):** ⚠️ macOS shuffles indexes on replug — VERIFY before every session: console `GET /api/cameras/probe` (Robot page shows thumbnails), or LeLab `curl -s http://localhost:8000/available-cameras`. Typical: overhead C922 = 0, wrist Innomaker = 1, but they SWAP.
 
 ## Verify camera indexes (do this first, every session)
 ```bash

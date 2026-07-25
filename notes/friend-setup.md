@@ -103,11 +103,15 @@ drops on disconnect; that is intentional).
 - **Clear the workspace** — nothing fragile within arm's reach, arm not near
   the table edge.
 - **Stay next to it** the first session. Your kill switches: Ctrl-C in the
-  terminal, or unplug the arm's power. The driver also clamps every remote
-  step (max 15° per tick) and a 0.5 s network deadman stops motion when
-  packets stop.
-- The hub currently has **no auth** — anyone with the URL can drive whatever
-  rig is registered. Only run the agent while we're actually testing.
+  terminal, or unplug the arm's power — and anyone watching the drive page
+  can hit E-STOP / Stop teleop without holding control. The driver also
+  clamps every remote step (max 15° per tick) and a 0.5 s network deadman
+  stops motion when packets stop.
+- **Auth is built but currently switched off** (`HUB_TOKEN` unset on the hub)
+  — anyone with the URL can drive whatever rig is registered. Only run the
+  agent while we're actually testing. If Kristjan sets a token, add
+  `HUB_TOKEN=<shared secret>` to the agent command (and controller runs get
+  it too) — everything else stays the same.
 
 ## If something's off
 

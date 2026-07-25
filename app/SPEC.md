@@ -1,146 +1,162 @@
-# Lab Console (working name) — spec
+# Lab Console — spec
 
-Web app replacing phosphobot/LeLab for this lab. One purpose: **run the data flywheel with quality gates** — control → guided record → grade → train → eval — for the SO-101 on this Mac, lerobot 0.6.0.
+Web app replacing phosphobot/LeLab for this lab, grown into a small teleop
+platform. Two products in one build:
 
-**Standalone-first**: the app is a complete ML-practitioner tool with zero blockchain dependency. Hackathon layers (payments/identity/provenance) bolt on as a separate service talking to this app's API; the core never imports them.
+1. **The lab tool** — run the data flywheel with quality gates: control →
+   guided record → grade → train → eval, for the SO-101 on this Mac, lerobot 0.6.0.
+2. **The platform** — registered rigs (real arms + MuJoCo sims) streaming to a
+   deployed hub; operators browse a lobby, take a rig, and drive it with a
+   keyboard or their own leader arm. **Live: https://hub-production-3903.up.railway.app**
 
-## Principles (non-negotiable, encode the hard-won levers)
-1. **Thin wrapper over lerobot 0.6.0.** Backend imports lerobot classes in-process from an env pinned `lerobot==0.6.0`. Never reimplement drivers, calibration math, or dataset format. Version lever preserved by construction.
-2. **Quality gates are the product.** Preflight before every session (cam indexes, brightness, calibration). Coverage engineered during recording, not discovered post-mortem.
-3. **Never destructive.** No episode deletion (fragile tool, locked-in lesson). Exclusion lists only. Push to Hub early.
-4. **Journal always.** Every session produces a draft `journal.md` entry.
-5. **No database.** HF Hub (datasets, model repos, checkpoints) + the local lerobot cache ARE the state. The app is a control plane/lens over them, plus thin sidecar JSON for what the Hub can't hold (run configs, lineage, eval notes, coach state). Delete the app → nothing of value is lost.
+> History note: v0 of this spec listed "multi-robot, cloud hosting, auth" as
+> non-goals. The platform pivot inverted that — those are now shipped. Still
+> out of scope: other robot types, mobile UI, phosphobot pro features.
 
-## Non-goals
-- Multi-robot/fleet, cloud hosting, auth, other robot types, mobile UI.
-- Replicating phosphobot pro features (marketplace, cloud training UX).
-- Replacing `lerobot-rollout` CLI for eval/DAgger in v1 (v2).
+## Principles (encode the hard-won levers)
+1. **Thin wrapper over lerobot 0.6.0.** The driver imports lerobot classes
+   in-process from a pinned env (`app/driver/pyproject.toml`). Never
+   reimplement drivers, calibration math, or dataset format.
+2. **Quality gates are the product** (lab tool side). Camera confirm +
+   brightness band shipped; the fuller preflight/coach is roadmap (below).
+3. **Never destructive.** No episode deletion; exclusion lists only.
+4. **No database.** HF Hub + the local lerobot cache ARE the state, plus thin
+   sidecar JSON (`app/console/.data/`) for what the Hub can't hold. The hub's
+   rig registry is deliberately in-memory — a redeploy costs one re-register.
+5. **Boring transports.** 20 Hz HTTP polling + MJPEG re-serve, curl-debuggable,
+   identical in dev and prod. No WebSocket/WebRTC until a measured need; the
+   single planned upgrade lever is a WS relay if teleop feel demands it.
 
-## Architecture — TypeScript-first, Python as a device driver
+## Architecture — one build, three roles
 ```
 app/
-  console/  ONE TypeScript app: TanStack Start (React 19, Router, Query, shadcn) + Effect v4 API
-  driver/   ~3 Python files in a uv env pinned lerobot==0.6.0 — robot loops only
+  console/  ONE TypeScript app: TanStack Start (React 19, Router, Query,
+            shadcn) + Effect v4 HttpApi. Bun. Dockerfile + railway.json.
+  driver/   Python, uv env pinned lerobot==0.6.0 — robot loops only.
+            backends/{real,sim}.py · sources/{keys,phone,scripted,remote}.py
+            controller.py (operator-side leader-over-wire bridge)
 ```
-- **Single process, single contract.** Custom server entry (Bun, port **8100**): `/api/*` → Effect **HttpApi** web handler; everything else → TanStack Start. Effect layer built once at module scope (stashed on `globalThis` in dev so Vite HMR can't double-init; driver acquired lazily so reloads never orphan a Python process).
-- **HttpApi is the only API contract** → server handlers, derived `HttpApiClient` for the frontend (no hand-written fetch, no duplicated types), `/api/openapi.json` + Scalar docs at `/api/docs` (hackathon: chain-layer service consumes the same OpenAPI). Frontend: TanStack Query option factories over the derived client, one module-scope browser runtime, `runClientEffect` promise bridge — no raw API calls in components.
-- Outside the typed contract (raw routes beside HttpApi): `/api/ws` (joint state + session events — `SubscriptionRef` stream → WS) and `/api/cams/*` (MJPEG passthrough from driver).
-- **console (TS)** owns: HF Hub (token from `~/.cache/huggingface/token`, list/poll via HF JSON API), local dataset scan (`meta/info.json` + **hyparquet** for parquet stats), report card (brightness via sharp, coverage via threshold+PCA in TS), episode thumbnails (ffmpeg CLI), runs registry (JSON sidecar), Colab cell generation, coach sampling, rig profile, journal drafts. Chain layers (hackathon) plug in here — all TS SDKs; operator gating = HttpApi middleware.
-- **Deliberately absent** (single-user localhost tool, principle #5): no database, no ORM, no auth framework, no cookie sessions. "Repositories" are FileSystem/Hub/driver-backed. Effect v4 is beta — pin all `effect`/`@effect/*` packages to one exact version.
-- **driver (Python)** is stateless and does only what lerobot physically requires: teleop / record / rollout / DAgger / calibrate / replay loops, serial, cameras-during-sessions. Control channel = **ndjson-RPC over stdio** (TS sends `{cmd, config}` with full config each call; driver emits `state`/`episode_saved`/`error` events). Frames = one localhost **MJPEG port**, proxied by server. Crash → supervisor restarts, UI surfaces it. Loops cribbed from LeLab's `record.py`/`teleoperate.py` (same lerobot version, readable locally).
-- **Driver backends**: the RPC protocol is the seam. `connect {backend: "real" | "sim"}` selects who answers it — `real` (serial + OpenCV + lerobot, the default) or `sim` (MuJoCo; see "Sim mode" below). The console never knows the difference; every feature above the protocol works unchanged.
-- One owner of the arm: server-side state machine `disconnected → connected → teleop | recording | rollout` gates driver commands; illegal transitions rejected in TS.
-- Sidecar store `app/console/.data/<repo_id>/` for coach config + per-episode prompt tags + session logs. **Nothing extra written into dataset dirs** (keeps Hub push clean).
-- Litmus test: delete `driver/` → everything except live robot control still works (datasets, trainings, grading, journal).
+Role from `LAB_MODE` at boot (`src/api/config.ts`):
+- **hub** — lobby/drive UI + relay. Serves `/api/mode`, `/api/hub/*`, and an
+  allowlist (`/api/health`, `/api/docs`, `/api/openapi.json`); every other
+  `/api/*` 404s (no arm, no cameras, no cache there). Deployed on Railway:
+  1 replica, sleep off — both load-bearing (in-memory registry).
+- **console** (default) — the local lab tool; setting `HUB_URL` also registers
+  it as a rig.
+- **agent** — headless rig: local API + rig link, serves no UI.
+  `LAB_AUTOCONNECT=sim|real` brings the backend up at boot.
 
-### Effect architecture (server)
-Services (`ServiceMap.Service`, one `Layer` each, composed once at entry):
-- `RigConfig` — ports/ids/cams/brightness band/HF user via `Config` (no `process.env`).
-- `HfHub` — `HttpClient` against HF JSON API; `testLayer` for offline.
-- `DatasetCatalog` — local scan + Hub merge, sync state.
-- `ReportCard` — parquet stats (hyparquet), brightness (sharp), coverage (threshold+PCA); cached in sidecar.
-- `RunsRegistry` — lineage sidecar via `FileSystem`.
-- `TrainingLauncher` — Colab cell gen + status derivation from Hub ckpt polling.
-- `RobotDriver` — Python subprocess as a **scoped resource** (`Command` + `Scope`: guaranteed kill on shutdown, `Schedule`-based restart on crash). stdout ndjson decoded into a `Stream` of `DriverEvent` (`Schema.Union`: `EpisodeSaved | StateChanged | DriverError`); commands Schema-encoded. `testLayer` = fake driver with scripted events → **all flows testable with no robot attached**.
-- `RobotSession` — state machine in a `SubscriptionRef` (changes are a `Stream` → WS fan-out); illegal transitions rejected here.
-- `Journal`, `CoachSampler` — pure logic behind services.
+Server entry `src/server.ts`: explicit `PORT` env (Railway) / 3000 default;
+serves `dist/client/assets` itself in prod (TanStack Start ships no static
+middleware); `/api/*` → Effect HttpApi handler; rest → SSR.
 
-Domain: branded IDs (`RepoId`, `RunId`, `EpisodeIndex`), `Schema.Class` records (`Dataset`, `Run`, `Checkpoint`), `Schema.TaggedClass` unions (`RunStatus`, `RobotState`, `DriverEvent`) with exhaustive `Match.valueTags`.
-Errors: `Schema.TaggedErrorClass` — `PortBusyError` (hint: close LeLab/CLI), `DriverCrashedError`, `PreflightFailedError` (lists failed gates), `IllegalTransitionError`, `HubUnreachableError` (degrade to local-only), `DatasetNotFoundError`. Recovery via `catchTags`, never blanket `catchAll`.
-Testing: `@effect/vitest` (`it.effect`), fresh layers per test; build M0/M1 against `RobotDriver.testLayer` + `HfHub.testLayer` first, swap live layers when hardware is attached.
-Setup note: before first Effect code, create the source mirror `.agent-sources/effect/` (shallow clone, kept out of commits via `.git/info/exclude`) per the effect-ts skill's source-first rule.
+### Hub ↔ rig ↔ operator (the platform wire)
+- **Rig dials OUT** (`src/rig/link.ts`): self-scheduling 50 ms link tick
+  (telemetry up, control down on the response) + 125 ms frame push. No inbound
+  ports, no reconnect logic — re-registration after a hub restart is implicit.
+- **Hub is a pipe, not a repeater** (`src/hub/routes.ts`, `store.ts`): input is
+  latest-wins, consume-once, dropped after 500 ms — the deadman. Injectable
+  impairment (`HUB_LATENCY_MS`, `HUB_DROP_RATE`) so loopback dev matches WAN.
+- **Verb table** (`src/hub/verbs.ts`): the complete surface an operator can
+  trigger — connect/teleop/stop/estop. One table; the hub allowlist and the
+  rig dispatch both derive from it. NOT a general tunnel: a guest can never
+  reach `/api/record/*` on someone's machine.
+- **Lease** = single writer per rig (random per-tab clientId, 20 s expiry,
+  renewed by input/claim). Safety verbs (`estop`, `teleop_stop`) bypass it;
+  "Take over" force-steals it (friends-tier trust).
+- **Auth** (`src/hub/auth.ts`): shared secret `HUB_TOKEN` — bearer header
+  (API/rig link), cookie (MJPEG `<img>` + sendBeacon can't set headers), query
+  param (curl debug). Unset ⇒ open. **Currently unset.** Real identity is a
+  later problem; the lease is collision avoidance, not security.
+- **Leader-over-wire** (`app/driver/controller.py` → hub → `sources/remote.py`):
+  operator's leader read at 30 Hz, lerobot-space dict (degrees + gripper
+  0..100) over one kept-alive HTTPS connection (~16 packets/s WAN). Values
+  clamped + non-finite dropped on the rig BEFORE lerobot. Cross-device works
+  by construction (each end normalizes through its own calibration); known
+  wart: wrist_roll zero is calibration-pose-relative across devices.
 
-## Preflight (blocks recording until green)
-- **Cameras**: enumerate; live thumbnails; user confirms "workspace" / "wrist" per session (macOS index shuffle). Persist last-known mapping, always re-confirm.
-- **Brightness**: mean gray of overhead frame within configured band (default 115–131). Warn outside.
-- **Calibration**: follower + leader calibration files exist for id `arm`; show age.
-- **Disk**: free space check.
+### Safety model (remote driving)
+15°/tick clamp on synthetic sources (only a rig-local leader runs uncapped) ·
+0.5 s hub deadman (hold pose) · servo EEPROM limits from the OWNER's
+calibration are the hard stop · e-stop for anyone, lease or not ·
+`disable_torque_on_disconnect` ⇒ network drop = arm goes limp.
 
-## Features — M0 hub foundation (no hardware needed — build first)
-- HF auth status (reuse cached token), whoami.
-- **Datasets**: local browse (scan `~/.cache/huggingface/lerobot` meta files, no lerobot import needed) + Hub browse (`kris0/*`).
-- **Trainings registry**: every training run as a first-class object with full lineage:
-  `run = {name, status: draft→launched→done/failed, dataset(repo_id + exclude list), policy(type, pretrained_path for warm-start), steps/batch/save_freq, hub model repo, wandb url, eval notes}`.
-  - List view merges sidecar runs with `kris0/*` Hub model repos → past trainings (act_wall_v1/v3, act_v3/v4, v052c…) appear day one.
-  - **Launcher**: "new training" form prefilled from a dataset → generates the exact version-matched Colab cell (crib-sheet convention: v0.6.0 checkout, `--save_checkpoint_to_hub`, `--policy.repo_id`) to copy-paste; registers the run as launched; **progress tracked by polling the Hub repo for checkpoints** (no agent needed inside Colab). One-click HF Jobs later when HF Pro exists.
-  - Recommend `--wandb.enable=true` going forward; run page links the wandb curve.
-- Acceptance: see all past trainings; create + launch a run; its checkpoints appear as they hit the Hub.
+### Driver protocol
+ndjson-RPC over stdio (TS sends `{cmd, config}`, driver emits
+`ready/status/joints/robot_state/record_state/episode_saved/error`). Frames on
+an OS-assigned localhost MJPEG port reported in `ready` (several rigs per
+machine). Spawn is lazy on first RPC; crash → next RPC respawns. `connect
+{backend: real|sim}` picks who answers — the console never knows the
+difference. Leader arm attach is optional on BOTH backends: attach failure
+warns and comes up follower-only (headless agents get one autoconnect attempt).
 
-## Features — M1 walking skeleton (control + record)
-- Ports: auto-discover `/dev/tty.usbmodem*`, map to follower/leader from saved config.
-- Connect/disconnect follower ± leader; live joint readout; torque on/off; move-to-home; **E-stop = torque kill** (always visible).
-- Teleop: leader→follower start/stop with cam previews.
-- Record session wizard: repo_id auto-named `kris0/<task>_<YYYYMMDD_HHMMSS>`, task string, num eps, episode/reset seconds, cams from verified mapping.
-- During recording: cam feeds, episode counter/timer, buttons + hotkeys: end-episode, re-record, discard, finish early.
-- **Safe extend**: resume existing dataset (wraps `--resume` + `dataset.root`).
-- Acceptance: record a 2-ep smoke dataset, loadable by `LeRobotDataset` in the lelab env, replayable with `lerobot-replay`.
+### Effect architecture (server, as built)
+Services (`Context.Service` — correct for the pinned `effect@4.0.0-beta.101`;
+one static `layer` each, composed once in `src/api/live.ts`, stashed on
+`globalThis` so Vite HMR can't double-init):
+- `HfHub` — HF JSON API via `HttpClient`; token from `~/.cache/huggingface`,
+  degrades to unauthenticated.
+- `DatasetCatalog` — local cache scan (meta/info.json + hyparquet) + Hub merge;
+  sim-dataset tags in sidecar.
+- `RunsRegistry` — training runs + lineage in sidecar JSON; Hub models
+  auto-imported; version-matched Colab cell generation; ckpt polling.
+- `Cameras` — probe/preview/confirm + brightness band; mapping persisted in
+  sidecar.
+- `RobotSvc`, `Recorder` — state machine + session control over the driver.
+- `DriverManager` — the Python subprocess singleton (spawn, ndjson decode,
+  RPC correlation, `error`/`exit` recovery). The load-bearing seam: everything
+  above it is written against 6 methods.
 
-## Features — M2 datasets + report card
-- **Local browse**: scan `~/.cache/huggingface/lerobot`; eps/fps/cams/tasks; total frames; size.
-- **Hub browse**: list `kris0/*` LeRobot datasets via `huggingface_hub`; pull; push; HF auth status/login. Deep-link each dataset to HF's dataset visualizer for episode playback (v1 playback = link out; embedded player later).
-- **Report card** (computed offline, cached in sidecar store):
-  - Coverage heatmap: first overhead frame per episode → threshold on black mat → `cv2.minAreaRect` → object (x, y, angle). Scatter + bin counts over the workspace grid.
-  - Orientation histogram: object angle bins; plus wrist_roll-at-grasp distribution (grasp = gripper close event from actions).
-  - Brightness per episode vs band; flag outliers.
-  - Episode health: length outliers, gripper-never-closed, action jerk spikes.
-- **Exclude-list builder**: tick episodes → emits `--dataset.episodes="[...]"` copy-string. No deletion.
+Domain: `Schema.Class` records, `Schema.TaggedErrorClass` errors
+(`DriverError`, `PreflightError`), typed per-endpoint errors — no blanket
+`catchAll`. Contract = `HttpApi` in `src/api/contract.ts`; the frontend uses a
+derived `HttpApiClient` (no hand-written fetch); OpenAPI at `/api/openapi.json`,
+Scalar at `/api/docs`. **The contract file + `/api/docs` are the API reference —
+this spec doesn't duplicate the route list.** Raw routes beside the contract:
+`/api/hub/*` (relay) and `/api/cams/*` (MJPEG passthrough).
 
-## Features — M3 coach (guided recording)
-- **Workspace config** (per task, stored in sidecar): grid rows×cols mapped to the taped rectangle (define by clicking 4 corners on the overhead frame → homography), orientation buckets (default 0/±45/±90).
-- Before each episode: sample target bin = least-covered (position × orientation), render "place at C2, rotate +45°" with an overlay on the live overhead feed.
-- After each episode: auto-detect actual placement (same CV), log prompted-vs-actual per episode; live coverage bar during the session.
-- Coverage counts merge M2 report card (existing eps) + current session, so extending a dataset targets its real gaps.
-- Acceptance: record 20-ep puzzle dataset where no bin has <2 eps.
+Honest deviations from full Effect idiom (next-iteration candidates, not
+accidents): env config read directly (`src/api/config.ts`, `src/api/rig.ts`)
+instead of `Config`; no `Effect.fn` spans; no test layers/vitest yet; driver
+subprocess is a plain class, not a scoped `Command` resource.
 
-## Sim mode (MuJoCo) — second driver backend
-Same driver process, same RPC verbs, MuJoCo instead of hardware. Target structure: extract a backend interface from the real implementation (`real.py` / `sim.py` behind the shared protocol). The whole flywheel — record → curate → grade → train → eval — runs identically on sim; datasets are ordinary LeRobot datasets written to the same cache (tag `sim: true` in the sidecar; show a SIM badge in the catalog and on every page while active).
+## Shipped (v1)
+- Local console: robot page (connect/teleop/e-stop, joint grid, cam previews),
+  record wizard + HUD (sources: leader/keys/phone*/scripted), datasets
+  (local+Hub merge, episode table, length-outlier flags, exclude-list
+  builder), trainings (registry, lineage, Colab cell, Hub ckpt polling).
+  *phone source currently broken — driver venv lacks the lerobot patches
+  (`phone_teleop/README.md`).
+- Platform: deployed hub, lobby, drive page (cams, jog pad, take/steal
+  control, safety buttons for bystanders, fault surfacing), headless agents,
+  sim + real rigs side by side, leader-over-wire, token auth (off), friend
+  onboarding (`notes/friend-setup.md`).
+- Sim backend: MuJoCo Menagerie scene, gripper-mounted wrist cam, lerobot-
+  frame joint mapping (degrees-from-mid ↔ MJCF offsets), scripted expert,
+  optional native viewer (`LAB_SIM_VIEWER=1` + mjpython), records real
+  LeRobot datasets. NOT sim2real — plumbing, practice, demo insurance.
 
-**Behavior deltas in sim**: physical preflight gates (cam-index confirm, brightness band, calibration age, port checks) are skipped/N-A — only the leader's serial port matters if leader-teleop is used; cameras = MuJoCo offscreen renders down the same MJPEG pipe; E-stop = pause physics.
+## Not built yet (the honest roadmap)
+- **Report card v1**: coverage heatmap (threshold+minAreaRect over first
+  frames), orientation histogram, brightness-vs-band flags, episode health
+  beyond length outliers.
+- **Coach** (guided recording): workspace grid via 4-corner homography,
+  least-covered-bin prompts, prompted-vs-actual logging.
+- **Preflight gate**: hard-block recording on cam-confirm/brightness/
+  calibration-age/disk; today only cam confirm + brightness banner exist.
+- **Journal draft** on session end (one-click append, never silent).
+- **Rollout/eval + DAgger UI**: eval matrix (position×orientation), DAgger
+  sessions feeding child training runs. CLI (`lerobot-rollout`) until then.
+- **Extend flow**: contract supports `resume`; UI hardcodes new-dataset.
+- **Operator recording** (the crowdsourced-data product): task assignment +
+  record verbs over the hub — deliberately absent until identity exists.
+- Platform hardening: real identity/auth-on, queued-command TTL (stale hub
+  commands currently deliver on rig re-register), WS relay if feel demands.
 
-**Phases:**
-- **sim-1 (plumbing double):** load scene (MuJoCo Menagerie `trs_so_arm100` + table + cube), scripted motion primitives (interpolated `move_to_pose`/`hold` à la ECE4560; four-step pick sequence), rendered MJPEG, joint-state events. Acceptance: full console session (connect → "cams" → teleop-view → record 2 eps) with zero hardware; dataset loads in `LeRobotDataset`. Upgrades the fake `testLayer` story with a physically honest double + hackathon demo insurance.
-- **sim-2 (teleop + real demos in sim):** physical leader arm (serial) drives the simulated follower; record loop writes LeRobot episodes from sim state + renders. Evaluate **so101-nexus** first (pip, MuJoCo backend, leader→sim teleop, LeRobot datasets, 6 Gymnasium tasks) — **gate: its lerobot dependency must be compatible with pinned 0.6.0**; if not, own glue over Menagerie using pick-101's lessons (fingertip box collision pads per MuJoCo #239, damped-least-squares IK, Cartesian jog).
-- **sim-3 (RL, post-MVP):** nexus Gymnasium tasks + BC-warm-start → PPO/SAC as a second run type in the Trainings registry; scripted-expert bulk data generation for pipeline tests.
-
-**Boundary (locked-in from the literature):** sim-trained RGB policies do NOT transfer to the real arm without domain-randomization work (state-based RL hit 100% in sim, RGB sim2real failed — ggando.com/blog/so101-rl-lift). Sim is for plumbing, UI/driver testing, teleop practice, task prototyping, eval-grid rehearsal, and RL experiments. Real camera data remains the fuel for real-arm policies. Keep sim and real datasets/models visibly separated (SIM badge, sidecar tag).
-
-## Features — cross-cutting
-- **Journal draft**: on session end, generate the dated entry (dataset, eps, lighting band observed, cam mapping, coach coverage summary); one-click append to `journal.md` (never silent auto-append).
-- Config file `app/backend/config.yaml`: ports, ids, cam defaults, brightness band, HF user.
-
-## v2 (spec'd later, keep in mind)
-- Train command generator (Colab cell / HF Jobs) prefilled from dataset + exclude list; run tracker.
-- Eval matrix: tagged rollout trials (position×orientation → success grid) feeding the coach; DAgger session UI with intervention stats.
-- Phone-teleop as a control source (reuse `phone_teleop/` IK).
-- Embedded episode player (video + joint plots).
-
-## API sketch
-```
-GET  /health, /config
-GET  /ports                         # discovered serial ports
-POST /robot/connect|disconnect      # {follower: bool, leader: bool, backend: "real"|"sim"}
-POST /robot/torque {on}, /robot/home, /robot/estop
-POST /teleop/start|stop
-GET  /cameras                       # enumerate + thumbnails
-POST /cameras/confirm               # {workspace: idx, wrist: idx}
-GET  /preflight                     # aggregate gate status
-POST /record/start {repo_id?, task, num_eps, ep_s, reset_s, resume?}
-POST /record/end-episode|rerecord|discard|finish
-GET  /record/status
-GET  /datasets/local, /datasets/hub
-POST /datasets/pull|push {repo_id}
-GET  /datasets/{repo_id}/report     # report card (computes+caches)
-GET  /datasets/{repo_id}/exclude    # builder state
-POST /coach/workspace               # grid + corners + buckets
-GET  /coach/next                    # sampled placement prompt
-GET  /journal/draft, POST /journal/append
-WS   /ws/joints ; GET /cams/{name}  # mjpeg
-```
-
-## Risks / open questions
-- In-process record loop is the hardest part (threading: cams + serial + episode events). Mitigation: copy LeLab's working loop structure verbatim first, refactor later.
-- Serial port contention with LeLab/CLI — RobotManager must fail loud with "port busy" hint.
-- CV placement detection accuracy on colored puzzle pieces vs white block — calibrate threshold per task; prompted-vs-actual logging measures its own error.
-- MJPEG at 2×640×480@30 over localhost is fine; don't prematurely WebRTC.
-- so101-nexus is Beta (APIs churn) and its lerobot version coupling is unverified against our pinned 0.6.0 — evaluate behind the sim-2 gate; fall back to own Menagerie glue.
-- MuJoCo offscreen rendering at 2 cams × 30 fps on Apple Silicon: expected fine, but verify before wiring the record loop to it (drop to 15 fps preview + full-rate capture if needed).
+## Risks / open questions (current)
+- Hub state is one process — fine at friends-scale; revisit before >~10 rigs.
+- MJPEG through Railway's edge verified at 8 fps; long-stream idle cuts not
+  yet observed — CamFeed `/snap` polling is the fallback if they appear.
+- so101-nexus was evaluated and NOT adopted (own Menagerie glue instead).
+- Cross-device wrist_roll zero handshake still undesigned (bites at the first
+  friend-leader → real-arm session).

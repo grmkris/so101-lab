@@ -33,7 +33,21 @@ cd ~/Code/github-com/so101-lab/phone_teleop
 - **Press & hold B1** → captures reference pose, starts teleop. Move phone → arm follows.
 - **A3 slider** → gripper open/close. Release B1 to pause.
 
+## Where phone teleop lives now
+Phone is also a first-class **console teleop source** (`app/driver/sources/phone.py`
+via the shared EE chain) — selectable on the console's record/robot pages. And the
+hub (`notes/friend-setup.md`) has replaced Tailscale as the remote story for
+driving *rigs*; this directory remains the standalone-script path.
+
 ## Known bugs we patched in lerobot (fragile — LOST on lerobot reinstall)
+
+> **⚠ TWO lerobot envs exist and only ONE is patched.** The LeLab tool env
+> (`~/.local/share/uv/tools/lelab/`) has both patches applied — these scripts
+> work. The console driver env (`app/driver/.venv/`) is **unpatched**, so the
+> console's `phone` source currently hits BOTH bugs below. Re-apply the two
+> edits to `app/driver/.venv/lib/python3.12/site-packages/lerobot/teleoperators/phone/teleop_phone.py`
+> (and again after any `uv sync`) until they land upstream.
+
 In `lerobot/teleoperators/phone/teleop_phone.py`:
 1. **B1 read (calibrate):** `_wait_for_capture_trigger` read B1 with `get_int(1)` only. Our phone
    sends B1 as a **bool**, so calibration never triggered. Patched to fall back to `get_bool(1)`.

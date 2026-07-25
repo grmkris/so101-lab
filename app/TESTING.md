@@ -17,15 +17,12 @@ Start the app: `cd app/console && bun run dev` → http://localhost:3000
 | 3 | Source `scripted expert` → Start teleop | arm runs the pick choreography in the streams |
 | 4 | Stop → source `keyboard (EE jog)` → Start teleop → click the key pad | W/S/A/D/Q/E jog the arm; O/C gripper |
 | 5 | Release all keys / click away | arm holds pose (deadman ~0.5 s) |
-| 6 | Source `phone` → Start teleop (no phone around) | arm holds; after ~40 s a friendly "phone not found" error surfaces |
+| 6 | Source `phone` → Start teleop (no phone around) | arm holds; after ~40 s a friendly "phone not found" error surfaces. ⚠ with a REAL phone this source is currently broken — the driver venv lacks the lerobot phone patches (`phone_teleop/README.md`) |
 | 7 | Record page → source `Scripted expert`, 2 eps × 5 s | REC/RESET HUD cycles, `done — 2/2 saved`, dataset gets SIM badge on Datasets page |
 | 8 | Record again → source `Keyboard`, drive during REC via the pad | keys drive the arm while recording; 2/2 saved |
 | 9 | Datasets page → `report` link on the new dataset | episode table renders; exclude an ep → `--dataset.episodes` flag string appears |
 | 10 | E-STOP during any teleop | physics pauses, state back to connected |
 
-CLI equivalent of 7–8 (drives the driver directly):
-`app/driver/.venv/bin/python` + `test_sim_driver.py` / `test_t3_keys_record.py`
-(session tmp scripts; both loop connect→record→verify `LeRobotDataset` loads).
 
 ## 2 — Rig session (real arm, user at the rig)
 
@@ -54,17 +51,16 @@ difference from production is the value of `HUB_URL`.
 Two terminal tabs, both in `app/console`:
 
 ```sh
-# tab 1 — the hub (this is what deploys to Railway)
-bun run sim:hub                                    # → :3001
-HUB_LATENCY_MS=120 HUB_DROP_RATE=0.05 bun run sim:hub   # …or impaired
+# tab 1 — the hub (dev twin of the Railway deployment)
+bun run hub                                        # → :3001
+HUB_LATENCY_MS=120 HUB_DROP_RATE=0.05 bun run hub  # …or impaired
 
-# tab 2 — the rig (your existing console + driver)
-bun run sim:rig                                    # → :3000
+# tab 2 — the rig (existing console + driver; autoconnects the sim)
+bun run rig:sim                                    # → :3000
 ```
 
-Then **open http://localhost:3000 once** — vite loads the server entry lazily, so
-the rig link only starts after the first request (in production it starts at
-boot). Look for `[rig-link] kris-sim -> http://localhost:3001` in tab 2.
+Look for `[rig-link] kris-sim -> http://localhost:3001` in tab 2 (the dev
+server pokes its own entry on listen, so the link starts without a browser).
 
 | # | Step | Expect |
 |---|------|--------|
@@ -78,16 +74,34 @@ boot). Look for `[rig-link] kris-sim -> http://localhost:3001` in tab 2.
 | 8 | Restart the rig, then restart the hub | both re-register with no reconnect logic — that is a Railway redeploy |
 | 9 | Re-run with `HUB_LATENCY_MS=120 HUB_DROP_RATE=0.3` | still driveable; rig card shows link ≈125 ms; arm still holds on silence |
 
-Going remote for real: deploy the hub (`bun run build && bun run start`), then
-start the rig with `HUB_URL=https://<app>.up.railway.app RIG_NAME=kris-sim`.
-Nothing else changes.
+## 4 — Against the DEPLOYED hub (https://hub-production-3903.up.railway.app)
+
+The hub is live on Railway (Dockerfile + railway.json in `app/console`;
+redeploy = `railway up --service hub --detach` from `app/console`).
+
+```sh
+# headless sim rig on your Mac, registered with the cloud hub
+HUB_URL=https://hub-production-3903.up.railway.app RIG_NAME=kris-sim \
+  LAB_AUTOCONNECT=sim bun run agent
+```
+
+| # | Step | Expect |
+|---|------|--------|
+| 1 | Hub lobby in any browser | rig online, streaming, `link` ≈ your RTT to Amsterdam |
+| 2 | Drive with the keyboard from another network (phone off wifi) | ~100–200 ms feel; deadman holds on silence |
+| 3 | Leader-over-wire: `app/driver/.venv/bin/python controller.py --hub https://hub-production-3903.up.railway.app --rig kris-sim --port /dev/tty.usbmodemXXXX` | sim mirrors the physical leader; ~15 packets/s in the controller log |
+| 4 | While the controller drives: **Take over** in the browser (confirm) | controller prints `lost the rig` and exits; browser drives immediately |
+| 5 | As a non-holder: **E-STOP** | works without the lease — safety verbs bypass it |
+| 6 | `railway up` mid-session | rig re-registers in seconds; operator re-claims (lease loss expected) |
+
+Local prod-build twin of the deployment: `bun run build && HUB_TOKEN=x PORT=3001 bun run hub:prod`.
 
 ## Regression suite (run after driver/console changes)
 
 ```sh
-cd app/console && bunx tsc --noEmit && bunx biome check src
-cd app/driver && .venv/bin/python -c "import ast; [ast.parse(open(f).read(),f) for f in ['driver.py','teleop_loop.py','recorder.py']]"
-# + sim smoke rows 2–8 above (or the two driver test scripts)
+cd app/console && bunx tsc --noEmit && bunx biome check src && bun run build
+cd app/driver && for f in *.py backends/*.py sources/*.py; do .venv/bin/python -c "import ast; ast.parse(open('$f').read())" || echo "FAIL $f"; done
+# + sim smoke rows 2–8 above
 ```
 
 Known gaps / by design:
