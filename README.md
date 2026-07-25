@@ -6,7 +6,7 @@ Lab notebook + tooling for my SO-101 arm (LeRobot). Everything I learn doing imi
 
 ## Layout
 
-- `app/` — **Lab Console**: one TypeScript app (TanStack Start + Effect v4, Bun) + a Python driver pinned to lerobot 0.6.0. Three roles from one build: the **hub** (lobby + relay, deployed at https://hub-production-3903.up.railway.app), a headless **rig agent** (your arm or a MuJoCo sim, dials out — no port forwarding), and the default local lab console. `app/driver/controller.py` = drive a remote rig with your own leader arm. See `app/SPEC.md` and `notes/friend-setup.md`.
+- `app/` — **Lab Console** (⚠ MOVED: now developed at [eth-global-lisbon-2026-proof-of-hands](https://github.com/grmkris/eth-global-lisbon-2026-proof-of-hands); this copy is frozen): one TypeScript app (TanStack Start + Effect v4, Bun) + a Python driver pinned to lerobot 0.6.0. Three roles from one build: the **hub** (lobby + relay, deployed at https://hub-production-3903.up.railway.app), a headless **rig agent** (your arm or a MuJoCo sim, dials out — no port forwarding), and the default local lab console. `app/driver/controller.py` = drive a remote rig with your own leader arm. See `app/SPEC.md` and `notes/friend-setup.md`.
 - `journal.md` — run log, newest on top. Every record/train/eval run: lerobot version, dataset, lighting, orientation policy, result.
 - `notes/` — hard-won practices: the three reliability levers, eval checklist, command crib sheet, friend onboarding.
 - `scripts/` — small helpers (motor ping, wiggle smoke test, camera preview, dataset frame review).

@@ -8,7 +8,8 @@ Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal:
 - After each real record/train/eval run, append a dated entry to `journal.md` (newest on top): lerobot version, dataset, lighting, camera indexes, orientation policy, result. This log is the point — past runs couldn't be compared because nothing was written down.
 - Commit + push to `origin main` after meaningful changes. Public repo (build-in-public).
 
-## The app (`app/`) — Lab Console + teleop platform
+## The app (`app/`) — MOVED to github.com/grmkris/eth-global-lisbon-2026-proof-of-hands
+The platform now lives in that public bun monorepo (apps/web + apps/driver, Railway project `proof-of-hands`). The copy under `app/` here is FROZEN — make platform changes in the new repo. Everything below describes the system itself and still applies.
 One TypeScript app (`app/console`: TanStack Start, React 19, Effect v4, Bun) + a Python driver (`app/driver`: uv env pinned `lerobot==0.6.0`). Three roles from ONE build, resolved by `LAB_MODE` env:
 - **hub** — lobby + relay, **deployed: https://hub-production-3903.up.railway.app** (Railway project `so101-hub`, Dockerfile in `app/console/`, 1 replica + no sleep are load-bearing — in-memory rig registry).
 - **agent** — headless rig (arm or MuJoCo sim). Dials OUT to the hub (no inbound ports). `LAB_AUTOCONNECT=sim|real` brings the backend up at boot.

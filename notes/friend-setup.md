@@ -1,5 +1,8 @@
 # Friend setup — SO-101 + the hub
 
+> ⚠ MOVED: the maintained version of this guide is
+> [docs/friend-setup.md in eth-global-lisbon-2026-proof-of-hands](https://github.com/grmkris/eth-global-lisbon-2026-proof-of-hands/blob/main/docs/friend-setup.md).
+
 Two independent things you can do; each works without the other:
 
 - **A. Drive Kristjan's sim with YOUR leader arm** — needs only steps 0–1 + "A" below.
