@@ -1,3 +1,4 @@
 sim/.venv/
 sim/model/assets/
 __pycache__/
+*.local

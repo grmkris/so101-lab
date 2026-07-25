@@ -246,11 +246,18 @@ class SimBackend:
                 teleop.connect()
                 self.teleop = teleop
                 log(f"sim: leader arm attached on {leader_port}")
-            except Exception as exc:  # noqa: BLE001 — surfaced to the user
-                raise ValueError(
-                    f"Could not connect to the leader arm on {leader_port}. "
-                    "Is it plugged in and not held by another process?"
-                ) from exc
+            except Exception as exc:  # noqa: BLE001
+                # The leader is an optional extra for a sim — a rig whose arm
+                # is unplugged must still come up (headless agents autoconnect
+                # with withLeader=true and only get ONE attempt). Keyboard and
+                # scripted driving are unaffected; teleop_ready still refuses
+                # source="leader" while self.teleop is None.
+                emit({
+                    "event": "error",
+                    "where": "sim.connect",
+                    "error": f"leader arm unavailable on {leader_port} ({exc}) — sim up without it",
+                })
+                log(f"sim: leader attach failed ({exc}) — continuing without leader")
         emit({"event": "robot_state", "state": self.state, "backend": self.name})
         return {"state": self.state, "leader": self.teleop is not None}
 
