@@ -9,11 +9,10 @@ Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal:
 - Commit + push to `origin main` after meaningful changes. Public repo (build-in-public).
 
 ## The app (`app/`) — MOVED to github.com/grmkris/eth-global-lisbon-2026-proof-of-hands
-The platform now lives in that public bun monorepo (apps/web + apps/driver, Railway project `proof-of-hands`). The copy under `app/` here is FROZEN — make platform changes in the new repo. Everything below describes the system itself and still applies.
-One TypeScript app (`app/console`: TanStack Start, React 19, Effect v4, Bun) + a Python driver (`app/driver`: uv env pinned `lerobot==0.6.0`). Three roles from ONE build, resolved by `LAB_MODE` env:
-- **hub** — lobby + relay, **deployed: https://hub-production-3903.up.railway.app** (Railway project `so101-hub`, Dockerfile in `app/console/`, 1 replica + no sleep are load-bearing — in-memory rig registry).
-- **agent** — headless rig (arm or MuJoCo sim). Dials OUT to the hub (no inbound ports). `LAB_AUTOCONNECT=sim|real` brings the backend up at boot.
-- **console** (default) — the local lab tool: robot page, record wizard, datasets, trainings.
+The platform now lives in that public bun monorepo (apps/web + apps/driver, Railway project `proof-of-hands`). The copy under `app/` here is FROZEN — make platform changes in the new repo. ⚠ The new repo has since ELIMINATED the console role (2026-07-25): no `LAB_MODE`, no roles — one deployed web app (the hub) + portless headless agents; camera setup/record/trainings all ride owner verbs over the hub pipe. Read the new repo's docs/SPEC.md, not the frozen copy here.
+One TypeScript app (TanStack Start, React 19, Effect v4, Bun) + a Python driver (uv env pinned `lerobot==0.6.0`):
+- **hub** — THE web app, **deployed: https://web-production-b5106.up.railway.app** (Railway project `proof-of-hands`, push-to-deploy from GitHub main; 1 replica + no sleep are load-bearing — in-memory rig registry). Old `so101-hub` project/URL is legacy, pending decommission.
+- **agent** — headless rig (arm or MuJoCo sim). Dials OUT to the hub (no inbound ports). `LAB_AUTOCONNECT=sim|real` brings the backend up at boot. Owner key printed at boot gates owner verbs (cameras/record/tasks/trainings).
 
 Key facts: transport = 20 Hz HTTP polling + MJPEG re-serve (deliberate — no WS/WebRTC; curl-debuggable); single-writer **lease** per rig (e-stop/teleop_stop bypass it; "Take over" force-steals); safety = 15°/tick remote clamp + 0.5 s deadman + servo EEPROM limits; auth (`HUB_TOKEN`) built but **currently unset**; `app/driver/controller.py` = drive a remote rig with your own leader arm (~16 packets/s). `FOLLOWER_PORT`/`LEADER_PORT`/`ROBOT_ID` env override the defaults in `src/api/rig.ts`. Scripts: `hub`, `hub:prod`, `agent`, `rig:sim`, `rig:sim:viewer`, `rig:real`. Docs: `app/SPEC.md` (architecture), `app/TESTING.md` (checklists), `notes/friend-setup.md` (onboarding).
 ⚠ Phone teleop source in the console is **broken**: the driver venv lacks the lerobot phone patches (see `phone_teleop/README.md`) — LeLab env has them, `app/driver/.venv` does not.
