@@ -60,13 +60,23 @@ class RealBackend:
                 teleop = SO101Leader(SO101LeaderConfig(port=req["leaderPort"], id=robot_id))
                 try:
                     teleop.bus.connect()
-                except Exception as exc:
-                    raise RuntimeError(
-                        f"Could not connect to the leader arm on {req['leaderPort']}. "
-                        "Plugged in, powered, and not held by LeLab/CLI?"
-                    ) from exc
-                teleop.bus.write_calibration(teleop.calibration)
-                teleop.configure()
+                    teleop.bus.write_calibration(teleop.calibration)
+                    teleop.configure()
+                except Exception as exc:  # noqa: BLE001
+                    # Leader is optional — a follower-only rig (friend's machine,
+                    # headless agent autoconnect) must still come up. Keyboard and
+                    # phone sources are unaffected; teleop_ready refuses
+                    # source="leader" while self.teleop is None.
+                    emit({
+                        "event": "error",
+                        "where": "real.connect",
+                        "error": (
+                            f"leader arm unavailable on {req['leaderPort']} ({exc})"
+                            " — follower up without it"
+                        ),
+                    })
+                    log(f"real: leader attach failed ({exc}) — continuing without leader")
+                    teleop = None
 
             self.robot, self.teleop, self.state = robot, teleop, "connected"
             self._emit_state()
