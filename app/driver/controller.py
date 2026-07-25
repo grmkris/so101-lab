@@ -23,6 +23,7 @@ the rig holds pose after 0.5 s without packets.
 import argparse
 import http.client
 import json
+import os
 import signal
 import sys
 import time
@@ -33,11 +34,21 @@ import urllib.request
 from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
 
 
+TOKEN = ""  # set from --token / HUB_TOKEN in main()
+
+
+def _headers() -> dict:
+    h = {"content-type": "application/json"}
+    if TOKEN:
+        h["authorization"] = f"Bearer {TOKEN}"
+    return h
+
+
 def api(hub: str, path: str, payload: dict, timeout: float = 2.0) -> dict:
     req = urllib.request.Request(
         f"{hub}{path}",
         data=json.dumps(payload).encode(),
-        headers={"content-type": "application/json"},
+        headers=_headers(),
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=timeout) as res:
@@ -70,7 +81,7 @@ class HubLink:
                 "POST",
                 path,
                 body=json.dumps(payload),
-                headers={"content-type": "application/json"},
+                headers=_headers(),
             )
             res = conn.getresponse()
             res.read()  # drain so the connection is reusable
@@ -90,7 +101,14 @@ def main() -> None:
     parser.add_argument("--port", required=True, help="leader serial port")
     parser.add_argument("--id", default="arm", help="leader calibration id")
     parser.add_argument("--hz", type=float, default=30.0)
+    parser.add_argument(
+        "--token",
+        default=os.environ.get("HUB_TOKEN", ""),
+        help="hub shared secret (default: HUB_TOKEN env)",
+    )
     args = parser.parse_args()
+    global TOKEN
+    TOKEN = args.token
 
     hub = args.hub.rstrip("/")
     rig = f"/api/hub/rigs/{args.rig}"

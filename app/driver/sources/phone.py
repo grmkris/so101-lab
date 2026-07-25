@@ -24,12 +24,10 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from lerobot.teleoperators.teleoperator import Teleoperator
-
 from shared import emit, log
+from sources.base import STALE_INPUT_S, SourceBase
 from sources.ee_chain import build_ee_pipeline
 
-STALE_INPUT_S = 0.5  # no fresh phone packet for this long -> hold pose
 CONNECT_RETRIES = 10  # app backgrounding / screen lock drops it off the network
 CONNECT_RETRY_S = 2.0
 
@@ -40,7 +38,7 @@ class PhoneSourceConfig:
     calibration_dir: Path | None = None
 
 
-class PhoneSource(Teleoperator):
+class PhoneSource(SourceBase):
     name = "phone_source"
     config_class = PhoneSourceConfig
 
@@ -122,35 +120,7 @@ class PhoneSource(Teleoperator):
         self.obs = dict(joint_action)  # open-loop feedback for FK/IK seeding
         return joint_action
 
-    # --- Teleoperator boilerplate ---
-
-    @property
-    def action_features(self) -> dict:
-        return {f"{name}.pos": float for name in self.motor_names}
-
-    @property
-    def feedback_features(self) -> dict:
-        return {}
-
-    @property
-    def is_connected(self) -> bool:
-        return True  # source facade is alive; the phone link is managed internally
-
-    def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
-        pass  # listener thread owns discovery + calibration (started in __init__)
-
-    @property
-    def is_calibrated(self) -> bool:
-        return True
-
-    def calibrate(self) -> None:
-        pass
-
-    def configure(self) -> None:
-        pass
-
-    def send_feedback(self, feedback: dict) -> None:
-        pass
+    # boilerplate from SourceBase; disconnect is real — the phone link is ours
 
     def disconnect(self) -> None:
         self._stop = True

@@ -2,27 +2,24 @@ import {
 	createStartHandler,
 	defaultStreamHandler,
 } from "@tanstack/react-start/server";
+import { HUB_URL, RIG_NAME, ROLE } from "#/api/config";
 import { apiHandler } from "#/api/live";
 import { mjpegBase } from "#/api/services/driver-manager";
 import { hubAuthorized } from "#/hub/auth";
-import { handleHubRequest } from "#/hub/routes";
+import { handleHubRequest, json } from "#/hub/routes";
 import { startRigLink } from "#/rig/link";
 
 const startFetch = createStartHandler(defaultStreamHandler);
 
-// One build, three roles, resolved from env at boot:
+// One build, three roles (see api/config.ts):
 //   hub     — the deployed cloud app: lobby + drive UI, relay. No driver.
 //   console — the local lab tool (default); setting HUB_URL also registers it.
 //   agent   — headless rig: local API + rig link only, serves no UI.
-type Role = "hub" | "agent" | "console";
-const ROLE: Role =
-	process.env.LAB_MODE === "hub"
-		? "hub"
-		: process.env.LAB_MODE === "agent"
-			? "agent"
-			: "console";
-const HUB_URL = process.env.HUB_URL;
-const RIG_NAME = process.env.RIG_NAME ?? "local-rig";
+
+// The hub serves ONLY these /api paths (an allowlist, not a deny-regex —
+// every other endpoint is rig-local and must not exist on a machine with no
+// arm, no cameras and no lerobot cache).
+const HUB_API = new Set(["/api/health", "/api/docs", "/api/openapi.json"]);
 
 const boot = globalThis as unknown as { __labRigLinkStarted?: boolean };
 if (HUB_URL && ROLE !== "hub" && !boot.__labRigLinkStarted) {
@@ -50,45 +47,24 @@ export default {
 		// differ only by env, so the client has to ask at runtime. An agent is
 		// still a rig to everyone who talks to it.
 		if (url.pathname === "/api/mode") {
-			return new Response(
-				JSON.stringify({
-					mode: ROLE === "hub" ? "hub" : "rig",
-					rigName: RIG_NAME,
-				}),
-				{ headers: { "content-type": "application/json" } },
-			);
+			return json({ mode: ROLE === "hub" ? "hub" : "rig", rigName: RIG_NAME });
 		}
 
 		// Hub relay — raw routes beside the typed contract. A rig must not accept
 		// rig registrations, so this is gated rather than always-on.
 		if (url.pathname.startsWith("/api/hub/")) {
-			if (ROLE !== "hub")
-				return new Response(JSON.stringify({ error: "not a hub" }), {
-					status: 404,
-					headers: { "content-type": "application/json" },
-				});
+			if (ROLE !== "hub") return json({ error: "not a hub" }, 404);
 			if (!hubAuthorized(request, url))
-				return new Response(JSON.stringify({ error: "unauthorized" }), {
-					status: 401,
-					headers: { "content-type": "application/json" },
-				});
+				return json({ error: "unauthorized" }, 401);
 			return handleHubRequest(request, url);
 		}
 
-		// A hub has no arm, no cameras and no lerobot cache. Gate the hardware
-		// routes rather than let them spawn a driver that cannot exist there.
-		if (
-			ROLE === "hub" &&
-			/^\/api\/(robot|cameras|record|cams)\b/.test(url.pathname)
-		) {
-			return new Response(
-				JSON.stringify({ error: "this is a hub — no robot attached" }),
-				{ status: 404, headers: { "content-type": "application/json" } },
-			);
-		}
-
-		// MJPEG passthrough — outside the typed contract (infinite multipart stream)
-		if (url.pathname.startsWith("/api/cams/")) {
+		if (ROLE === "hub") {
+			// allowlist, defined above
+			if (url.pathname.startsWith("/api/") && !HUB_API.has(url.pathname))
+				return json({ error: "this is a hub — no robot attached" }, 404);
+		} else if (url.pathname.startsWith("/api/cams/")) {
+			// MJPEG passthrough — outside the typed contract (infinite multipart)
 			const name = url.pathname.split("/").at(-1);
 			const base = mjpegBase();
 			if (!base) return new Response("driver not ready", { status: 503 });
@@ -101,6 +77,7 @@ export default {
 				},
 			});
 		}
+
 		if (url.pathname === "/api" || url.pathname.startsWith("/api/")) {
 			return apiHandler(request);
 		}

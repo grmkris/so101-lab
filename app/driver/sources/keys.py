@@ -14,11 +14,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from lerobot.teleoperators.teleoperator import Teleoperator
-
+from sources.base import STALE_INPUT_S, SourceBase
 from sources.ee_chain import build_ee_pipeline
-
-STALE_INPUT_S = 0.5  # deadman: browser silent for this long -> hold pose
 
 
 @dataclass
@@ -27,7 +24,7 @@ class BrowserKeysConfig:
     calibration_dir: Path | None = None
 
 
-class BrowserKeys(Teleoperator):
+class BrowserKeys(SourceBase):
     name = "browser_keys"
     config_class = BrowserKeysConfig
 
@@ -67,36 +64,3 @@ class BrowserKeys(Teleoperator):
         joint_action = self.pipeline((raw, self.obs))
         self.obs = dict(joint_action)  # open-loop feedback for FK/IK seeding
         return joint_action
-
-    # --- Teleoperator boilerplate ---
-
-    @property
-    def action_features(self) -> dict:
-        return {f"{name}.pos": float for name in self.motor_names}
-
-    @property
-    def feedback_features(self) -> dict:
-        return {}
-
-    @property
-    def is_connected(self) -> bool:
-        return True
-
-    def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
-        pass
-
-    @property
-    def is_calibrated(self) -> bool:
-        return True
-
-    def calibrate(self) -> None:
-        pass
-
-    def configure(self) -> None:
-        pass
-
-    def send_feedback(self, feedback: dict) -> None:
-        pass
-
-    def disconnect(self) -> None:
-        pass

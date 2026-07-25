@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import { HUB_TOKEN_COOKIE } from "#/lib/constants";
 
 export interface RigSummary {
 	name: string;
@@ -39,7 +40,7 @@ export const hubToken = {
 	set: (token: string): void => {
 		localStorage.setItem("lab-hub-token", token);
 		const secure = location.protocol === "https:" ? "; Secure" : "";
-		document.cookie = `lab_hub_token=${encodeURIComponent(token)}; path=/; max-age=31536000; SameSite=Lax${secure}`;
+		document.cookie = `${HUB_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=31536000; SameSite=Lax${secure}`;
 	},
 };
 
@@ -60,6 +61,14 @@ const post = async (path: string, body: Record<string, unknown> = {}) => {
 	return json;
 };
 
+/** GET with the same auth + error contract as `post`. */
+const get = async <T>(path: string, unreachable: string): Promise<T> => {
+	const res = await fetch(path, { headers: authHeaders() });
+	if (res.status === 401) throw new Error("unauthorized");
+	if (!res.ok) throw new Error(unreachable);
+	return res.json() as Promise<T>;
+};
+
 export type LabMode = "hub" | "rig";
 
 /**
@@ -78,35 +87,29 @@ export const modeQuery = queryOptions({
 
 export const rigsQuery = queryOptions({
 	queryKey: ["hub", "rigs"],
-	queryFn: async (): Promise<ReadonlyArray<RigSummary>> => {
-		const res = await fetch("/api/hub/rigs", { headers: authHeaders() });
-		if (res.status === 401) throw new Error("unauthorized");
-		if (!res.ok) throw new Error("hub unreachable");
-		return res.json();
-	},
+	queryFn: () =>
+		get<ReadonlyArray<RigSummary>>("/api/hub/rigs", "hub unreachable"),
 	refetchInterval: 2_000,
 });
 
 export const rigQuery = (name: string) =>
 	queryOptions({
 		queryKey: ["hub", "rigs", name],
-		queryFn: async (): Promise<RigSummary> => {
-			const res = await fetch(`/api/hub/rigs/${encodeURIComponent(name)}`, {
-				headers: authHeaders(),
-			});
-			if (res.status === 401) throw new Error("unauthorized");
-			if (!res.ok) throw new Error("rig not registered on this hub");
-			return res.json();
-		},
+		queryFn: () =>
+			get<RigSummary>(
+				`/api/hub/rigs/${encodeURIComponent(name)}`,
+				"rig not registered on this hub",
+			),
 		refetchInterval: 500,
 	});
 
 export const impairmentQuery = queryOptions({
 	queryKey: ["hub", "impairment"],
-	queryFn: async (): Promise<{ latencyMs: number; dropRate: number }> => {
-		const res = await fetch("/api/hub/impairment", { headers: authHeaders() });
-		return res.json();
-	},
+	queryFn: () =>
+		get<{ latencyMs: number; dropRate: number }>(
+			"/api/hub/impairment",
+			"hub unreachable",
+		),
 	staleTime: 60_000,
 });
 

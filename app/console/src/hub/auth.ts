@@ -10,15 +10,19 @@
  * who among token-holders — the lease clientId is still client-chosen. Fine
  * for a friend-group deployment; real identity is a later problem.
  */
-const TOKEN = process.env.HUB_TOKEN ?? "";
+import { HUB_TOKEN } from "#/api/config";
+import { HUB_TOKEN_COOKIE } from "#/lib/constants";
 
 export const hubAuthorized = (request: Request, url: URL): boolean => {
-	if (!TOKEN) return true;
-	if (request.headers.get("authorization") === `Bearer ${TOKEN}`) return true;
+	if (!HUB_TOKEN) return true;
+	if (request.headers.get("authorization") === `Bearer ${HUB_TOKEN}`)
+		return true;
 	const cookies = request.headers.get("cookie") ?? "";
 	if (
-		cookies.split(/;\s*/).includes(`lab_hub_token=${encodeURIComponent(TOKEN)}`)
+		cookies
+			.split(/;\s*/)
+			.includes(`${HUB_TOKEN_COOKIE}=${encodeURIComponent(HUB_TOKEN)}`)
 	)
 		return true;
-	return url.searchParams.get("token") === TOKEN;
+	return url.searchParams.get("token") === HUB_TOKEN;
 };

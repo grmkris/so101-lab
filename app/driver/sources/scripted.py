@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from lerobot.teleoperators.teleoperator import Teleoperator
+from sources.base import SourceBase
 
 
 @dataclass
@@ -17,7 +17,7 @@ class ScriptedExpertConfig:
     calibration_dir: Path | None = None
 
 
-class ScriptedExpert(Teleoperator):
+class ScriptedExpert(SourceBase):
     """Loops keyframe interpolation; emits lerobot-unit joint targets."""
 
     name = "sim_expert"
@@ -26,6 +26,7 @@ class ScriptedExpert(Teleoperator):
     def __init__(self, backend, keyframes) -> None:
         self.b = backend
         self.keyframes = keyframes
+        self.motor_names = backend.lerobot_joint_names
         self.id = "sim"
         self.calibration_dir = None
         self.calibration = None
@@ -34,30 +35,8 @@ class ScriptedExpert(Teleoperator):
     def reset(self) -> None:
         self._t0 = time.time()
 
-    @property
-    def action_features(self) -> dict:
-        return {f"{name}.pos": float for name in self.b.lerobot_joint_names}
-
-    @property
-    def feedback_features(self) -> dict:
-        return {}
-
-    @property
-    def is_connected(self) -> bool:
-        return True
-
     def connect(self, calibrate: bool = True) -> None:  # noqa: ARG002
-        self._t0 = time.time()
-
-    @property
-    def is_calibrated(self) -> bool:
-        return True
-
-    def calibrate(self) -> None:
-        pass
-
-    def configure(self) -> None:
-        pass
+        self._t0 = time.time()  # restart the choreography clock
 
     def get_action(self) -> dict:
         t = (time.time() - self._t0) % sum(d for _, d in self.keyframes)
@@ -70,9 +49,3 @@ class ScriptedExpert(Teleoperator):
             t -= dur
             prev = target
         return self.b.rad_to_lerobot(self.keyframes[-1][0])
-
-    def send_feedback(self, feedback: dict) -> None:
-        pass
-
-    def disconnect(self) -> None:
-        pass

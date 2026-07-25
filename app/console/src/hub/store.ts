@@ -9,9 +9,7 @@ export interface RigFrame {
 }
 
 export interface RigCommand {
-	id: number;
 	verb: string;
-	args?: Record<string, unknown>;
 }
 
 export interface Rig {
@@ -49,16 +47,9 @@ export const impairment = {
 
 const store = globalThis as unknown as {
 	__labHubRigs?: Map<string, Rig>;
-	__labHubSeq?: number;
 };
 store.__labHubRigs ??= new Map<string, Rig>();
-store.__labHubSeq ??= 0;
 const rigs = store.__labHubRigs;
-
-export const nextCommandId = (): number => {
-	store.__labHubSeq = (store.__labHubSeq ?? 0) + 1;
-	return store.__labHubSeq;
-};
 
 export const sleep = (ms: number): Promise<void> =>
 	new Promise((r) => setTimeout(r, ms));

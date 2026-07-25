@@ -9,12 +9,10 @@
  */
 import { apiHandler } from "#/api/live";
 import { mjpegBase } from "#/api/services/driver-manager";
+import { isVerb, VERBS } from "#/hub/verbs";
 
 const LINK_MS = 50; // 20 Hz control
 const FRAME_MS = 125; // 8 fps preview — the recording stays full-rate locally
-// sim renders to these fixed names; a real rig names them cam0/cam1 and only
-// knows which exist once previews are running, so the list is discovered
-const SIM_CAMS = ["workspace_cam", "wrist_cam"];
 
 /** Call the rig's own API in-process — reuses all existing validation. */
 const localApi = async (
@@ -57,10 +55,24 @@ export const startRigLink = (opts: {
 	const auth: Record<string, string> = token
 		? { authorization: `Bearer ${token}` }
 		: {};
-	let cams: string[] = [];
+	// live streams as the driver reports them (cameras/status.previewing) —
+	// refreshed on the frame cadence, advertised to the hub on the link cadence
 	let previewing: ReadonlyArray<string> = [];
 	let linkMs = 0;
-	let warned = false;
+	let linkWarned = false;
+	let frameWarned = false;
+
+	const runCommand = async (verb: string) => {
+		if (!isVerb(verb)) {
+			console.error(`[rig-link] unknown command ${verb}`);
+			return;
+		}
+		const spec = VERBS[verb];
+		await localApi(spec.path, {
+			method: "POST",
+			...("body" in spec ? { body: JSON.stringify(spec.body) } : {}),
+		});
+	};
 
 	let autoConnectTried = false;
 	const link = async () => {
@@ -70,26 +82,18 @@ export const startRigLink = (opts: {
 		if (autoConnect && !autoConnectTried && robot?.state === "disconnected") {
 			autoConnectTried = true; // one attempt — never fight a human disconnect
 			console.error(`[rig-link] auto-connecting backend=${autoConnect}`);
-			await localApi("/api/robot/connect", {
-				method: "POST",
-				body: JSON.stringify({ withLeader: true, backend: autoConnect }),
-			});
+			await runCommand(autoConnect === "sim" ? "connect_sim" : "connect_real");
 			if (autoConnect === "real") {
-				const cams = (await localApi("/api/cameras/probe")) as Array<{
+				const probed = (await localApi("/api/cameras/probe")) as Array<{
 					index: number;
 				}> | null;
-				if (cams?.length)
+				if (probed?.length)
 					await localApi("/api/cameras/preview/start", {
 						method: "POST",
-						body: JSON.stringify({ indexes: cams.map((c) => c.index) }),
+						body: JSON.stringify({ indexes: probed.map((c) => c.index) }),
 					});
 			}
 		}
-		const cameras = (await localApi("/api/cameras/status")) as {
-			previewing?: string[];
-		} | null;
-		previewing = cameras?.previewing ?? [];
-		const advertised = cams.length > 0 ? cams : previewing;
 
 		try {
 			const res = await fetch(`${base}/api/hub/link`, {
@@ -101,7 +105,7 @@ export const startRigLink = (opts: {
 					armState: robot?.state ?? "disconnected",
 					source: robot?.source ?? null,
 					joints: robot?.joints ?? {},
-					cams: advertised,
+					cams: previewing,
 					lastError: robot?.lastError ?? null,
 					linkMs,
 				}),
@@ -115,7 +119,7 @@ export const startRigLink = (opts: {
 				} | null;
 				commands: Array<{ verb: string }>;
 			};
-			warned = false;
+			linkWarned = false;
 
 			if (body.input) {
 				await localApi("/api/robot/teleop/input", {
@@ -127,8 +131,8 @@ export const startRigLink = (opts: {
 				await runCommand(cmd.verb);
 			}
 		} catch (err) {
-			if (!warned) {
-				warned = true;
+			if (!linkWarned) {
+				linkWarned = true;
 				console.error(
 					`[rig-link] hub unreachable at ${base} (${String(err)}) — retrying`,
 				);
@@ -136,87 +140,51 @@ export const startRigLink = (opts: {
 		}
 	};
 
-	const runCommand = async (verb: string) => {
-		switch (verb) {
-			case "connect_sim":
-				// withLeader so a physical leader arm can drive the sim
-				await localApi("/api/robot/connect", {
+	const pushOne = async (mjpeg: string, cam: string) => {
+		try {
+			const snap = await fetch(`${mjpeg}/snap/${cam}`);
+			if (!snap.ok) return;
+			const buf = await snap.arrayBuffer();
+			const res = await fetch(
+				`${base}/api/hub/frame?rig=${encodeURIComponent(rigName)}&cam=${encodeURIComponent(cam)}`,
+				{
 					method: "POST",
-					body: JSON.stringify({ withLeader: true, backend: "sim" }),
-				});
-				break;
-			case "connect_real":
-				await localApi("/api/robot/connect", {
-					method: "POST",
-					body: JSON.stringify({ withLeader: true, backend: "real" }),
-				});
-				break;
-			case "teleop_start":
-				await localApi("/api/robot/teleop/start", {
-					method: "POST",
-					body: JSON.stringify({ source: "keys" }),
-				});
-				break;
-			case "teleop_start_leader":
-				await localApi("/api/robot/teleop/start", {
-					method: "POST",
-					body: JSON.stringify({ source: "leader" }),
-				});
-				break;
-			case "teleop_start_remote":
-				// joint targets stream in from the operator's own leader arm
-				await localApi("/api/robot/teleop/start", {
-					method: "POST",
-					body: JSON.stringify({ source: "remote" }),
-				});
-				break;
-			case "teleop_stop":
-				await localApi("/api/robot/teleop/stop", { method: "POST" });
-				break;
-			case "estop":
-				await localApi("/api/robot/estop", { method: "POST" });
-				break;
-			case "disconnect":
-				await localApi("/api/robot/disconnect", { method: "POST" });
-				break;
-			default:
-				console.error(`[rig-link] unknown command ${verb}`);
+					headers: { "content-type": "image/jpeg", ...auth },
+					body: buf,
+				},
+			);
+			if (!res.ok) throw new Error(`hub rejected frame: ${res.status}`);
+			frameWarned = false;
+		} catch (err) {
+			if (!frameWarned) {
+				frameWarned = true;
+				console.error(
+					`[rig-link] frame push failed for ${cam} (${String(err)}) — retrying`,
+				);
+			}
 		}
 	};
 
 	const pushFrames = async () => {
-		const found: string[] = [];
-		const candidates = [...new Set([...previewing, ...SIM_CAMS])];
-		for (const cam of candidates) {
-			try {
-				const mjpeg = mjpegBase(); // NOT `base` — that is the hub URL
-				if (!mjpeg) break;
-				const snap = await fetch(`${mjpeg}/snap/${cam}`);
-				if (!snap.ok) continue;
-				found.push(cam);
-				const buf = await snap.arrayBuffer();
-				const res = await fetch(
-					`${base}/api/hub/frame?rig=${encodeURIComponent(rigName)}&cam=${encodeURIComponent(cam)}`,
-					{
-						method: "POST",
-						headers: { "content-type": "image/jpeg", ...auth },
-						body: buf,
-					},
-				);
-				if (!res.ok)
-					console.error(
-						`[rig-link] hub rejected frame ${cam}: ${res.status} ${await res.text()}`,
-					);
-			} catch (err) {
-				console.error(
-					`[rig-link] frame push failed for ${cam}: ${String(err)}`,
-				);
-			}
-		}
-		cams = found;
+		const cameras = (await localApi("/api/cameras/status")) as {
+			previewing?: string[];
+		} | null;
+		previewing = cameras?.previewing ?? [];
+		const mjpeg = mjpegBase(); // null until the driver reports its port
+		if (!mjpeg || previewing.length === 0) return;
+		await Promise.all(previewing.map((cam) => pushOne(mjpeg, cam)));
+	};
+
+	// Self-scheduling (not setInterval): a tick that outlives its budget —
+	// routine once WAN RTT > 50ms — must not stack concurrent duplicates.
+	const loop = (fn: () => Promise<void>, ms: number) => {
+		const tick = () => {
+			void fn().finally(() => setTimeout(tick, ms));
+		};
+		tick();
 	};
 
 	console.error(`[rig-link] ${rigName} -> ${base} (link ${LINK_MS}ms)`);
-	setInterval(() => void link(), LINK_MS);
-	setInterval(() => void pushFrames(), FRAME_MS);
+	loop(link, LINK_MS);
+	loop(pushFrames, FRAME_MS);
 };

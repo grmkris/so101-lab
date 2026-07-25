@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Hand, OctagonX, Play, Square, TriangleAlert } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CamFeed, CamOffAir } from "#/components/cam-feed";
 import { ErrorNote } from "#/components/error-note";
@@ -15,6 +15,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
+import { apiErrorMessage } from "#/lib/errors";
 import {
 	claimRig,
 	clientId,
@@ -30,7 +31,6 @@ function DrivePage() {
 	const { rig: rigName } = Route.useParams();
 	const rig = useQuery(rigQuery(rigName));
 	const [rtt, setRtt] = useState<number | null>(null);
-	const lastAxes = useRef<Record<string, number>>({});
 
 	const holder = rig.data?.holder ?? null;
 	const iAmDriving = holder === clientId;
@@ -40,7 +40,7 @@ function DrivePage() {
 		// the kicked client learns on its next input and backs off.
 		mutationFn: (force: boolean) => claimRig(rigName, force),
 		onSuccess: () => toast.success("you have control"),
-		onError: (e) => toast.error(String(e)),
+		onError: (e) => toast.error(apiErrorMessage(e)),
 	});
 	const release = useMutation({
 		mutationFn: () => releaseRig(rigName),
@@ -48,7 +48,7 @@ function DrivePage() {
 	});
 	const command = useMutation({
 		mutationFn: (verb: string) => sendRigCommand(rigName, verb),
-		onError: (e) => toast.error(String(e)),
+		onError: (e) => toast.error(apiErrorMessage(e)),
 	});
 
 	// Hand control back when the tab closes so the rig is not stuck held.
@@ -79,7 +79,6 @@ function DrivePage() {
 	}, [iAmDriving, rigName]);
 
 	const onAxes = (axes: Record<string, number>) => {
-		lastAxes.current = axes;
 		const started = performance.now();
 		void sendRigInput(rigName, axes)
 			.then(() => setRtt(Math.round(performance.now() - started)))
@@ -141,7 +140,8 @@ function DrivePage() {
 			/>
 
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-				{(cams.length > 0 ? cams : ["workspace_cam", "wrist_cam"]).map((cam) =>
+				{/* cam names come from the rig's own advertisement — no hardcoded list */}
+				{(cams.length > 0 ? cams : ["camera"]).map((cam) =>
 					data?.online && cams.includes(cam) ? (
 						<CamFeed
 							key={cam}

@@ -11,7 +11,6 @@ import {
 	isOnline,
 	leaseHolder,
 	listRigs,
-	nextCommandId,
 	type Rig,
 	releaseLease,
 	setFrame,
@@ -19,8 +18,9 @@ import {
 	sleep,
 	upsertRig,
 } from "./store";
+import { isVerb, VERBS } from "./verbs";
 
-const json = (body: unknown, status = 200): Response =>
+export const json = (body: unknown, status = 200): Response =>
 	new Response(JSON.stringify(body), {
 		status,
 		headers: {
@@ -29,17 +29,8 @@ const json = (body: unknown, status = 200): Response =>
 		},
 	});
 
-/** Verbs a remote guest is allowed to trigger. Everything else is rig-local. */
-const ALLOWED_VERBS = new Set([
-	"connect_sim",
-	"connect_real",
-	"teleop_start",
-	"teleop_start_leader",
-	"teleop_start_remote",
-	"teleop_stop",
-	"estop",
-	"disconnect",
-]);
+const enc = new TextEncoder();
+const CRLF = enc.encode("\r\n");
 
 const rigSummary = (rig: Rig) => ({
 	name: rig.name,
@@ -66,12 +57,12 @@ const mjpegResponse = (rig: Rig, cam: string): Response => {
 				if (frame && frame.at !== lastAt) {
 					lastAt = frame.at;
 					controller.enqueue(
-						new TextEncoder().encode(
+						enc.encode(
 							`--frame\r\nContent-Type: image/jpeg\r\nContent-Length: ${frame.data.length}\r\n\r\n`,
 						),
 					);
 					controller.enqueue(frame.data);
-					controller.enqueue(new TextEncoder().encode("\r\n"));
+					controller.enqueue(CRLF);
 					return;
 				}
 				await sleep(50);
@@ -197,14 +188,13 @@ export const handleHubRequest = async (
 			}
 			if (action === "/command") {
 				const verb = body.verb ?? "";
+				if (!isVerb(verb))
+					return json({ error: `verb not allowed: ${verb}` }, 403);
 				// Safety verbs bypass the lease: anyone watching a rig misbehave
 				// must be able to stop it, holder or not.
-				const isSafety = verb === "estop" || verb === "teleop_stop";
-				if (!isSafety && leaseHolder(rig) !== clientId)
+				if (VERBS[verb].safety !== true && leaseHolder(rig) !== clientId)
 					return json({ error: "not the controller" }, 403);
-				if (!ALLOWED_VERBS.has(verb))
-					return json({ error: `verb not allowed: ${verb}` }, 403);
-				rig.pending.push({ id: nextCommandId(), verb });
+				rig.pending.push({ verb });
 				return json({ ok: true, queued: verb });
 			}
 		}
