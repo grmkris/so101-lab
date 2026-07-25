@@ -12,6 +12,53 @@ Newest on top. Template:
 
 ---
 
+## 2026-07-25 — platform day: console eliminated, leader agent, WebSocket input plane
+
+**No training data today.** Every dataset written was sim checkpoint data
+(tagged sim in `app/.data/sim-datasets.json`), so nothing here feeds the ML
+track — logged so a future session does not mistake these repos for demos.
+
+- lerobot: 0.6.0 everywhere (record/infer); no training run.
+- datasets (ALL SIM, throwaway): `poh_cube_corner_v1` 5 eps ·
+  `poh_ckptc_v1` 3 · `poh_finalcheck_v1` 2 · `poh_closeout_v1` 1. Recorded
+  through the task/attempt loop as checkpoint evidence, not demonstrations.
+- real hardware: leader + follower both on this Mac, driven through the
+  DEPLOYED hub (Railway EU West) rather than locally. Teleop worked
+  end-to-end; no episodes recorded on the real arm.
+- lighting: n/a (no real recording).
+
+**What shipped (repo: eth-global-lisbon-2026-proof-of-hands):**
+1. **Console role eliminated** — one deployed web app (the hub) + portless
+   headless agents. No `LAB_MODE`, no roles. Camera setup, recording,
+   trainings and dataset report cards all ride the rig verb pipe; the hub API
+   is GET-only. Dataset episode tables now read parquet straight off the HF
+   Hub, so the deployed hub renders them with no local lerobot cache.
+2. **Leader agent** (`bun run teleop`) — the teleoperator's side is now
+   symmetric with the rig owner's: one no-args command, serial port
+   auto-detected, hub URL baked in, registers under the hostname. The BROWSER
+   picks the rig ("Drive with X's leader"); the agent claims nothing. Key
+   invariant: **a leader is a bound input device of a browser session, never a
+   lease holder** — which is what lets a task attempt keep running while a
+   remote leader drives it.
+3. **The 20-episode loop** — tasks carry a quota, `episodesDone` is derived
+   from the dataset's own lerobot meta, and the card shows a real 13/20 bar
+   with an auto-continue chain that advances only on a saved episode.
+4. **WebSocket input plane** — measured against the deployed hub at a 30 Hz
+   target: **24 packets/s over the socket vs 10/s over HTTP keep-alive**,
+   which was RTT-bound. Camera preview 8 -> 12.5 fps (`LAB_FRAME_MS`).
+   Everything else stays polled HTTP; input falls back to the HTTP mailbox
+   whenever a socket is missing (vite dev cannot upgrade one — test the
+   socket against `bun run hub:prod`).
+
+**Lever learned (transport):** the felt teleop lag over the cloud hub was not
+bandwidth, it was quantization — one-POST-at-a-time is RTT-bound, and the rig
+then waited up to a 50 ms poll to pick input up. Event-driven in both
+directions removes both; what is left is the physical hop to Railway.
+
+**Owed (needs the arms + a human):** rerun the two hardware checkpoints —
+leader-over-wire showing ~30 packets/s via socket, and a task attempt kept by
+the browser while the leader drives.
+
 ## 2026-07-24 — ggando 4-post arc digested + sim on-ramp started
 
 Read ggando's full SO-101 series (same hardware, ~6 months ahead of us on the RL question). Punchline table:
