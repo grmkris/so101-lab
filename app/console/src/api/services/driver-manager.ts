@@ -153,6 +153,9 @@ class DriverProc {
 	}
 
 	async rpc<T>(cmd: string, extra: Record<string, unknown> = {}): Promise<T> {
+		// A fault stays visible until the next connect attempt — sticky enough
+		// to be read, but a clean reconnect must not keep showing a stale one.
+		if (cmd === "connect") this.lastError = null;
 		await this.start();
 		const proc = this.proc;
 		if (!proc?.stdin) throw new Error("driver not running");
