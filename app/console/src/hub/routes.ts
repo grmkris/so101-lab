@@ -168,13 +168,15 @@ export const handleHubRequest = async (
 			const body = (await request.json().catch(() => ({}))) as {
 				clientId?: string;
 				axes?: Record<string, number>;
+				joints?: Record<string, number>;
 				verb?: string;
+				force?: boolean;
 			};
 			const clientId = body.clientId;
 			if (!clientId) return json({ error: "clientId required" }, 400);
 
 			if (action === "/claim") {
-				const ok = claimLease(rig, clientId);
+				const ok = claimLease(rig, clientId, body.force === true);
 				return json({ ok, holder: leaseHolder(rig) }, ok ? 200 : 409);
 			}
 			if (action === "/release") {
@@ -194,9 +196,12 @@ export const handleHubRequest = async (
 				return json({ ok: true });
 			}
 			if (action === "/command") {
-				if (leaseHolder(rig) !== clientId)
-					return json({ error: "not the controller" }, 403);
 				const verb = body.verb ?? "";
+				// Safety verbs bypass the lease: anyone watching a rig misbehave
+				// must be able to stop it, holder or not.
+				const isSafety = verb === "estop" || verb === "teleop_stop";
+				if (!isSafety && leaseHolder(rig) !== clientId)
+					return json({ error: "not the controller" }, 403);
 				if (!ALLOWED_VERBS.has(verb))
 					return json({ error: `verb not allowed: ${verb}` }, 403);
 				rig.pending.push({ id: nextCommandId(), verb });

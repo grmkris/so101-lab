@@ -113,6 +113,12 @@ class SimBackend:
             self.joint_qpos.append(self.model.jnt_qposadr[jid])
             self.joint_range.append(tuple(self.model.jnt_range[jid]))
             self.actuator_ids.append(self.model.actuator(mj_name).id)
+        # lerobot's DEGREES zero is the MID of the calibrated range, but MJCF
+        # zero is wherever the model author put it — for Pitch/Elbow that is a
+        # joint LIMIT (~90° from mid). Map lerobot degrees relative to each
+        # joint's mid so a real leader's pose lands on the same sim pose (and
+        # the IK URDF, which is symmetric about mid, matches the sim frame).
+        self.joint_mid = [(lo + hi) / 2.0 for lo, hi in self.joint_range]
         self.cube_qpos = self.model.jnt_qposadr[self.model.joint("cube_free").id]
 
         home = KEYFRAMES[0][0]
@@ -140,7 +146,7 @@ class SimBackend:
                 lo, hi = self.joint_range[i]
                 out["gripper.pos"] = round((rad[i] - lo) / (hi - lo) * 100.0, 2)
             else:
-                out[f"{lname}.pos"] = round(np.degrees(rad[i]), 2)
+                out[f"{lname}.pos"] = round(np.degrees(rad[i] - self.joint_mid[i]), 2)
         return out
 
     def lerobot_to_rad(self, action: dict[str, float]) -> list[float]:
@@ -151,7 +157,7 @@ class SimBackend:
                 lo, hi = self.joint_range[i]
                 rad.append(lo + (max(0.0, min(100.0, v)) / 100.0) * (hi - lo))
             else:
-                rad.append(np.radians(v))
+                rad.append(self.joint_mid[i] + np.radians(v))
         return rad
 
     def _qpos_rad(self) -> list[float]:

@@ -110,8 +110,11 @@ export const impairmentQuery = queryOptions({
 	staleTime: 60_000,
 });
 
-export const claimRig = (name: string) =>
-	post(`/api/hub/rigs/${encodeURIComponent(name)}/claim`);
+export const claimRig = (name: string, force = false) =>
+	post(
+		`/api/hub/rigs/${encodeURIComponent(name)}/claim`,
+		force ? { force } : {},
+	);
 export const releaseRig = (name: string) =>
 	post(`/api/hub/rigs/${encodeURIComponent(name)}/release`);
 export const sendRigInput = (name: string, axes: Record<string, number>) =>

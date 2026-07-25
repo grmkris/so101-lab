@@ -21,11 +21,13 @@ the rig holds pose after 0.5 s without packets.
 """
 
 import argparse
+import http.client
 import json
 import signal
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
@@ -40,6 +42,45 @@ def api(hub: str, path: str, payload: dict, timeout: float = 2.0) -> dict:
     )
     with urllib.request.urlopen(req, timeout=timeout) as res:
         return json.loads(res.read() or b"{}")
+
+
+class HubLink:
+    """One kept-alive HTTPS connection for the 30Hz input stream. A fresh
+    urllib request pays a full TLS handshake per POST (~150ms), which capped
+    the stream at ~6 packets/s; keep-alive is RTT-bound (~15-16/s)."""
+
+    def __init__(self, hub: str, timeout: float = 0.5) -> None:
+        u = urllib.parse.urlparse(hub)
+        self.host = u.netloc
+        self.https = u.scheme == "https"
+        self.timeout = timeout
+        self.conn: http.client.HTTPConnection | None = None
+
+    def _connect(self) -> http.client.HTTPConnection:
+        if self.conn is None:
+            cls = http.client.HTTPSConnection if self.https else http.client.HTTPConnection
+            self.conn = cls(self.host, timeout=self.timeout)
+        return self.conn
+
+    def post(self, path: str, payload: dict) -> int:
+        """Returns the HTTP status. Raises OSError-family on transport failure."""
+        try:
+            conn = self._connect()
+            conn.request(
+                "POST",
+                path,
+                body=json.dumps(payload),
+                headers={"content-type": "application/json"},
+            )
+            res = conn.getresponse()
+            res.read()  # drain so the connection is reusable
+            return res.status
+        except Exception:
+            # drop the connection; next call reopens
+            if self.conn is not None:
+                self.conn.close()
+                self.conn = None
+            raise
 
 
 def main() -> None:
@@ -78,15 +119,22 @@ def main() -> None:
     signal.signal(signal.SIGINT, stop)
     signal.signal(signal.SIGTERM, stop)
 
+    link = HubLink(hub)
+    lease_lost = False
     sent = dropped = 0
     window = time.time()
     while running:
         tick = time.time()
         action = leader.get_action()  # {"<joint>.pos": deg, "gripper.pos": 0..100}
         try:
-            api(hub, f"{rig}/input", {**client, "joints": action}, timeout=0.5)
+            status = link.post(f"{rig}/input", {**client, "joints": action})
+            if status == 403:
+                # someone force-took the rig in the browser — it's theirs now
+                print("lost the rig (someone took over) — exiting")
+                lease_lost = True
+                break
             sent += 1
-        except (urllib.error.URLError, TimeoutError, OSError):
+        except (TimeoutError, OSError):
             dropped += 1  # latest-wins on the hub; the next packet corrects
         if time.time() - window >= 5.0:
             rate = sent / (time.time() - window)
@@ -95,15 +143,17 @@ def main() -> None:
             window = time.time()
         time.sleep(max(0.0, 1.0 / args.hz - (time.time() - tick)))
 
-    print("\nstopping teleop, releasing the rig")
-    for path, payload in (
-        (f"{rig}/command", {**client, "verb": "teleop_stop"}),
-        (f"{rig}/release", client),
-    ):
-        try:
-            api(hub, path, payload)
-        except Exception:  # noqa: BLE001 — best effort on the way out
-            pass
+    if not lease_lost:
+        # normal exit: stop the session and hand the rig back
+        print("\nstopping teleop, releasing the rig")
+        for path, payload in (
+            (f"{rig}/command", {**client, "verb": "teleop_stop"}),
+            (f"{rig}/release", client),
+        ):
+            try:
+                api(hub, path, payload)
+            except Exception:  # noqa: BLE001 — best effort on the way out
+                pass
     leader.disconnect()
 
 

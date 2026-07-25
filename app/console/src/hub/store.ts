@@ -109,10 +109,16 @@ export const leaseHolder = (rig: Rig): string | null => {
 	return null;
 };
 
-/** First-come-first-served; the holder keeps it by continuing to send input. */
-export const claimLease = (rig: Rig, holder: string): boolean => {
+/** First-come-first-served; the holder keeps it by continuing to send input.
+ * `force` steals the seat — friends-only hub, a stuck holder must not brick
+ * the rig. The kicked client finds out on its next input (403). */
+export const claimLease = (
+	rig: Rig,
+	holder: string,
+	force = false,
+): boolean => {
 	const current = leaseHolder(rig);
-	if (current !== null && current !== holder) return false;
+	if (!force && current !== null && current !== holder) return false;
 	rig.lease = { holder, expiresAt: Date.now() + LEASE_MS };
 	return true;
 };

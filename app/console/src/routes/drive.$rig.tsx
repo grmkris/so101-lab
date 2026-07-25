@@ -36,7 +36,9 @@ function DrivePage() {
 	const iAmDriving = holder === clientId;
 
 	const claim = useMutation({
-		mutationFn: () => claimRig(rigName),
+		// Taking over from a live holder is a force-steal (friends-only hub);
+		// the kicked client learns on its next input and backs off.
+		mutationFn: (force: boolean) => claimRig(rigName, force),
 		onSuccess: () => toast.success("you have control"),
 		onError: (e) => toast.error(String(e)),
 	});
@@ -121,7 +123,14 @@ function DrivePage() {
 						</Button>
 					) : (
 						<Button
-							onClick={() => claim.mutate()}
+							onClick={() => {
+								if (
+									holder &&
+									!confirm("Someone is driving this rig. Take over anyway?")
+								)
+									return;
+								claim.mutate(holder !== null);
+							}}
 							disabled={claim.isPending || !data?.online}
 						>
 							<Hand />
@@ -229,9 +238,29 @@ function DrivePage() {
 					{iAmDriving ? (
 						<KeyJogPad onAxes={onAxes} />
 					) : (
-						<p className="text-sm text-muted-foreground">
-							Take control to drive. Video stays live either way.
-						</p>
+						<div className="flex flex-wrap items-center gap-3">
+							<p className="text-sm text-muted-foreground">
+								Take control to drive. Video stays live either way.
+							</p>
+							{/* Safety verbs work without the lease — anyone watching a rig
+							    misbehave can stop it. */}
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={() => command.mutate("teleop_stop")}
+							>
+								<Square />
+								Stop teleop
+							</Button>
+							<Button
+								size="sm"
+								variant="destructive"
+								onClick={() => command.mutate("estop")}
+							>
+								<OctagonX />
+								E-STOP
+							</Button>
+						</div>
 					)}
 
 					{data && Object.keys(data.joints).length > 0 && (
