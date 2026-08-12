@@ -76,6 +76,34 @@ def point_at(image_path: str, query: str, api_key: str | None = None, timeout: f
     return out
 
 
+def ask(image_path: str, question: str, api_key: str | None = None, timeout: float = 90.0) -> str:
+    """Free-text question about an image (e.g. grasp verification). Returns the raw answer."""
+    api_key = api_key or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        sys.exit("GEMINI_API_KEY not set — create a free key at https://aistudio.google.com/apikey")
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "inline_data": {
+                            "mime_type": "image/jpeg",
+                            "data": base64.b64encode(open(image_path, "rb").read()).decode(),
+                        }
+                    },
+                    {"text": question},
+                ]
+            }
+        ],
+    }
+    t0 = time.perf_counter()
+    r = httpx.post(URL, params={"key": api_key}, json=body, timeout=timeout)
+    r.raise_for_status()
+    text = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+    print(f"[er ask] {time.perf_counter()-t0:.1f}s: {text[:120]}")
+    return text
+
+
 def overlay(image_path: str, points, out_path: str):
     import cv2
 

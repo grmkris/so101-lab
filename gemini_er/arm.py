@@ -64,8 +64,80 @@ def move_joints(robot: SO101Follower, target, seconds: float = 2.5, gripper: flo
         precise_sleep(1.0 / FPS)
 
 
-def ik_to_xyz(kin: RobotKinematics, current_deg: np.ndarray, xyz) -> np.ndarray:
-    """Joint degrees that put the EE at absolute xyz, keeping the current orientation."""
+def ik_to_xyz(
+    kin: RobotKinematics, current_deg: np.ndarray, xyz, iters: int = 30, tol_m: float = 0.003
+) -> np.ndarray:
+    """Joint degrees that put the EE at absolute xyz, keeping the current orientation.
+
+    placo's solver steps incrementally (the teleop loop re-solves at 30 Hz), so a
+    single call under-shoots — iterate until the FK of the solution reaches xyz.
+    """
+    target = np.asarray(xyz, dtype=float)
     T = kin.forward_kinematics(current_deg).copy()
-    T[:3, 3] = np.asarray(xyz, dtype=float)
-    return kin.inverse_kinematics(current_deg, T)
+    T[:3, 3] = target
+    j = np.array(current_deg, dtype=float)
+    for _ in range(iters):
+        j = kin.inverse_kinematics(j, T)
+        if np.linalg.norm(kin.forward_kinematics(j)[:3, 3] - target) < tol_m:
+            break
+    return j
+
+
+def plan_line(kin: RobotKinematics, start_deg, from_xyz, to_xyz, step_m: float = 0.01):
+    """IK continuation along a straight EE line, each step seeded from the last.
+
+    Keeps the solver on one arm configuration branch — one-shot IK to a far
+    target can land on a flipped-elbow solution whose joint-space interpolation
+    sweeps the EE through a wild arc. Returns the list of joint arrays.
+    """
+    a, b = np.asarray(from_xyz, float), np.asarray(to_xyz, float)
+    n = max(1, int(np.ceil(np.linalg.norm(b - a) / step_m)))
+    j = np.array(start_deg, dtype=float)
+    path = []
+    for i in range(1, n + 1):
+        j = ik_to_xyz(kin, j, a + (b - a) * (i / n))
+        path.append(j)
+    return path
+
+
+def follow_path(robot: SO101Follower, path, sec_per_point: float = 0.2, gripper: float | None = None):
+    """Stream a whole path continuously at 30 Hz — one observation read total.
+
+    Reading state between segments stalls the serial bus and makes the motion
+    jerky; here only the start pose is read, then targets stream open-loop.
+    """
+    names = list(robot.bus.motors.keys())
+    pts = [joints_deg(robot)] + [np.array(p, dtype=float).copy() for p in path]
+    if gripper is not None:
+        gi = names.index("gripper")
+        for p in pts:
+            p[gi] = gripper
+    for a, b in zip(pts, pts[1:]):
+        n = max(1, int(sec_per_point * FPS))
+        for i in range(1, n + 1):
+            v = a + (b - a) * (i / n)
+            robot.send_action({f"{m}.pos": float(v[j]) for j, m in enumerate(names)})
+            precise_sleep(1.0 / FPS)
+
+
+def settle_to(kin: RobotKinematics, robot: SO101Follower, xyz, iters: int = 3, tol_m: float = 0.004):
+    """Closed-loop on FK: measure where the arm actually is, re-command with the
+    error added. Fixes servo lag/gravity droop that open-loop streaming leaves."""
+    target = np.asarray(xyz, dtype=float)
+    correction = np.zeros(3)
+    for _ in range(iters):
+        j = joints_deg(robot)
+        err = target - kin.forward_kinematics(j)[:3, 3]
+        if np.linalg.norm(err) < tol_m:
+            break
+        correction += err
+        move_joints(robot, ik_to_xyz(kin, j, target + correction), 0.8)
+    return float(np.linalg.norm(target - kin.forward_kinematics(joints_deg(robot))[:3, 3]))
+
+
+def max_step_deg(path) -> float:
+    """Largest single-joint jump between consecutive path points (branch-flip tell)."""
+    if len(path) < 2:
+        return 0.0
+    diffs = np.abs(np.diff(np.array(path)[:, :5], axis=0))  # ignore gripper
+    return float(diffs.max())

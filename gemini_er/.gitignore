@@ -1,0 +1,4 @@
+# session artifacts — photos include the room; public repo
+*.jpg
+debug/
+__pycache__/

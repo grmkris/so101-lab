@@ -8,17 +8,21 @@ import sys
 import cv2
 
 
-def grab(index: int, w: int = 640, h: int = 480, warmup: int = 30):
-    cap = cv2.VideoCapture(index)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, w)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
-    for _ in range(warmup):
-        cap.read()
-    ok, frame = cap.read()
-    cap.release()
-    if not ok:
-        raise RuntimeError(f"camera {index} gave no frame (in use by another process, or unplugged?)")
-    return frame
+def grab(index: int, w: int = 640, h: int = 480, warmup: int = 30, retries: int = 3):
+    import time
+
+    for attempt in range(retries):
+        cap = cv2.VideoCapture(index)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, w)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
+        for _ in range(warmup):
+            cap.read()
+        ok, frame = cap.read()
+        cap.release()
+        if ok:
+            return frame
+        time.sleep(1.0 + attempt)  # macOS device handoff needs a beat sometimes
+    raise RuntimeError(f"camera {index} gave no frame after {retries} tries (in use, or unplugged?)")
 
 
 if __name__ == "__main__":

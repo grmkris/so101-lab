@@ -12,6 +12,49 @@ Newest on top. Template:
 
 ---
 
+## 2026-08-12 — Gemini Robotics ER 2 day: pointing→pick pipeline built, SmolVLA zero-shot flown
+
+**Not an ML-data day** (lighting ambient, not locked). Gemini Robotics 2 dropped;
+tested whether ER 2 (`gemini-robotics-er-2-preview`, API key — Gemini CLI OAuth is
+dead, killed by the Antigravity migration) can drive the SO-101 as a high-level brain.
+
+- lerobot: 0.6.0 everywhere. LeLab env grew `[smolvla]` extras (transformers 5.5.4;
+  numpy 2.3.5→2.2.6 side effect). Driver venv (proof-of-hands repo) runs all
+  `gemini_er/` scripts.
+- cameras: SHUFFLED AGAIN + wrist cam needed a replug: workspace(front-oblique)=0,
+  wrist=1, MacBook builtin=2.
+- dataset: `kris0/rollout_smolvla_zeroshot` (2 eps, local only).
+
+**What got built (`gemini_er/`)**: coarse stage (workspace cam → ER 2 point →
+arm-touch homography, LOO 0.85 cm after dropping 4 far-field outliers) + fine stage
+(wrist-cam servo: `grasp_center` pixel + 2-jog pixel→metre matrix, ER once for
+semantics then cv2 template tracking) + IK pick primitive (placo continuation
+planning — one-shot IK branch-flips, 25°-jump gate) + proprioceptive grasp detection
+(empty close→1.0, block→6.6+; gate + retry) + box cycle (drop verify, container-theft
+guard). **Verified picks achieved** (servo converged 6–18 px, grip 8.9–24.2,
+ER verify YES).
+
+**ER 2 verdict**: pointing is excellent (dead-center, 2–4 s, incl. "bottom contact
+edge" prompts that dodge oblique-cam parallax). Success-detection verify ≈ its
+published 87.7% — false verdicts ~1/8, advisory only. It is a real brain; it is NOT
+a motor system — matching Google's own SO-101 sample (robotics-pointing-sample:
+same architecture, stops at *pointing*) and Spot sample (grasps via wrist cam+depth).
+
+**Hard-won during debugging**: streamed path points carry the IK seed's gripper
+value (re-closed jaws mid-lift, thrice); servo sign error (plan said −A⁻¹·err);
+close target 5 never squeezed the block (grip test: block stalls at 6.6, so close
+to 0); ER hijacked by similar objects at frame edges (sanity-reject >250 px from
+grasp_center); container coarse prompt "contact edge" aims drops at the rim.
+
+**SmolVLA zero-shot** (`lerobot/smolvla_base`, MPS, `--rename_map` workspace→camera1
+wrist→camera2): moved toward the block with intent, no grasp. Setup is close to its
+community-SO-101 pretraining distribution → fine-tune is the move.
+
+**Next**: record 30–50 block→box teleop demos (data rules apply) → SmolVLA fine-tune
+on Colab → ER 2 orchestrates (task strings, success verify, retries) + SmolVLA
+executes. Submit On-Device 2 trusted-tester form. ChArUco board PDF ready on
+Desktop for coverage upgrade when printed.
+
 ## 2026-07-25 — platform day: console eliminated, leader agent, WebSocket input plane
 
 **No training data today.** Every dataset written was sim checkpoint data

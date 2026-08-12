@@ -46,6 +46,27 @@ $PY pick.py --task "the white block"
 - `pick.py` — target from `--xy` or ER 2; refuses targets outside the
   calibrated rectangle (+2 cm) or the EE box; home→hover→descend→close→lift.
 
+## v2: wrist-cam fine stage + cycles
+- `wrist_calibrate.py --wrist-cam 1` — interactive: jaws around a test object,
+  SPACE; learns `grasp_center` + jog matrix A (saved under `"wrist"` in
+  calib.json). `--center-only` redoes placement without jogs.
+- `grip_test.py` — calibrates the proprioceptive grasp detector (empty close
+  reads ~1.0, block stalls ~6.6+ — that's how picks are confirmed).
+- `pick.py` now servos via the wrist cam by default (`--no-servo` to skip,
+  `--no-descend` for convergence tests) and ER-verifies the grasp after lift.
+- `cycle.py --cycles N` — mat → box → mat round trips: fresh container locate
+  per stage, drop verified by ER, container-theft guard on in-box picks.
+
+## Zero-shot SmolVLA (the VLA track)
+```bash
+PATH="$HOME/.local/share/uv/tools/lelab/bin:$PATH" lerobot-rollout ... \
+  --rename_map='{"observation.images.workspace_cam": "observation.images.camera1", "observation.images.wrist_cam": "observation.images.camera2"}' \
+  --policy.path=lerobot/smolvla_base --policy.device=mps
+```
+(full command in journal 2026-08-12; LeLab env has the `[smolvla]` extras).
+Zero-shot: moves toward the target with intent, no grasp — fine-tune on 30–50
+task demos is the path (ggando: SmolVLA 100% post-fine-tune).
+
 ## Known limits
 - Homography assumes the target sits ON the table plane; tall objects offset xy.
 - Wrist orientation is whatever the home pose has (orientation_weight 0.01) —
