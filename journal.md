@@ -55,6 +55,27 @@ on Colab → ER 2 orchestrates (task strings, success verify, retries) + SmolVLA
 executes. Submit On-Device 2 trusted-tester form. ChArUco board PDF ready on
 Desktop for coverage upgrade when printed.
 
+**Evening addendum — autonomous capability mapping** (user away; wrist cam died
+mid-session — Innomaker dropped off the USB bus, indexes re-shuffled, built-in
+stole slot 1; needs physical replug). Raw data: `gemini_er/data/*.jsonl`.
+- **Touch map (9 cells)**: blind positioning error 2.2–4.5 cm across the mat
+  (one 0.6 cm cell near-right), direction consistently "x short", while FK
+  self-reports ≤0.6 cm — the torque-on-droop-vs-torque-off-calibration gap,
+  quantified. This is exactly the correction the wrist servo was making.
+- **Bias-corrected push tour**: with the touch map as an IDW bias field, pushing
+  the block works well INSIDE the mapped region (5 of 6 legs reached, final err
+  0.6–2.8 cm, 15 cm diagonal in 6 strokes). At the left/far mat edges (outside
+  calibration coverage) pushes go sideways — the envelope shrinks exactly where
+  the far-field calibration points were dropped.
+- **Bias-corrected BLIND grasp: 0/3.** Even with the bias field, open-loop
+  grasping of a 2.5 cm block does not work. Closed-loop (wrist cam) or a
+  learned policy is REQUIRED — the day's central conclusion, now with numbers.
+- **ER 2 jitter study**: on a STATIC frame, pointing is near-deterministic
+  (std 2.3 px, max spread 5.8 px over 10 calls). The apparent servo-time jitter
+  came from frame-to-frame scene changes, not the model.
+- One transient gripper "Input voltage error" at torque-on after hours of use;
+  clean ping after 30 s, no recurrence. Watch the PSU under long sessions.
+
 ## 2026-07-25 — platform day: console eliminated, leader agent, WebSocket input plane
 
 **No training data today.** Every dataset written was sim checkpoint data

@@ -1,0 +1,10 @@
+{"t": "20:20:33", "target": [0.12, -0.13], "fk_residual_cm": 0.59, "measured": [0.0487, -0.1366], "err_cm": 7.2, "result": "ok"}
+{"t": "20:21:31", "target": [0.12, -0.13], "fk_residual_cm": 0.32, "measured": [0.0864, -0.1345], "err_cm": 3.4, "result": "ok"}
+{"t": "20:21:54", "target": [0.17, -0.13], "fk_residual_cm": 0.62, "measured": [0.1274, -0.1385], "err_cm": 4.3, "result": "ok"}
+{"t": "20:22:18", "target": [0.22, -0.13], "fk_residual_cm": 0.24, "measured": [0.1903, -0.1468], "err_cm": 3.4, "result": "ok"}
+{"t": "20:22:55", "target": [0.22, -0.05], "fk_residual_cm": 0.53, "measured": [0.1928, -0.0614], "err_cm": 2.9, "result": "ok"}
+{"t": "20:23:18", "target": [0.17, -0.05], "fk_residual_cm": 0.12, "measured": [0.1395, -0.0586], "err_cm": 3.2, "result": "ok"}
+{"t": "20:23:40", "target": [0.12, -0.05], "fk_residual_cm": 0.57, "measured": [0.0754, -0.054], "err_cm": 4.5, "result": "ok"}
+{"t": "20:24:03", "target": [0.12, 0.02], "fk_residual_cm": 2.05, "measured": [0.1169, 0.0145], "err_cm": 0.6, "result": "ok"}
+{"t": "20:24:26", "target": [0.17, 0.02], "fk_residual_cm": 0.06, "measured": [0.1492, 0.0143], "err_cm": 2.2, "result": "ok"}
+{"t": "20:24:48", "target": [0.22, 0.02], "fk_residual_cm": 0.51, "measured": [0.1922, 0.0163], "err_cm": 2.8, "result": "ok"}
