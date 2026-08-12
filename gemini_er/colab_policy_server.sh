@@ -40,6 +40,7 @@ json.dump(c, open(p, "w"), indent=2)
 print("model_dtype ->", c["model_dtype"])
 EOF
 
-echo "=== [5/5] policy server :8080 (blocking cell = keep-alive) ==="
-echo "client should use: --pretrained_name_or_path=/content/molmoact2_so101 --server_address=$(tailscale ip -4):8080"
-python -m lerobot.async_inference.policy_server --host=0.0.0.0 --port=8080
+PORT="${PORT:-8081}"  # 8080 is taken by Colab's own runtime
+echo "=== [5/5] policy server :$PORT (blocking cell = keep-alive) ==="
+echo "client should use: --pretrained_name_or_path=/content/molmoact2_so101 --server_address=$(tailscale ip -4):$PORT"
+python -m lerobot.async_inference.policy_server --host=0.0.0.0 --port="$PORT"
