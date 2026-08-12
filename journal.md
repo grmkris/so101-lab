@@ -76,6 +76,23 @@ stole slot 1; needs physical replug). Raw data: `gemini_er/data/*.jsonl`.
 - One transient gripper "Input voltage error" at torque-on after hours of use;
   clean ping after 30 s, no recurrence. Watch the PSU under long sessions.
 
+**Late addendum — ChArUco board flips the blind-grasp verdict (upright blocks).**
+Printed 5×7/35 mm ChArUco on the mat (per google robotics-pointing-sample, but
+improved: arm self-registration instead of hand-measured board origin — arm
+touches 5 points, ER points the tip, affine board-mm→arm-cmd absorbs droop/
+origin/print scale). `board_calibrate.py`: 19 corners, residuals 0.23–0.6 cm
+(~10× better than the touch-map field). `pick_board.py` blind grasp through the
+chain: first tries EMPTY — jaws clipped the block's near corner. Root cause:
+ER's "contact edge" point is the block's NEAR bottom edge; center is ~1 cm
+deeper along the camera axis. Fix = +12 mm offset along the image-up direction
+mapped through the board homography. **With offset: upright block 2/2 HELD
+(grip 10.0–10.2), tipped-over block 0/3** — put-down drops kept tipping it
+(fixed-height release, no orientation awareness). `move_board.py` (square→square
+chess primitive, auto-retry with fresh ER locate per attempt) written.
+Conclusion sharpened: board-grade calibration makes scripted picks work when
+the object matches the script's geometric assumptions; any pose variation
+(a tipped block!) breaks it. The VLA case, again, with numbers.
+
 ## 2026-07-25 — platform day: console eliminated, leader agent, WebSocket input plane
 
 **No training data today.** Every dataset written was sim checkpoint data
