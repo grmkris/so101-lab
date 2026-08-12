@@ -23,7 +23,7 @@ echo "=== [2/5] lerobot v0.6.0 [molmoact2,async] ==="
 cd /content
 [ -d lerobot ] || git clone --depth 1 --branch v0.6.0 https://github.com/huggingface/lerobot
 cd lerobot
-pip install -q -e ".[molmoact2,async]" av
+pip install -q -e ".[molmoact2,async]" "av==15.1.0"  # av 16+ breaks lerobot's pyav_utils
 
 echo "=== [3/5] async whitelist patch (molmoact2 not upstream-whitelisted) ==="
 sed -i 's/SUPPORTED_POLICIES = \["molmoact2", /SUPPORTED_POLICIES = \[/' src/lerobot/async_inference/constants.py  # idempotence
