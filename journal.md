@@ -2,6 +2,35 @@
 
 Newest on top. Template:
 
+## 2026-08-13 (morning) — v2: persistent arm daemon + hardened orchestrator
+
+Deep-researched (3 agents: lerobot client internals w/ line refs, Live API
+stability forensics from our own logs, MolmoAct2 episode semantics) then built:
+
+- **`arm_daemon.py`** — ONE long-lived lerobot RobotClient (imported, not
+  subprocess). Cameras+robot connect once; episodes start **~2 s** after the
+  command (v1: ~165 s overhead/attempt); per-episode `stub.Ready()` resets the
+  server WITHOUT reloading the policy. Idle = torqued hold at the checkpoint's
+  ready pose (no pre-pose jerk). **Proprioceptive episode termination**
+  (grasp-release trigger / stall / 45 s budget — MolmoAct2 has NO done signal,
+  its training episodes avg 17 s; nobody in the field has automated this).
+  **Live mid-episode steering VERIFIED on hardware**: task string rides on
+  every observation (robot_client.py:414) — swapped "pick up the white cube" →
+  "put the white cube in the plastic box" at grip-close, block retained, policy
+  redirected. SCENE_ONLY mode (Innomaker cannot survive sustained streaming;
+  wrist views are community-documented OOD anyway).
+- **`live_agent.py` v2** — tools = daemon verbs (run_task/steer_task/stop_arm/
+  arm_status/home); event-driven heartbeat with 10 s stall-recovery timer
+  (root cause of the ~100 s Live API deaths = SERVER-SIDE INFERENCE STALLS,
+  diagnosed from our logs — the keepalive timeout is just the messenger);
+  TaskGroup (gather leaked a duplicate command-reader per reconnect);
+  ws ping 10/10 via `HttpOptions(async_client_args=...)`.
+- Observed: model checks arm_status before acting, missions survive reconnect
+  churn, box→mat extraction completed under v2. Box placement remains the
+  model's floor (Ai2's own Block-in-Box: 33.3%). Block went missing off-camera
+  at session end — paused there. Still queued: temporal ensembling port
+  (ACT-style, targets release-jerk drop scatter), success-trigger validation.
+
 ## 2026-08-13 — first zero-shot VLA grasps + ER 2 orchestrator flies (overnight session)
 
 **Not an ML-data day.** The MolmoAct2 remote-inference night: first learned policy
