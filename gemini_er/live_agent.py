@@ -12,6 +12,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 
 import cv2
@@ -31,6 +32,7 @@ calib = load()
 CAM = calib["camera_index"]
 
 tool_running = asyncio.Event()  # set while a blocking tool executes
+arm_lock = threading.Lock()  # owned by the worker thread: survives session churn
 resume_handle = None
 pending_cmd = None  # active mission; re-sent after reconnects until 'reset'
 last_user_turn = 0.0  # heartbeats interrupt generation: hold off after commands
@@ -48,29 +50,43 @@ def speak(text):
 # ---------- tools (run in threads; camera is released between grabs) ----------
 
 def tool_vla_task(args):
-    task = str(args.get("instruction", "pick up the white block"))[:100]
-    # pipeline needs ~15s before actions flow; clamp the model's budget to sane
-    seconds = min(max(int(args.get("seconds", 120)), 90), 180)
-    if not SERVER:
-        return {"error": "no policy server configured (SERVER env)"}
-    speak(f"Running the robot policy: {task}")
-    env = {**os.environ, "SERVER": SERVER, "TASK": task, "DURATION": str(seconds)}
-    p = subprocess.run(["bash", "run_molmoact.sh"], env=env, capture_output=True,
-                       text=True, timeout=seconds + 60)
-    log("vla_task", task=task, seconds=seconds, rc=p.returncode,
-        tail=p.stdout[-500:] + p.stderr[-300:])
-    return {"outcome": "unverified",
-            "instruction": "Inspect the next camera frame and judge from pixels "
-                           "whether the task progressed. Do not assume success."}
+    if not arm_lock.acquire(blocking=False):
+        return {"error": "arm is BUSY executing a previous action - wait for "
+                         "its result before issuing another physical tool call"}
+    try:
+        task = str(args.get("instruction", "pick up the white block"))[:100]
+        # pipeline needs ~15s before actions flow; clamp the budget to sane
+        seconds = min(max(int(args.get("seconds", 120)), 90), 180)
+        if not SERVER:
+            return {"error": "no policy server configured (SERVER env)"}
+        speak(f"Running the robot policy: {task}")
+        env = {**os.environ, "SERVER": SERVER, "TASK": task,
+               "DURATION": str(seconds)}
+        p = subprocess.run(["bash", "run_molmoact.sh"], env=env,
+                           capture_output=True, text=True, timeout=seconds + 60)
+        log("vla_task", task=task, seconds=seconds, rc=p.returncode,
+            tail=p.stdout[-500:] + p.stderr[-300:])
+        return {"outcome": "unverified",
+                "instruction": "Inspect the next camera frame and judge from "
+                               "pixels whether the task progressed. Do not "
+                               "assume success."}
+    finally:
+        arm_lock.release()
 
 
 def tool_home(args):
-    robot = arm.connect()
+    if not arm_lock.acquire(blocking=False):
+        return {"error": "arm is BUSY executing a previous action - wait for "
+                         "its result before issuing another physical tool call"}
     try:
-        arm.move_joints(robot, np.array(calib["home_joints"]), 2.5, gripper=80)
+        robot = arm.connect()
+        try:
+            arm.move_joints(robot, np.array(calib["home_joints"]), 2.5, gripper=80)
+        finally:
+            robot.disconnect()
+        return {"outcome": "arm commanded to home pose, gripper open"}
     finally:
-        robot.disconnect()
-    return {"outcome": "arm commanded to home pose, gripper open"}
+        arm_lock.release()
 
 
 TOOLS = [{"function_declarations": [
@@ -125,7 +141,7 @@ def make_config():
 async def frames_and_heartbeat(session):
     last_hb = 0.0
     while True:
-        if not tool_running.is_set():  # camera free + safe to interrupt
+        if not arm_lock.locked():  # camera free + safe to interrupt
             frame = None
             try:
                 frame = await asyncio.to_thread(grab, CAM, 640, 480, 5)
