@@ -17,6 +17,10 @@ if [ "${SCENE_ONLY:-0}" = "1" ]; then
   CAM1_IDX="$CAM0_IDX"
 fi
 
+# clear zombie clients (reconnect-orphaned) holding cameras / the serial port
+pkill -f "lerobot.async_inference.robot_client" 2>/dev/null && sleep 2
+true
+
 # park in the checkpoint's ready pose (center of its state-normalization band):
 # parked home is quantile-clamped as out-of-band -> "stay" freeze
 if [ "${PRE_POSE:-1}" = "1" ]; then
