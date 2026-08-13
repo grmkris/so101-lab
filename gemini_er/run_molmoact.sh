@@ -16,7 +16,7 @@ $PY -m lerobot.async_inference.robot_client \
   --robot.port=/dev/tty.usbmodem5AE60832001 \
   --robot.id=arm \
   --robot.max_relative_target=15 \
-  --robot.cameras="{ cam0: {type: opencv, index_or_path: $CAM0_IDX, width: 640, height: 480, fps: 30}, cam1: {type: opencv, index_or_path: $CAM1_IDX, width: 640, height: 480, fps: 30}}" \
+  --robot.cameras="{ cam0: {type: opencv, index_or_path: $CAM0_IDX, width: 640, height: 480, fps: 30, warmup_s: 4}, cam1: {type: opencv, index_or_path: $CAM1_IDX, width: 640, height: 480, fps: 30, warmup_s: 6}}" \
   --task="$TASK" \
   --policy_type=molmoact2 \
   --pretrained_name_or_path=/content/molmoact2_so101 \
@@ -27,8 +27,8 @@ $PY -m lerobot.async_inference.robot_client \
   --fps=30 \
   --debug_visualize_queue_size=False &
 PID=$!
-( sleep "$DURATION" && kill -INT "$PID" 2>/dev/null ) &
+( sleep "$DURATION" && kill -INT "$PID" 2>/dev/null && sleep 10 && kill -9 "$PID" 2>/dev/null ) &
 WATCHER=$!
 wait "$PID"
-kill "$WATCHER" 2>/dev/null
+pkill -P "$WATCHER" 2>/dev/null; kill "$WATCHER" 2>/dev/null
 echo "rollout ended (max ${DURATION}s)"

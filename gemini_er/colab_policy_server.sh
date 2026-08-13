@@ -30,6 +30,29 @@ sed -i 's/SUPPORTED_POLICIES = \["molmoact2", /SUPPORTED_POLICIES = \[/' src/ler
 sed -i 's/SUPPORTED_POLICIES = \[/SUPPORTED_POLICIES = ["molmoact2", /' src/lerobot/async_inference/constants.py
 grep -n "SUPPORTED_POLICIES" src/lerobot/async_inference/constants.py
 
+echo "=== [3b/5] policy cache patch (upstream reloads the policy per client session) ==="
+python - <<'EOF'
+p = "src/lerobot/async_inference/policy_server.py"
+s = open(p).read()
+old = """        start = time.perf_counter()
+        self.policy = policy_class.from_pretrained(policy_specs.pretrained_name_or_path)
+        self.policy.to(self.device)"""
+new = """        start = time.perf_counter()
+        _ck = (self.policy_type, policy_specs.pretrained_name_or_path, self.device)
+        if getattr(self, "_cached_policy_key", None) == _ck and self.policy is not None:
+            self.logger.info("Reusing cached policy - skipping reload")
+        else:
+            self.policy = policy_class.from_pretrained(policy_specs.pretrained_name_or_path)
+            self.policy.to(self.device)
+            self._cached_policy_key = _ck"""
+if "_cached_policy_key" in s:
+    print("policy cache patch already present")
+else:
+    assert old in s, "policy_server anchor not found - upstream changed?"
+    open(p, "w").write(s.replace(old, new))
+    print("policy cache patch applied")
+EOF
+
 echo "=== [4/5] checkpoint snapshot -> bf16 (fp32 default won't fit an L4) ==="
 hf download lerobot/MolmoAct2-SO100_101-LeRobot --local-dir /content/molmoact2_so101 >/dev/null
 python - <<'EOF'
