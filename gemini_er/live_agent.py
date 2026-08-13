@@ -119,29 +119,57 @@ def make_config():
 async def frames_and_heartbeat(session):
     while True:
         if not tool_running.is_set():  # camera free + safe to interrupt
+            frame = None
             try:
                 frame = await asyncio.to_thread(grab, CAM, 640, 480, 5)
+            except Exception as e:
+                log("camera_error", err=str(e)[:200])  # camera-only: keep looping
+            if frame is not None:
                 ok, jpg = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
                 if ok:
+                    # socket errors must PROPAGATE so the reconnect loop fires
                     await session.send_realtime_input(
                         video=types.Blob(data=jpg.tobytes(), mime_type="image/jpeg"))
                     await session.send_realtime_input(text=HEARTBEAT)
-            except Exception as e:
-                log("frame_error", err=str(e)[:200])
         await asyncio.sleep(3.0)  # well under the 1 fps hard limit
 
 
+CMD_FILE = DEBUG / "live_cmds.txt"
+
+
 async def user_commands(session):
+    """Commands come from stdin (if a tty) AND from appended lines in
+    debug/live_cmds.txt - the file path works while running backgrounded."""
+    CMD_FILE.touch()
+    offset = CMD_FILE.stat().st_size  # only react to NEW lines
+    print(f"type a command, or: echo 'cmd' >> {CMD_FILE}", flush=True)
+    stdin_ok = sys.stdin.isatty()
     loop = asyncio.get_running_loop()
-    print("type a command > ", end="", flush=True)
-    while True:
-        cmd = (await loop.run_in_executor(None, sys.stdin.readline)).strip()
-        if not cmd:
-            continue
+
+    async def send(cmd):
         log("user", text=cmd)
         await session.send_client_content(
             turns=types.Content(role="user", parts=[types.Part(text=cmd)]),
             turn_complete=True)
+
+    while True:
+        if stdin_ok:
+            import select
+            r, _, _ = select.select([sys.stdin], [], [], 0)
+            if r:
+                cmd = sys.stdin.readline().strip()
+                if cmd:
+                    await send(cmd)
+        size = CMD_FILE.stat().st_size
+        if size > offset:
+            with open(CMD_FILE) as f:
+                f.seek(offset)
+                new = f.read()
+            offset = size
+            for line in new.splitlines():
+                if line.strip():
+                    await send(line.strip())
+        await asyncio.sleep(1.0)
 
 
 async def receive(session):
