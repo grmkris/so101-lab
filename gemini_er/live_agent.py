@@ -145,7 +145,19 @@ def tool_home(args):
 
 
 def tool_arm_status(args):
-    return arm_state() or {"error": "no status - daemon down?"}
+    st = arm_state()
+    if not st:
+        return {"error": "no status - daemon down?"}
+    g = st.get("gripper")
+    if g is not None:
+        if g < 4:
+            st["gripper_state"] = ("jaws fully closed on NOTHING - the gripper "
+                                   "is EMPTY, any held-object belief is wrong")
+        elif g < 30:
+            st["gripper_state"] = "jaws closed on an OBJECT - actually holding something"
+        else:
+            st["gripper_state"] = "jaws open - not holding anything"
+    return st
 
 
 TOOLS = [{"function_declarations": [
