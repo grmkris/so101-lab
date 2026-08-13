@@ -32,6 +32,8 @@ CAM = calib["camera_index"]
 
 tool_running = asyncio.Event()  # set while a blocking tool executes
 resume_handle = None
+pending_cmd = None  # active mission; re-sent after reconnects until 'reset'
+last_user_turn = 0.0  # heartbeats interrupt generation: hold off after commands
 
 
 def log(kind, **kw):
@@ -47,7 +49,8 @@ def speak(text):
 
 def tool_vla_task(args):
     task = str(args.get("instruction", "pick up the white block"))[:100]
-    seconds = min(int(args.get("seconds", 60)), 90)
+    # pipeline needs ~15s before actions flow; clamp the model's budget to sane
+    seconds = min(max(int(args.get("seconds", 60)), 45), 90)
     if not SERVER:
         return {"error": "no policy server configured (SERVER env)"}
     speak(f"Running the robot policy: {task}")
@@ -77,7 +80,9 @@ TOOLS = [{"function_declarations": [
                     "'pick up the white block'. Use for any physical manipulation.",
      "parameters": {"type": "OBJECT", "properties": {
          "instruction": {"type": "STRING"},
-         "seconds": {"type": "INTEGER", "description": "max run time, <=90"}},
+         "seconds": {"type": "INTEGER",
+                     "description": "run budget 45-90s; setup takes ~15s "
+                                    "before the arm starts acting"}},
          "required": ["instruction"]}},
     {"name": "home", "behavior": "BLOCKING",
      "description": "Move the arm to its safe home pose with the gripper open.",
@@ -117,6 +122,7 @@ def make_config():
 
 
 async def frames_and_heartbeat(session):
+    last_hb = 0.0
     while True:
         if not tool_running.is_set():  # camera free + safe to interrupt
             frame = None
@@ -130,7 +136,12 @@ async def frames_and_heartbeat(session):
                     # socket errors must PROPAGATE so the reconnect loop fires
                     await session.send_realtime_input(
                         video=types.Blob(data=jpg.tobytes(), mime_type="image/jpeg"))
-                    await session.send_realtime_input(text=HEARTBEAT)
+                    # heartbeat is a USER TURN and interrupts generation:
+                    # fire sparingly, and never right after a command
+                    now = time.monotonic()
+                    if now - last_hb >= 12.0 and now - last_user_turn >= 30.0:
+                        last_hb = now
+                        await session.send_realtime_input(text=HEARTBEAT)
         await asyncio.sleep(3.0)  # well under the 1 fps hard limit
 
 
@@ -147,6 +158,9 @@ async def user_commands(session):
     loop = asyncio.get_running_loop()
 
     async def send(cmd):
+        global pending_cmd, last_user_turn
+        pending_cmd = cmd
+        last_user_turn = time.monotonic()
         log("user", text=cmd)
         await session.send_client_content(
             turns=types.Content(role="user", parts=[types.Part(text=cmd)]),
@@ -186,6 +200,9 @@ async def receive(session):
                     log("model", text=p.text)
                     speak(p.text)
         if msg.tool_call:
+            global pending_cmd
+            if any(fc.name == "reset" for fc in msg.tool_call.function_calls):
+                pending_cmd = None  # mission complete
             tool_running.set()
             responses = []
             for fc in msg.tool_call.function_calls:
@@ -216,6 +233,14 @@ async def main():
         try:
             async with client.aio.live.connect(model=MODEL, config=make_config()) as s:
                 log("connected", resumed=bool(resume_handle))
+                if pending_cmd:  # resumption restores the socket, not the mission
+                    global last_user_turn
+                    last_user_turn = time.monotonic()
+                    log("resend_mission", text=pending_cmd)
+                    await s.send_client_content(
+                        turns=types.Content(role="user",
+                                            parts=[types.Part(text=pending_cmd)]),
+                        turn_complete=True)
                 await asyncio.gather(receive(s), frames_and_heartbeat(s),
                                      user_commands(s))
         except KeyboardInterrupt:
