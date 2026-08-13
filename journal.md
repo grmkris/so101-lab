@@ -2,6 +2,32 @@
 
 Newest on top. Template:
 
+## 2026-08-13 (afternoon close) — v2 mission complete: cube placed in box autonomously
+
+Session wrap after ~22h total. Afternoon highlights:
+- **The headline**: the v2 stack completed "put the white cube in the plastic
+  box" fully autonomously — ER 2 cycled run_task episodes (~65 s cadence, 5 s
+  between), verified from camera each cycle under an anti-give-up mission, and
+  one cycle nailed the drop. Camera-confirmed. Zero human hands.
+- Box→mat extraction resisted round 2 (~25 episodes) — in-box grasping is the
+  model's hardest skill; landed twice earlier in the day, dice didn't repeat.
+  The fix is fine-tuning, not retries.
+- Hardening shipped during the grind (all committed): anti-hallucination
+  `gripper_state` in arm_status (model kept imagining held cubes; the servo's
+  position sensor + our measured signatures — empty≈1, held 7-22, open 45+ —
+  now overrule its vision); **mission-aware heartbeat** (reconnect amnesia made
+  the model forget missions; every heartbeat now restates the active mission);
+  camera watchdog VALIDATED in production (caught an Innomaker death in 13 s,
+  parked the arm safely).
+- **Innomaker wrist cam: condemned.** 5 deaths across 3 port arrangements,
+  including on a dedicated port — dies under sustained streaming, refuses
+  15 fps, renegotiates modes randomly. BUY A REPLACEMENT (any fixed-focus UVC;
+  even a second C922). Note: the day's 4/4 grasp streak RAN with the wrist cam
+  (320²+640² @ fps15) — dual-view is worth restoring once hardware exists.
+- C922 quirk discovered: renegotiates 16:9 modes (640×360/320×180) after hub
+  re-cabling — always verify delivered frame size, not just open success.
+- Colab shut down by user at session end. Tailscale keys were 1-day ephemeral.
+
 ## 2026-08-13 (morning) — v2: persistent arm daemon + hardened orchestrator
 
 Deep-researched (3 agents: lerobot client internals w/ line refs, Live API

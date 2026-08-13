@@ -4,3 +4,45 @@
 {"t": "09:45:43", "task": "put the white cube in the plastic box", "end_reason": "budget", "duration_s": 60.0}
 {"t": "09:46:35", "task": "put the white cube in the plastic box", "end_reason": "budget", "duration_s": 45.2}
 {"t": "09:48:21", "task": "put the white cube in the plastic box", "end_reason": "stopped", "duration_s": 45.5}
+{"t": "13:23:31", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 60.4}
+{"t": "13:24:23", "task": "put the white cube inside the plastic box", "end_reason": "budget", "duration_s": 45.1}
+{"t": "13:38:09", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 61.2}
+{"t": "13:41:45", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 61.1}
+{"t": "13:42:59", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 67.8}
+{"t": "13:45:06", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 60.1}
+{"t": "13:47:49", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "budget", "duration_s": 60.2}
+{"t": "13:48:42", "task": "put the white cube inside the plastic box", "end_reason": "budget", "duration_s": 46.0}
+{"t": "13:50:10", "task": "pick up the white cube and place it inside the plastic box", "end_reason": "stopped", "duration_s": 32.0}
+{"t": "13:52:11", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "13:53:18", "task": "place the white cube on the black mat", "end_reason": "budget", "duration_s": 60.3}
+{"t": "13:54:34", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.0}
+{"t": "13:56:33", "task": "open the gripper and place the white cube on the black mat", "end_reason": "budget", "duration_s": 60.1}
+{"t": "13:57:41", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "13:58:28", "task": "open the gripper", "end_reason": "budget", "duration_s": 30.7}
+{"t": "14:00:25", "task": "pick up the white cube from inside the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.7}
+{"t": "14:01:32", "task": "pick up the white cube from inside the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "14:04:50", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.5}
+{"t": "14:05:57", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.1}
+{"t": "14:08:02", "task": "pick up the white cube from the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "14:09:10", "task": "take the white cube out of the plastic box and place it on the mat", "end_reason": "budget", "duration_s": 60.4}
+{"t": "14:10:17", "task": "grasp the white cube from the plastic box and move it to the black mat", "end_reason": "budget", "duration_s": 60.4}
+{"t": "14:12:17", "task": "pick up the white cube from the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.5}
+{"t": "14:14:17", "task": "reach into the box, pick up the white cube, and put it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "14:15:31", "task": "pick up the white cube from the box and place it on the mat", "end_reason": "budget", "duration_s": 60.0}
+{"t": "14:17:39", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.4}
+{"t": "14:18:46", "task": "place the object held in the gripper on the black mat and open the gripper", "end_reason": "budget", "duration_s": 60.3}
+{"t": "14:19:48", "task": "open the gripper to release the white cube onto the black mat", "end_reason": "budget", "duration_s": 45.1}
+{"t": "14:22:54", "task": "pick up the white cube from the center of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.4}
+{"t": "14:24:02", "task": "place the held cube on the black mat and open the gripper", "end_reason": "budget", "duration_s": 60.5}
+{"t": "14:26:42", "task": "pick up the white cube from inside the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.5}
+{"t": "14:27:49", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.1}
+{"t": "14:29:55", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.9}
+{"t": "14:31:02", "task": "pick up the white cube from the center of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.9}
+{"t": "14:33:06", "task": "pick up the white cube from the center of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.1}
+{"t": "14:34:15", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 61.4}
+{"t": "14:37:43", "task": "pick up the white cube from the plastic box and place it on the black mat", "end_reason": "camera_failure", "duration_s": 13.2}
+{"t": "14:48:31", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "14:49:27", "task": "pick up the white cube from the plastic box", "end_reason": "budget", "duration_s": 46.0}
+{"t": "14:51:27", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.2}
+{"t": "14:53:30", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.4}
+{"t": "14:55:32", "task": "take the white cube out of the plastic box and place it on the black mat", "end_reason": "budget", "duration_s": 60.3}
