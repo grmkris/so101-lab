@@ -2,6 +2,42 @@
 
 Newest on top. Template:
 
+## 2026-08-13 — first zero-shot VLA grasps + ER 2 orchestrator flies (overnight session)
+
+**Not an ML-data day.** The MolmoAct2 remote-inference night: first learned policy
+ever to drive this arm, and it grasped zero-shot.
+
+- Stack: `lerobot/MolmoAct2-SO100_101-LeRobot` (Ai2, 5B bf16) served from a
+  **Colab L4** via lerobot 0.6.0 async inference (policy_server whitelist-patched
+  for molmoact2 + policy-cache patched — upstream reloads the policy per client
+  session, 273s each; cached = 2s handshakes). Transport: **Tailscale userspace**
+  on Colab (inbound tailnet→localhost forwarding), ~175ms RTT. Nobody has
+  published this topology. Scripts: `gemini_er/colab_policy_server.sh`,
+  `run_molmoact.sh`.
+- **Two roadblocks, both diagnosed to mechanism**: (1) freeze-at-home-pose —
+  the server filters near-identical obs from a stationary arm AND the processor
+  quantile-clamps out-of-band joint states; fix = start from the checkpoint's
+  ready pose (derived from its norm stats: ~[3.3,-34.3,31.4,56,-11.5]).
+  (2) sluggish/burst motion — queue starvation at fps 30 (30-act chunks, ~1s
+  latency, stale-drop) + 1.8MB raw-frame blocking uplink; fix = fps 15,
+  cam0 at 320x240, aggregate latest_only.
+- **Results (tuned stack): 4/4 grasps** incl. a ~45°-rotated block (which the
+  scripted stack could never do), full mat→box place, then box→mat extraction.
+  Motion is slow — that's the trained teleop pace, not lag.
+- **ER 2 streaming orchestrator (`live_agent.py`) first flight**: Live API
+  session (gemini-robotics-er-2-streaming-preview, free tier), 1fps frames +
+  heartbeat, blocking tools (vla_task/home/ack/reset), macOS say for voice.
+  ER 2 autonomously ran 4 vla_task attempts with retries after visual
+  verification, then home+reset on completion. Hard-won: Live API sockets die
+  ~100s (keepalive timeout, preview flakiness) → reconnect + session-resumption
+  + mission-resend required; heartbeats interrupt generation → 12s cadence +
+  30s holdoff after user turns; model chose 12s tool budgets → clamp 90-180s.
+- Env note: driver venv gained google-genai; LeLab env gained grpcio/protobuf/
+  matplotlib. Cameras: C922=0, Innomaker wrist=1 (replug), builtin=2 — Innomaker
+  wedged once more mid-night, physical replug again; it only does 640x480.
+- Data: `gemini_er/data/molmoact2_zeroshot.jsonl`. Next: 50-demo recording
+  session → SmolVLA fine-tune (baseline) + MolmoAct2 LoRA (A/B), per plan.
+
 ```
 ## YYYY-MM-DD — <what>
 - lerobot: <version/commit> (record) / <version/commit> (train) / <version/commit> (infer)

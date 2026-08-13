@@ -50,7 +50,7 @@ def speak(text):
 def tool_vla_task(args):
     task = str(args.get("instruction", "pick up the white block"))[:100]
     # pipeline needs ~15s before actions flow; clamp the model's budget to sane
-    seconds = min(max(int(args.get("seconds", 60)), 45), 90)
+    seconds = min(max(int(args.get("seconds", 120)), 90), 180)
     if not SERVER:
         return {"error": "no policy server configured (SERVER env)"}
     speak(f"Running the robot policy: {task}")
@@ -81,8 +81,9 @@ TOOLS = [{"function_declarations": [
      "parameters": {"type": "OBJECT", "properties": {
          "instruction": {"type": "STRING"},
          "seconds": {"type": "INTEGER",
-                     "description": "run budget 45-90s; setup takes ~15s "
-                                    "before the arm starts acting"}},
+                     "description": "run budget 90-180s; the arm moves slowly "
+                                    "and setup takes ~15s - prefer 150+ for "
+                                    "pick-and-place"}},
          "required": ["instruction"]}},
     {"name": "home", "behavior": "BLOCKING",
      "description": "Move the arm to its safe home pose with the gripper open.",

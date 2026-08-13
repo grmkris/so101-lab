@@ -44,7 +44,7 @@ $PY -m lerobot.async_inference.robot_client \
   --robot.port=/dev/tty.usbmodem5AE60832001 \
   --robot.id=arm \
   --robot.max_relative_target=15 \
-  --robot.cameras="{ cam0: {type: opencv, index_or_path: $CAM0_IDX, width: 320, height: 240, fps: 30, warmup_s: 4}, cam1: {type: opencv, index_or_path: $CAM1_IDX, width: 320, height: 240, fps: 30, warmup_s: 6}}" \
+  --robot.cameras="{ cam0: {type: opencv, index_or_path: $CAM0_IDX, width: 320, height: 240, fps: 30, warmup_s: 4}, cam1: {type: opencv, index_or_path: $CAM1_IDX, width: 640, height: 480, fps: 30, warmup_s: 6}}" \
   --task="$TASK" \
   --policy_type=molmoact2 \
   --pretrained_name_or_path=/content/molmoact2_so101 \
