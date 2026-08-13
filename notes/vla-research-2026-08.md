@@ -100,3 +100,13 @@ latest release — no upgrade dilemma.
    seam — later the tool becomes "run the fine-tuned policy").
 4. MolmoAct2 zero-shot on rented GPU (weekend experiment).
 5. π0.5 remote if we want benchmark-best.
+
+## Watchlist addendum (2026-08-13)
+
+- **Flex-π** (flex-pi.github.io, arXiv 2608.10860, UW/TRI/Ai2-adjacent): 6B
+  multi-stream world-action model (future RGB + 3D pointmaps + DINO semantics
+  + actions; cross-modality forcing). Claims 2.3× strongest baseline on
+  bimanual YAM, beats π0.5, strong at 50 demos/task. Status: repo placeholder,
+  code+checkpoints "ready soon", no SO-101/lerobot support, RTX 5090-class.
+  RELEVANCE: our 50-demo dataset feeds it if ported; our daemon+remote-GPU
+  topology runs 6B-class models already. Watch github.com/geyan21/flex-pi.
