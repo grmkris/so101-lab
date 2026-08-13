@@ -260,8 +260,15 @@ async def heartbeat_loop(session):
             log("camera_error", err=str(e)[:150])
         hb_last = time.monotonic()
         turn_in_flight = True
+        hb_text = HEARTBEAT
+        if pending_cmd:
+            hb_text = (f"[HEARTBEAT] ACTIVE MISSION: {pending_cmd} -- observe "
+                       "the scene. If the arm is IDLE and the mission is not "
+                       "complete, call run_task NOW to continue it. If an "
+                       "episode is running, call ack. Only call reset when the "
+                       "mission is verifiably complete.")
         await session.send_client_content(
-            turns=types.Content(role="user", parts=[types.Part(text=HEARTBEAT)]),
+            turns=types.Content(role="user", parts=[types.Part(text=hb_text)]),
             turn_complete=True)
 
 
@@ -335,13 +342,19 @@ async def receive(session):
                     result = {"error": str(e)[:300]}
                 responses.append(types.FunctionResponse(
                     id=fc.id, name=fc.name, response=result))
-            try:  # fresh frame BEFORE the response: judge from now-pixels
-                jpg = await asyncio.to_thread(jpeg_frame)
-                if jpg:
-                    await session.send_realtime_input(
-                        video=types.Blob(data=jpg, mime_type="image/jpeg"))
-            except Exception:
-                pass
+            # fresh frames BEFORE the response: workspace AND wrist views so
+            # the model verifies containment/grasp from both angles
+            for cam_idx in (CAM, 1):
+                try:
+                    frame = await asyncio.to_thread(grab, cam_idx, 640, 480, 5)
+                    ok, jpg = cv2.imencode(".jpg", frame,
+                                           [cv2.IMWRITE_JPEG_QUALITY, 80])
+                    if ok:
+                        await session.send_realtime_input(
+                            video=types.Blob(data=jpg.tobytes(),
+                                             mime_type="image/jpeg"))
+                except Exception:
+                    pass
             turn_in_flight = True
             await session.send_tool_response(function_responses=responses)
 

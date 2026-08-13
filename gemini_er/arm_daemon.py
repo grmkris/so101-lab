@@ -62,6 +62,8 @@ def build_client():
                                        height=240, fps=30, warmup_s=4),
         }
     else:
+        # the 4/4-streak configuration: workspace 320x240 + wrist 640x480,
+        # ~1MB/obs at fps 15 - fast AND wrist-informed
         cams = {
             "cam0": OpenCVCameraConfig(index_or_path=CAM0_IDX, width=320,
                                        height=240, fps=30, warmup_s=4),
