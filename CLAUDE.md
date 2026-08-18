@@ -49,8 +49,8 @@ iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Standalone scripts work (L
 1. **SmolVLA fine-tune on blue-pegs** (queued — see journal 2026-07-24).
 2. Two-person remote teleop test (friend's hardware) → then task assignment / recording by operators (the crowdsourced-data product).
 3. DAgger corrections for tight-tolerance failures (keyboard trusted-timeout patch applied, untested).
-4. `sim/` learning track (MuJoCo + ECE 4560) — NOT sim2real (ggando: pixel RL 100% sim, total failure real). The production sim is `app/driver/backends/sim.py`.
-5. Pegboard mastery → placement coach → chess (board ~34cm > edge-mount reach; center-side mount or smaller board).
+4. `sim/` learning track — upgraded to **LeIsaac/Isaac Lab** (SO-101 built in; real-leader→sim-follower teleop = demo factory; Runpod 4090). Still NOT sim2real-first (ggando: pixel RL 100% sim, total failure real) — sim demos augment real fine-tunes. Plan: `notes/vla-research-2026-08.md` two-track section. The production sim is `app/driver/backends/sim.py`.
+5. Chess, two tracks: **Track A (real, priority)** 50-demo fine-tune → precise placement → mini-chess (python-chess → the v2 ER-orchestrator, `gemini_er/live_agent.py` + `arm_daemon.py`); **Track B (sim)** LeIsaac chess env as demo factory + board-geometry testbed (board ~34cm > edge-mount reach; measure in sim first).
 
 ## Data collection rules (ggando-validated, 2026-07-24)
 - ONE consistent grasp strategy per dataset (mixed strategies = erratic policy at identical loss).
