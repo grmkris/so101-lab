@@ -148,3 +148,16 @@ the architecture is the chess robot.
 
 Convergence: sim demos augment real demos for fine-tunes; sim chess env
 becomes the rehearsal space for full-board play.
+
+## Runpod infra (provisioned 2026-08-18)
+
+- Network volume: **so101-sim**, 200 GB, **EU-RO-1** (RTX 4090 availability High,
+  ~25ms from Slovenia), id `2g6kr4hxb3`, $14/mo. Mounts at /workspace on pods.
+- API key (GraphQL read/write, named so101-sim-mac) stored at
+  `~/.runpod/so101.env` (chmod 600, NOT in repo) with volume id + DC.
+- Pattern: disposable pods (kill after every session) + persistent volume;
+  pods boot from NVIDIA Isaac Sim container image. Resume = deploy pod +
+  attach volume, ~3-5 min.
+- Next: pod bootstrap script (Isaac Sim image + Isaac Lab + LeIsaac + tailnet;
+  verify LeIsaac's lerobot version vs our 0.6.0 pin first) + chess asset
+  pipeline (Poly Haven -> Blender headless -> USD).
