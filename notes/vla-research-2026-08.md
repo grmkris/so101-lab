@@ -110,3 +110,41 @@ latest release — no upgrade dilemma.
   code+checkpoints "ready soon", no SO-101/lerobot support, RTX 5090-class.
   RELEVANCE: our 50-demo dataset feeds it if ported; our daemon+remote-GPU
   topology runs 6B-class models already. Watch github.com/geyan21/flex-pi.
+
+## Chess roadmap: two tracks (2026-08-18, from ChatGPT Isaac-sim convo review)
+
+Source: ChatGPT plan (LeRobot -> LeIsaac -> Isaac Lab -> Isaac Sim, SO-101
+chess env, Runpod 4090 ~$0.34/h + $14/mo storage ~= $36/mo). Assessment
+against lab evidence:
+
+**Key insight: the chess decomposition ChatGPT proposes (engine -> "e2e4" ->
+manipulation task) IS our v2 architecture** — ER 2 orchestrator + policy +
+camera verification, already running. Swap mission source to python-chess and
+the architecture is the chess robot.
+
+**Track A — real-world precision (PRIORITY, unchanged):**
+1. 50 real teleop demos (wall setup, data rules).
+2. Fine-tune SmolVLA (baseline) + MolmoAct2-LoRA (upside), A/B.
+3. Precise placement proven -> **real mini-chess**: 2x2 squares, 2 pieces,
+   python-chess -> orchestrator run_task missions. Shortest path to a real
+   legal chess move. No Isaac needed.
+
+**Track B — sim (parallel, learning + scale):**
+- The 7-day LeIsaac sprint as ChatGPT outlines (day 1 install + LiftCube,
+  day 2 leader->sim-follower teleop, day 3 EE control, day 4-5 chess env +
+  scripted e2e4, day 6 teleop demos, day 7 ACT train in sim).
+- GOAL REFRAMED: not sim2real chess transfer, but (1) learn the Isaac stack,
+  (2) demo-factory (real leader -> sim follower = unlimited randomized
+  demonstrations), (3) board-geometry testbed (34cm board vs reach — measure
+  in sim before buying/mounting anything), (4) two-arm chess seed.
+- Sim2real caution stands: ggando pixel-RL total-failure + our viewpoint-shift
+  0.80->0.13 measurement. Sim-trained policies are sim achievements until
+  proven on the real arm. Imitation+domain-randomization is the credible
+  variant, but Track A carries the real-world burden.
+- Infra: Runpod 4090 community + 200GB network volume (Isaac needs RTX-class;
+  Colab can't). Our tailnet/remote-GPU discipline carries over.
+- ⚠ Before install: verify LeIsaac's required lerobot version vs our 0.6.0
+  pin (version-match lever applies to sim too).
+
+Convergence: sim demos augment real demos for fine-tunes; sim chess env
+becomes the rehearsal space for full-board play.
