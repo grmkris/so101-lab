@@ -530,6 +530,38 @@ class TrajectoryExecutor:
             excluded_square=None,
         )
         self.drive_release_retreat(bin_exit, piece)
+        self._discard(piece, color)
+
+    def _discard(self, piece: str, color: str) -> None:
+        """Move a released piece from the chute mouth to the discard tray.
+
+        Modelling boundary, stated deliberately: the funnel's interior is not
+        simulated. What is simulated is the part that can affect the robot —
+        the piece is carried to the mouth, released, and verified to have
+        actually left the tool and settled inside the mouth footprint. From
+        there a passive fabricated chute takes it somewhere the arm cannot
+        reach, so no amount of accumulation can obstruct a planned motion.
+
+        This is why the tray is placed outside the reach envelope rather than
+        beside the board: an unreachable tray needs no occupancy model, and a
+        reachable one would put capture history back into the planning state.
+        """
+
+        mouth_x, mouth_y = self.geometry.capture_bin(color)
+        address = self.backend._qpos_address(piece)
+        resting = np.asarray(self.data.qpos[address : address + 3], dtype=float)
+        radius = float(np.hypot(resting[0] - mouth_x, resting[1] - mouth_y))
+        allowance = float(max(self.geometry.board["capture_bin_inner_size"]))
+        if radius > allowance:
+            raise TrajectoryExecutionError(
+                f"released {piece} did not settle at the {color} chute mouth: "
+                f"{radius * 1000:.1f} mm from centre (allowed {allowance * 1000:.1f} mm)"
+            )
+        index = self.backend._captures[color]
+        self.backend._captures[color] += 1
+        self.backend._set_piece_xyz(
+            piece, self.geometry.discard_slot(color, index)
+        )
 
 
 def replace_trajectory(trajectory: JointTrajectory, **changes) -> JointTrajectory:

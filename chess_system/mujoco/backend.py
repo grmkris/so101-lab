@@ -86,14 +86,14 @@ class MujocoChessBackend:
             raise RuntimeError(f"capture square is empty: {source}")
         piece = self._square_piece.pop(source)
         self._piece_square[piece] = None
-        x, y = self.geometry.capture_bin(bin_color)
+        # Captured pieces leave the workspace down the chute and come to rest
+        # in the discard tray. The former 10 mm in-cup grid was not physically
+        # possible: it overlapped 14 mm pieces and stacked them past the cup
+        # walls, which hid a real collision until the physics-stepped backend
+        # dropped a second capture onto the first.
         index = self._captures[bin_color]
-        # Spread captures in a deterministic 3xN grid within the cup.
-        x += ((index % 3) - 1) * 0.010
-        y += ((index // 3) % 3 - 1) * 0.010
-        z = float(self.geometry.board["nominal_top_z"]) + 0.006 + (index // 9) * 0.044
         self._captures[bin_color] += 1
-        self._set_piece_xyz(piece, (x, y, z))
+        self._set_piece_xyz(piece, self.geometry.discard_slot(bin_color, index))
 
     def square_pose(self, square: str, phase: str) -> SquarePose:
         board_z = float(self.geometry.board["nominal_top_z"])

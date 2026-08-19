@@ -96,3 +96,26 @@ Pass criteria:
 - No visible servo oscillation, overload, or persistent sag.
 
 If it fails, revise the extension root, tip taper, pads, or mast tolerance. Do not enlarge the board: larger pitch would move the far squares outside the reliable envelope.
+
+## Capture chute and discard tray
+
+Required parts, not optional. Without the chute, a released piece stays at the
+mouth and the next capture into the same colour lands on top of it — the
+failure that retired the original capture cups.
+
+Per colour:
+
+- **Chute mouth** — 40 × 40 mm opening centred at `(150, ±128) mm` from the pan
+  pivot, top edge flush with the board surface. These coordinates are load
+  bearing: the validated `capture_bin:<colour>` routes target them, so moving
+  the mouth invalidates the route library.
+- **Funnel** — passive slope from the mouth outward in ±Y to the tray. Steep
+  enough that a 24 mm piece released at the mouth clears it under gravity
+  without help; verify by hand before trusting a game.
+- **Discard tray** — centred at `(90, ±360) mm`, 4 × 4 slots at 18 mm pitch,
+  10 mm walls. Holds 16; a game produces at most 15 per colour.
+
+The tray must stay **outside the arm's reach** (its nearest slot is 339 mm
+against roughly 306 mm of arm). That margin is what lets the planner ignore
+captured pieces entirely. If you relocate the tray closer for convenience, the
+planner becomes wrong rather than merely inconvenient.

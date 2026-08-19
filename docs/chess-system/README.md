@@ -19,6 +19,8 @@ One fixed SO-101 arm will manipulate a complete 8×8 chess position. A normal 34
 | Common grasp mast | **7 mm diameter** |
 | Finger extension | **20 mm nominal** |
 | Open tool envelope | **≤19 mm** |
+| Chute mouth | **(150, ±128) mm, 40 × 40 mm** |
+| Discard tray | **(90, ±360) mm, 16 slots at 18 mm pitch** |
 
 The 4 mm open-tool clearance is intentional but tight. It makes the five-piece crowded-clearance coupon a blocking gate before full-set fabrication.
 
@@ -116,3 +118,43 @@ On uncertainty, capture one fresh observation and stop for operator correction. 
 4. Equivalent scripted move suites pass in MuJoCo and Isaac.
 5. One physical source-to-destination transfer passes verification repeatedly.
 6. Captures, both castlings, en passant, promotion pause, illegal-move rejection, disturbances, and emergency stop pass end-to-end.
+
+
+## Captured pieces leave the workspace
+
+A game produces up to 15 captures per colour. The original 40 × 40 × 20 mm
+capture cups hold four 14 mm pieces per layer and their walls are shorter than
+a 24 mm piece, so they cannot retain a stack. Nothing caught this until the
+physics-stepped backend dropped a second capture onto the first: the kinematic
+backend had been teleporting captures onto a 10 mm grid, which overlaps 14 mm
+pieces — a placement that was never physically possible.
+
+Captures are therefore routed off the board:
+
+```text
+     square ──carry──► chute mouth ──release──►  funnel  ──►  discard tray
+                    (150, ±128) mm                            (90, ±360) mm
+                    validated route                           outside reach
+```
+
+The mouth keeps its original coordinates, so all 130 validated baseline routes
+— including `capture_bin:white` and `capture_bin:black` — remain bit-identical
+and needed no re-validation.
+
+The tray sits 339–404 mm from the pan pivot against roughly 306 mm of arm. That
+distance is the design: **an unreachable tray needs no occupancy model.** A tray
+beside the board would put capture history back into the planning state, which
+is what produced the failure in the first place — the drop pose never advanced
+and bin fill was not even part of the cache key.
+
+### The modelling boundary, stated
+
+The funnel's interior is not simulated. What is simulated is the part that can
+affect the robot: the piece is carried to the mouth, released, and **verified**
+to have left the tool and settled inside the mouth footprint before it is
+moved to the tray. If it does not settle there, the move fails.
+
+The fabricated chute is what makes that boundary true. It is a passive sloped
+funnel from each mouth to its tray, and it is a required part — without it,
+released pieces stay at the mouth and the second capture repeats the original
+collision.

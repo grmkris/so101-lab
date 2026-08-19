@@ -13,55 +13,113 @@
     "square_size": 0.023,
     "playfield_near_x": 0.085,
     "playfield_center_y": 0.0,
-    "carrier_size": [0.204, 0.204, 0.004],
+    "carrier_size": [
+      0.204,
+      0.204,
+      0.004
+    ],
     "carrier_near_x": 0.075,
     "nominal_top_z": -0.0134,
     "flatness_tolerance": 0.001,
     "placement_tolerance": 0.001,
-    "fiducial_size": 0.020,
+    "fiducial_size": 0.02,
     "fiducial_centers": [
-      [0.075, 0.119],
-      [0.279, 0.119],
-      [0.279, -0.119],
-      [0.075, -0.119]
+      [
+        0.075,
+        0.119
+      ],
+      [
+        0.279,
+        0.119
+      ],
+      [
+        0.279,
+        -0.119
+      ],
+      [
+        0.075,
+        -0.119
+      ]
     ],
     "capture_bin_centers": {
-      "white": [0.150, 0.128],
-      "black": [0.150, -0.128]
+      "white": [
+        0.15,
+        0.128
+      ],
+      "black": [
+        0.15,
+        -0.128
+      ]
     },
-    "capture_bin_inner_size": [0.040, 0.040],
-    "capture_bin_height": 0.020
+    "capture_bin_inner_size": [
+      0.04,
+      0.04
+    ],
+    "capture_bin_height": 0.02,
+    "discard_tray_centers": {
+      "white": [
+        0.09,
+        0.36
+      ],
+      "black": [
+        0.09,
+        -0.36
+      ]
+    },
+    "discard_tray_pitch": 0.018,
+    "discard_tray_columns": 4,
+    "discard_tray_capacity": 16,
+    "discard_tray_wall_height": 0.01
   },
   "piece": {
     "base_diameter": 0.014,
     "base_height": 0.005,
-    "maximum_upper_width": 0.010,
+    "maximum_upper_width": 0.01,
     "total_height": 0.024,
     "grasp_mast_diameter": 0.007,
     "grasp_mast_bottom_z": 0.008,
     "grasp_mast_height": 0.012,
     "target_mass": 0.012,
-    "mass_range": [0.009, 0.016],
+    "mass_range": [
+      0.009,
+      0.016
+    ],
     "collision_clearance": 0.002
   },
   "tool": {
-    "extension_length": 0.020,
+    "extension_length": 0.02,
     "tip_thickness": 0.0025,
     "tip_width": 0.004,
     "contact_height": 0.012,
     "closed_outer_width": 0.014,
     "maximum_open_outer_width": 0.019,
-    "maximum_mass": 0.020,
+    "maximum_mass": 0.02,
     "stock_body_vertical_clearance": 0.008,
-    "nominal_tcp_offset": [0.0, 0.0, 0.020],
+    "nominal_tcp_offset": [
+      0.0,
+      0.0,
+      0.02
+    ],
     "reinstall_tolerance": 0.001
   },
   "robot": {
-    "geometric_radius_range": [0.013, 0.306],
-    "conditioned_radius_range": [0.063, 0.300],
-    "preferred_radius_range": [0.150, 0.270],
-    "pan_range_degrees": [-110.0, 110.0],
-    "payload_kg": 0.200,
+    "geometric_radius_range": [
+      0.013,
+      0.306
+    ],
+    "conditioned_radius_range": [
+      0.063,
+      0.3
+    ],
+    "preferred_radius_range": [
+      0.15,
+      0.27
+    ],
+    "pan_range_degrees": [
+      -110.0,
+      110.0
+    ],
+    "payload_kg": 0.2,
     "ik_position_tolerance": 0.003,
     "minimum_joint_margin_degrees": 5.0,
     "maximum_path_joint_step_degrees": 15.0
@@ -77,26 +135,39 @@
     ],
     "publish_hz": 50,
     "control_hz": 30,
-    "watchdog_seconds": 0.250,
+    "watchdog_seconds": 0.25,
     "arm_unit": "degrees",
-    "gripper_range": [0.0, 100.0]
+    "gripper_range": [
+      0.0,
+      100.0
+    ]
   },
   "validation": {
     "crowded_coupon_pitch": 0.023,
     "crowded_coupon_trials": 30,
     "crowded_coupon_minimum_successes": 29,
     "neighbor_contact_limit": 0,
-    "teleop_p95_latency_seconds": 0.150,
+    "teleop_p95_latency_seconds": 0.15,
     "board_translation_abort": 0.002,
     "board_rotation_abort_degrees": 0.5
   },
   "motion_planning": {
-    "ready_joints_degrees": [3.3, -34.3, 31.4, 56.0, -11.5],
+    "ready_joints_degrees": [
+      3.3,
+      -34.3,
+      31.4,
+      56.0,
+      -11.5
+    ],
     "rrt_step_degrees": 4.0,
     "edge_resolution_degrees": 0.25,
     "goal_bias": 0.15,
     "maximum_iterations": 20000,
-    "attempt_seeds": [101, 211, 307],
+    "attempt_seeds": [
+      101,
+      211,
+      307
+    ],
     "shortcut_attempts": 200,
     "maximum_velocity_degrees_s": 25.0,
     "maximum_acceleration_degrees_s2": 60.0,

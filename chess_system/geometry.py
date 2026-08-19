@@ -103,6 +103,40 @@ class ChessGeometry:
             raise ValueError(f"capture-bin color must be white or black, got {color!r}") from exc
         return float(x), float(y)
 
+    def discard_slot(self, color: str, index: int) -> tuple[float, float, float]:
+        """Resting pose of the ``index``-th captured piece of ``color``.
+
+        Captured pieces are released at the chute mouth — see
+        :meth:`capture_bin` — and the fabricated funnel carries them to a tray
+        outside the arm's reach. The tray is deliberately unreachable (nearest
+        slot ~339 mm against ~306 mm of arm), so however it fills it can never
+        obstruct a planned motion, which is the whole reason captures are not
+        stacked back inside the workspace.
+
+        Slots are spaced at the tray pitch so pieces never overlap. A game
+        produces at most 15 captures per colour and the tray holds 16.
+        """
+
+        board = self.board
+        try:
+            cx, cy = board["discard_tray_centers"][color.lower()]
+        except KeyError as exc:
+            raise ValueError(
+                f"discard tray color must be white or black, got {color!r}"
+            ) from exc
+        capacity = int(board["discard_tray_capacity"])
+        if not 0 <= index < capacity:
+            raise ValueError(
+                f"discard slot {index} outside tray capacity {capacity}"
+            )
+        pitch = float(board["discard_tray_pitch"])
+        columns = int(board["discard_tray_columns"])
+        offset = (columns - 1) / 2
+        outward = 1.0 if cy > 0 else -1.0
+        x = float(cx) + ((index % columns) - offset) * pitch
+        y = float(cy) + ((index // columns) - offset) * pitch * outward
+        return x, y, float(board["nominal_top_z"])
+
     def report(self) -> dict[str, Any]:
         rmin, rmax = self.square_radius_range()
         conditioned_min, conditioned_max = self.robot["conditioned_radius_range"]

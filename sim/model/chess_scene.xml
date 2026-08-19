@@ -92,6 +92,20 @@
 <geom name="capture_bin_black_wall_y_pos" type="box" pos="0 0.021000 0.010000" size="0.020000 0.001 0.010000" rgba="0.04 0.05 0.06 1"/>
 <geom name="capture_bin_black_wall_y_neg" type="box" pos="0 -0.021000 0.010000" size="0.020000 0.001 0.010000" rgba="0.04 0.05 0.06 1"/>
     </body>
+    <body name="discard_tray_white" pos="0.090000 0.360000 -0.013400">
+      <geom name="discard_tray_white_floor" type="box" pos="0 0 0.0015" size="0.036000 0.036000 0.0015" rgba="0.62 0.63 0.60 1"/>
+<geom name="discard_tray_white_wall_x_pos" type="box" pos="0.036000 0 0.005000" size="0.001 0.036000 0.005000" rgba="0.62 0.63 0.60 1"/>
+<geom name="discard_tray_white_wall_x_neg" type="box" pos="-0.036000 0 0.005000" size="0.001 0.036000 0.005000" rgba="0.62 0.63 0.60 1"/>
+<geom name="discard_tray_white_wall_y_pos" type="box" pos="0 0.036000 0.005000" size="0.036000 0.001 0.005000" rgba="0.62 0.63 0.60 1"/>
+<geom name="discard_tray_white_wall_y_neg" type="box" pos="0 -0.036000 0.005000" size="0.036000 0.001 0.005000" rgba="0.62 0.63 0.60 1"/>
+    </body>
+    <body name="discard_tray_black" pos="0.090000 -0.360000 -0.013400">
+      <geom name="discard_tray_black_floor" type="box" pos="0 0 0.0015" size="0.036000 0.036000 0.0015" rgba="0.10 0.11 0.13 1"/>
+<geom name="discard_tray_black_wall_x_pos" type="box" pos="0.036000 0 0.005000" size="0.001 0.036000 0.005000" rgba="0.10 0.11 0.13 1"/>
+<geom name="discard_tray_black_wall_x_neg" type="box" pos="-0.036000 0 0.005000" size="0.001 0.036000 0.005000" rgba="0.10 0.11 0.13 1"/>
+<geom name="discard_tray_black_wall_y_pos" type="box" pos="0 0.036000 0.005000" size="0.036000 0.001 0.005000" rgba="0.10 0.11 0.13 1"/>
+<geom name="discard_tray_black_wall_y_neg" type="box" pos="0 -0.036000 0.005000" size="0.036000 0.001 0.005000" rgba="0.10 0.11 0.13 1"/>
+    </body>
     <body name="piece_white_pawn_a" pos="0.119500 0.080500 -0.013400">
   <freejoint name="piece_white_pawn_a_joint"/>
   <geom name="piece_white_pawn_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>

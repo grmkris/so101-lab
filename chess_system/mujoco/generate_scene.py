@@ -212,8 +212,29 @@ def _scene_xml(*, planning: bool = False) -> str:
     carrier_center_z = board_top - carrier_z / 2
     white_bin = geometry.capture_bin("white")
     black_bin = geometry.capture_bin("black")
+    white_tray = board["discard_tray_centers"]["white"]
+    black_tray = board["discard_tray_centers"]["black"]
     bin_x, bin_y = map(float, board["capture_bin_inner_size"])
     bin_h = float(board["capture_bin_height"])
+    tray_pitch = float(board["discard_tray_pitch"])
+    tray_cols = int(board["discard_tray_columns"])
+    tray_rows = -(-int(board["discard_tray_capacity"]) // tray_cols)
+    tray_x = tray_cols * tray_pitch
+    tray_y = tray_rows * tray_pitch
+    tray_h = float(board["discard_tray_wall_height"])
+
+    def tray_geoms(color: str) -> str:
+        rgba = "0.62 0.63 0.60 1" if color == "white" else "0.10 0.11 0.13 1"
+        return "\n".join(
+            [
+                f'<geom name="discard_tray_{color}_floor" type="box" pos="0 0 0.0015" size="{tray_x/2:.6f} {tray_y/2:.6f} 0.0015" rgba="{rgba}"/>',
+                f'<geom name="discard_tray_{color}_wall_x_pos" type="box" pos="{tray_x/2:.6f} 0 {tray_h/2:.6f}" size="0.001 {tray_y/2:.6f} {tray_h/2:.6f}" rgba="{rgba}"/>',
+                f'<geom name="discard_tray_{color}_wall_x_neg" type="box" pos="{-tray_x/2:.6f} 0 {tray_h/2:.6f}" size="0.001 {tray_y/2:.6f} {tray_h/2:.6f}" rgba="{rgba}"/>',
+                f'<geom name="discard_tray_{color}_wall_y_pos" type="box" pos="0 {tray_y/2:.6f} {tray_h/2:.6f}" size="{tray_x/2:.6f} 0.001 {tray_h/2:.6f}" rgba="{rgba}"/>',
+                f'<geom name="discard_tray_{color}_wall_y_neg" type="box" pos="0 {-tray_y/2:.6f} {tray_h/2:.6f}" size="{tray_x/2:.6f} 0.001 {tray_h/2:.6f}" rgba="{rgba}"/>',
+            ]
+        )
+
     def bin_geoms(color: str) -> str:
         rgba = "0.75 0.76 0.72 1" if color == "white" else "0.04 0.05 0.06 1"
         return "\n".join(
@@ -247,6 +268,12 @@ def _scene_xml(*, planning: bool = False) -> str:
     </body>
     <body name="capture_bin_black" pos="{black_bin[0]:.6f} {black_bin[1]:.6f} {board_top:.6f}">
       {bin_geoms("black")}
+    </body>
+    <body name="discard_tray_white" pos="{white_tray[0]:.6f} {white_tray[1]:.6f} {board_top:.6f}">
+      {tray_geoms("white")}
+    </body>
+    <body name="discard_tray_black" pos="{black_tray[0]:.6f} {black_tray[1]:.6f} {board_top:.6f}">
+      {tray_geoms("black")}
     </body>
     {_piece_bodies(collidable=not planning)}
     {_planning_proxies(enabled=planning)}
