@@ -1,0 +1,4 @@
+# Add these to the gitignored MuJoCo environment; do not alter the production
+# LeRobot 0.6.0 environments just to run chess orchestration tests.
+python-chess==1.999
+pyzmq>=27,<28

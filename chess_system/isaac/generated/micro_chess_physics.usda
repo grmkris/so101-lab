@@ -1,0 +1,2613 @@
+#usda 1.0
+(
+    defaultPrim = "World"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "World"
+{
+    def "Board"
+    {
+        def Cube "Carrier" (
+            prepend apiSchemas = ["PhysicsCollisionAPI"]
+        )
+        {
+            color3f[] primvars:displayColor = [(0.07, 0.08, 0.09)]
+            double size = 1
+            float3 xformOp:scale = (0.204, 0.204, 0.004)
+            double3 xformOp:translate = (0.177, 0, -0.0154)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+
+        def "Squares"
+        {
+            def Cube "s_0_0"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_0"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_0"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_0"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_0"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_0"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_0"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_0"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.0965, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_1"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_1"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_1"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_1"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_1"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_1"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_1"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_1"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.11950000000000001, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_2"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_2"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_2"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_2"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_2"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_2"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_2"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_2"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.14250000000000002, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_3"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_3"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_3"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_3"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_3"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_3"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_3"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_3"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1655, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_4"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_4"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_4"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_4"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_4"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_4"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_4"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_4"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.1885, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_5"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_5"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_5"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_5"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_5"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_5"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_5"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_5"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.21150000000000002, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_6"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_6"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_6"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_6"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_6"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_6"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_6"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_6"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2345, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_0_7"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, 0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_1_7"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, 0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_2_7"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, 0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_3_7"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, 0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_4_7"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, -0.0115, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_5_7"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, -0.0345, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_6_7"
+            {
+                color3f[] primvars:displayColor = [(0.18, 0.22, 0.2)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, -0.057499999999999996, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "s_7_7"
+            {
+                color3f[] primvars:displayColor = [(0.78, 0.7, 0.54)]
+                double size = 1
+                float3 xformOp:scale = (0.023, 0.023, 0.0005)
+                double3 xformOp:translate = (0.2575, -0.0805, -0.01315)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+    }
+
+    def "CaptureBins"
+    {
+        def "white"
+        {
+            def Cube "Floor" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.75, 0.76, 0.72)]
+                double size = 1
+                float3 xformOp:scale = (0.044, 0.044, 0.003)
+                double3 xformOp:translate = (0.15, 0.128, -0.0119)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallXPos" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.75, 0.76, 0.72)]
+                double size = 1
+                float3 xformOp:scale = (0.002, 0.044, 0.02)
+                double3 xformOp:translate = (0.17099999999999999, 0.128, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallXNeg" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.75, 0.76, 0.72)]
+                double size = 1
+                float3 xformOp:scale = (0.002, 0.044, 0.02)
+                double3 xformOp:translate = (0.129, 0.128, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallYPos" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.75, 0.76, 0.72)]
+                double size = 1
+                float3 xformOp:scale = (0.04, 0.002, 0.02)
+                double3 xformOp:translate = (0.15, 0.149, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallYNeg" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.75, 0.76, 0.72)]
+                double size = 1
+                float3 xformOp:scale = (0.04, 0.002, 0.02)
+                double3 xformOp:translate = (0.15, 0.107, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+
+        def "black"
+        {
+            def Cube "Floor" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.04, 0.05, 0.06)]
+                double size = 1
+                float3 xformOp:scale = (0.044, 0.044, 0.003)
+                double3 xformOp:translate = (0.15, -0.128, -0.0119)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallXPos" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.04, 0.05, 0.06)]
+                double size = 1
+                float3 xformOp:scale = (0.002, 0.044, 0.02)
+                double3 xformOp:translate = (0.17099999999999999, -0.128, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallXNeg" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.04, 0.05, 0.06)]
+                double size = 1
+                float3 xformOp:scale = (0.002, 0.044, 0.02)
+                double3 xformOp:translate = (0.129, -0.128, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallYPos" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.04, 0.05, 0.06)]
+                double size = 1
+                float3 xformOp:scale = (0.04, 0.002, 0.02)
+                double3 xformOp:translate = (0.15, -0.107, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+
+            def Cube "WallYNeg" (
+                prepend apiSchemas = ["PhysicsCollisionAPI"]
+            )
+            {
+                color3f[] primvars:displayColor = [(0.04, 0.05, 0.06)]
+                double size = 1
+                float3 xformOp:scale = (0.04, 0.002, 0.02)
+                double3 xformOp:translate = (0.15, -0.149, -0.0034000000000000002)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+            }
+        }
+    }
+
+    def "Pieces"
+    {
+        def Xform "white_pawn_a" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, 0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_b" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, 0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_c" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, 0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_d" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, 0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_e" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, -0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_f" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, -0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_g" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, -0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_pawn_h" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.11950000000000001, -0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_rook_a" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "rook"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, 0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_rook.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_knight_b" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "knight"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, 0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_knight.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_bishop_c" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "bishop"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, 0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_bishop.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_queen_d" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "queen"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, 0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_queen.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_king_e" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "king"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, -0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_king.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_bishop_f" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "bishop"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, -0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_bishop.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_knight_g" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "knight"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, -0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_knight.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "white_rook_h" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "white"
+            custom string chess:pieceType = "rook"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.0965, -0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/white_rook.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.88, 0.89, 0.84)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_a" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, 0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_b" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, 0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_c" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, 0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_d" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, 0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_e" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, -0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_f" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, -0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_g" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, -0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_pawn_h" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "pawn"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2345, -0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_pawn.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_rook_a" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "rook"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, 0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_rook.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_knight_b" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "knight"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, 0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_knight.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_bishop_c" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "bishop"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, 0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_bishop.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_queen_d" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "queen"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, 0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_queen.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_king_e" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "king"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, -0.0115, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_king.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_bishop_f" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "bishop"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, -0.0345, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_bishop.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_knight_g" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "knight"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, -0.057499999999999996, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_knight.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+
+        def Xform "black_rook_h" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+        )
+        {
+            custom string chess:color = "black"
+            custom string chess:pieceType = "rook"
+            float physics:mass = 0.012
+            double3 xformOp:translate = (0.2575, -0.0805, -0.0134)
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+
+            def Xform "Visual" (
+                prepend references = @visuals/black_rook.usda@</root>
+            )
+            {
+            }
+
+            def "Collision"
+            {
+                def Cylinder "Base" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.005
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.007
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.0025)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Body" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.022
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0055
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.016)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+
+                def Cylinder "Mast" (
+                    prepend apiSchemas = ["PhysicsCollisionAPI"]
+                )
+                {
+                    uniform token axis = "Z"
+                    double height = 0.016
+                    color3f[] primvars:displayColor = [(0.045, 0.055, 0.065)]
+                    double radius = 0.0035
+                    token visibility = "invisible"
+                    double3 xformOp:translate = (0, 0, 0.022)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+        }
+    }
+}
+

@@ -2,6 +2,8 @@ sim/.venv/
 sim/model/assets/
 __pycache__/
 *.local
+*.blend1
+chess_system/.local/
 
 # machine-local agent/MCP tooling — the app itself lives in app/ (bun);
 # the root npm tree exists only to back the shadcn MCP server
@@ -13,3 +15,6 @@ __pycache__/
 /.agents/
 /skills-lock.json
 /.agent-sources/
+
+# regenerable memoization cache — churns every run, grows unboundedly during a game
+chess_system/mujoco/generated/runtime_trajectory_cache.json

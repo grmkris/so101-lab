@@ -1,0 +1,68 @@
+{
+  "status": "pass",
+  "maximum_piece_width_mm": 14.0,
+  "maximum_piece_height_mm": 24.0,
+  "failures": [],
+  "pieces": {
+    "pawn": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 5,
+      "pass": true
+    },
+    "rook": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 5,
+      "pass": true
+    },
+    "knight": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 5,
+      "pass": true
+    },
+    "bishop": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 5,
+      "pass": true
+    },
+    "queen": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 5,
+      "pass": true
+    },
+    "king": {
+      "extents_mm": [
+        14.0,
+        14.0,
+        24.0
+      ],
+      "watertight": true,
+      "components": 6,
+      "pass": true
+    }
+  }
+}

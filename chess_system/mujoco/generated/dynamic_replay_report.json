@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "trials_per_scenario": 10,
+  "total_trials": 50,
+  "failed_scenarios": [],
+  "elapsed_seconds": 113.89531170809641,
+  "details": [
+    {
+      "scenario": "near_rank",
+      "trials": 10,
+      "successes": 10,
+      "failures": []
+    },
+    {
+      "scenario": "center",
+      "trials": 10,
+      "successes": 10,
+      "failures": []
+    },
+    {
+      "scenario": "far_rank",
+      "trials": 10,
+      "successes": 10,
+      "failures": []
+    },
+    {
+      "scenario": "crowded_back_rank",
+      "trials": 10,
+      "successes": 10,
+      "failures": []
+    },
+    {
+      "scenario": "capture_bin",
+      "trials": 10,
+      "successes": 10,
+      "failures": []
+    }
+  ]
+}
