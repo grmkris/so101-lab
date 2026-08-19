@@ -10,6 +10,11 @@ from pathlib import Path
 from typing import Any
 
 
+def failed_library_path(library_path: str | Path) -> Path:
+    path = Path(library_path)
+    return path.with_name(f"{path.stem}.failed{path.suffix}")
+
+
 class MotionMode(StrEnum):
     PICKUP_EXIT = "pickup_exit"
     PLACEMENT_ENTRY = "placement_entry"
@@ -126,7 +131,16 @@ class TrajectoryLibrary:
 
     @classmethod
     def load(cls, path: str | Path) -> "TrajectoryLibrary":
-        raw = json.loads(Path(path).read_text(encoding="utf-8"))
+        destination = Path(path)
+        if not destination.is_file():
+            failed = failed_library_path(destination)
+            extra = (
+                f" Generation failed; partial output is at {failed}."
+                if failed.is_file()
+                else ""
+            )
+            raise FileNotFoundError(f"trajectory library missing: {destination}.{extra}")
+        raw = json.loads(destination.read_text(encoding="utf-8"))
         library = cls(
             schema_version=int(raw["schema_version"]),
             geometry_schema_version=int(raw["geometry_schema_version"]),

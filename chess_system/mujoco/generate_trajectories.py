@@ -25,6 +25,7 @@ from chess_system.mujoco.trajectory import (
     MotionMode,
     TrajectoryLibrary,
     TrajectoryMetrics,
+    failed_library_path,
 )
 
 
@@ -402,16 +403,51 @@ def generate() -> tuple[TrajectoryLibrary, dict]:
     return library, report
 
 
+def persist_generation(
+    library: TrajectoryLibrary,
+    report: dict,
+    library_path: Path,
+    report_path: Path,
+) -> None:
+    """Write the report always. On pass, replace the canonical library.
+
+    On fail, write a sibling `.failed.json` and delete the canonical file so
+    a stale passing library cannot sit next to a failing report.
+    """
+
+    library_path = Path(library_path)
+    report_path = Path(report_path)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    failed_path = failed_library_path(library_path)
+    if report["status"] == "pass":
+        library.save(library_path)
+        if failed_path.is_file():
+            failed_path.unlink()
+        return
+    failed_library = TrajectoryLibrary(
+        schema_version=library.schema_version,
+        geometry_schema_version=library.geometry_schema_version,
+        trajectories=dict(library.trajectories),
+        generation={**library.generation, "status": "fail"},
+    )
+    failed_library.save(failed_path)
+    if library_path.is_file():
+        library_path.unlink()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     args = parser.parse_args()
     library, report = generate()
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    if report["status"] == "pass":
-        library.save(args.library)
+    persist_generation(library, report, args.library, args.report)
+    if report["status"] != "pass":
+        print(
+            f"FAILED: removed stale library {args.library}; "
+            f"wrote partial output to {failed_library_path(args.library)}"
+        )
     print(json.dumps({key: value for key, value in report.items() if key != "details"}, indent=2))
     raise SystemExit(0 if report["status"] == "pass" else 1)
 

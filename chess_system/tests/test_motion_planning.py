@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import json
 import math
+import tempfile
 import unittest
 from pathlib import Path
 
 import numpy as np
 
 from chess_system.controller import ChessController
+from chess_system.mujoco.generate_trajectories import persist_generation
 from chess_system.mujoco.rrt import RRTConnect
-from chess_system.mujoco.trajectory import TrajectoryLibrary
+from chess_system.mujoco.trajectory import TrajectoryLibrary, failed_library_path
 from chess_system.mujoco.trajectory_executor import PlannedMujocoChessBackend
 
 
@@ -102,6 +104,52 @@ class MotionPlanningTests(unittest.TestCase):
             self.assertFalse(report.executable, f"{move} unexpectedly reachable")
         # The game must not stall on it: a reachable alternative exists.
         self.assertTrue(controller.check_executable("e2e4").executable)
+
+
+class LibraryPersistTests(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.directory = Path(self.tmpdir.name)
+        self.library_path = self.directory / "trajectory_library.json"
+        self.report_path = self.directory / "trajectory_report.json"
+        self.failed_path = failed_library_path(self.library_path)
+        self.library = TrajectoryLibrary(generation={"planner": "test"})
+        self.library_path.write_text('{"stale": true}\n', encoding="utf-8")
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+
+    def test_failed_generation_deletes_stale_library(self):
+        persist_generation(
+            self.library,
+            {"status": "fail", "failures": [{"target": "a1"}]},
+            self.library_path,
+            self.report_path,
+        )
+        self.assertFalse(self.library_path.exists())
+        self.assertTrue(self.failed_path.is_file())
+        self.assertEqual(
+            json.loads(self.report_path.read_text(encoding="utf-8"))["status"],
+            "fail",
+        )
+        failed = TrajectoryLibrary.load(self.failed_path)
+        self.assertEqual(failed.generation["status"], "fail")
+        with self.assertRaisesRegex(FileNotFoundError, "Generation failed"):
+            TrajectoryLibrary.load(self.library_path)
+
+    def test_passed_generation_replaces_library_and_clears_failed_artifact(self):
+        self.failed_path.write_text('{"stale_failed": true}\n', encoding="utf-8")
+        persist_generation(
+            self.library,
+            {"status": "pass", "failures": []},
+            self.library_path,
+            self.report_path,
+        )
+        self.assertTrue(self.library_path.is_file())
+        self.assertFalse(self.failed_path.exists())
+        loaded = TrajectoryLibrary.load(self.library_path)
+        self.assertEqual(loaded.generation["planner"], "test")
+        self.assertNotIn("status", loaded.generation)
 
 
 if __name__ == "__main__":
