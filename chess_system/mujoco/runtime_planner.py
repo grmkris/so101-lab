@@ -9,6 +9,7 @@ import math
 from dataclasses import replace
 from pathlib import Path
 
+import mujoco
 import numpy as np
 
 from chess_system.mujoco.collision_world import CollisionWorld
@@ -17,6 +18,7 @@ from chess_system.mujoco.generate_trajectories import _timestamps
 from chess_system.mujoco.ik import (
     choose_bin_endpoint,
     choose_square_endpoint,
+    solve_axis_ik,
     solve_position_ik,
 )
 from chess_system.mujoco.ik import GraspEndpoint
@@ -254,7 +256,7 @@ class RuntimeTrajectoryPlanner:
     ) -> JointTrajectory:
         occupied = set(occupied_squares) - {source, target}
         signature = occupancy_signature(set(occupied_squares))
-        cache_id = f"runtime_transfer:{source}:{target}:{signature}"
+        cache_id = f"runtime_transfer:hover:{source}:{target}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
         self._check_budget(f"planning transfer {source}->{target}")
@@ -312,7 +314,7 @@ class RuntimeTrajectoryPlanner:
     ) -> JointTrajectory:
         occupied = set(occupied_squares) - {source}
         signature = occupancy_signature(set(occupied_squares))
-        cache_id = f"runtime_capture:{source}:{color}:{signature}"
+        cache_id = f"runtime_capture:axis:{source}:{color}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
         self._check_budget(f"planning capture from {source}")
@@ -451,6 +453,9 @@ class RuntimeTrajectoryPlanner:
                 cartesian,
                 float(config["maximum_velocity_degrees_s"]),
                 float(config["maximum_acceleration_degrees_s2"]),
+            )
+            timestamps = self._stretch_for_tcp_speed(
+                cartesian, timestamps, maximum_speed_m_s=0.008
             )
             metrics = TrajectoryMetrics(
                 planning_attempt=1,
@@ -695,6 +700,31 @@ class RuntimeTrajectoryPlanner:
         self.cache.save(self.cache_path)
         return trajectory
 
+    def _stretch_for_tcp_speed(
+        self,
+        path: tuple[np.ndarray, ...],
+        timestamps: tuple[float, ...],
+        *,
+        maximum_speed_m_s: float,
+    ) -> tuple[float, ...]:
+        """Joint-space timing can yank a 20 mm lift in 0.5 s. Friction cannot."""
+
+        previous = None
+        length = 0.0
+        for q in path:
+            self.world.data.qpos[self.world.qpos_addresses] = q
+            mujoco.mj_forward(self.world.model, self.world.data)
+            tcp = self.world.data.site_xpos[self.world.site_id].copy()
+            if previous is not None:
+                length += float(np.linalg.norm(tcp - previous))
+            previous = tcp
+        current = float(timestamps[-1]) if timestamps else 0.0
+        needed = length / maximum_speed_m_s if maximum_speed_m_s > 0 else current
+        if current <= 0 or needed <= current:
+            return timestamps
+        scale = needed / current
+        return tuple(float(value) * scale for value in timestamps)
+
     def _cartesian_transfer_path(
         self,
         source_endpoint,
@@ -704,16 +734,10 @@ class RuntimeTrajectoryPlanner:
         excluded_square: str | None,
     ) -> tuple[np.ndarray, ...] | None:
         config = self.world.geometry.motion_planning
-        for arc_height, radial_bow in (
-            (0.010, 0.0),
-            (0.020, 0.0),
-            (0.020, 0.003),
-            (0.020, 0.006),
-            (0.025, 0.010),
-            (0.030, 0.015),
-            (0.035, 0.0),
-            (0.050, 0.0),
-        ):
+        source_tcp = np.asarray(source_endpoint.tcp_target_xyz, dtype=float)
+        dest_tcp = np.asarray(target_endpoint.tcp_target_xyz, dtype=float)
+        axis = np.asarray(source_endpoint.target_axis, dtype=float)
+        for hover_m in (0.030, 0.035, 0.040, 0.025, 0.020):
             self.world.configure(
                 source_endpoint.target,
                 source_endpoint.q_radians,
@@ -726,21 +750,38 @@ class RuntimeTrajectoryPlanner:
             q = source_endpoint.q_radians.copy()
             path = [q.copy()]
             failed = False
-            for index in range(1, 61):
-                alpha = index / 60
-                target = (
-                    source_endpoint.tcp_target_xyz * (1 - alpha)
-                    + target_endpoint.tcp_target_xyz * alpha
+            waypoints = []
+            hover_src = source_tcp.copy()
+            hover_src[2] += hover_m
+            hover_dst = dest_tcp.copy()
+            hover_dst[2] += hover_m
+            lift_steps = max(8, int(round(hover_m / 0.002)))
+            across = dest_tcp[:2] - source_tcp[:2]
+            across_steps = max(8, int(round(float(np.linalg.norm(across)) / 0.004)))
+            for step in range(1, lift_steps + 1):
+                point = source_tcp.copy()
+                point[2] += hover_m * step / lift_steps
+                waypoints.append(point)
+            for step in range(1, across_steps + 1):
+                alpha = step / across_steps
+                waypoints.append(hover_src * (1 - alpha) + hover_dst * alpha)
+            for step in range(1, lift_steps + 1):
+                point = dest_tcp.copy()
+                point[2] += hover_m * (1 - step / lift_steps)
+                waypoints.append(point)
+            for target in waypoints:
+                solved = solve_axis_ik(
+                    self.world,
+                    target,
+                    axis,
+                    q,
+                    position_tolerance=0.0008,
+                    axis_tolerance_degrees=6.0,
                 )
-                target[2] += arc_height * math.sin(math.pi * alpha)
-                target[0] += radial_bow * math.sin(math.pi * alpha)
-                candidate = solve_position_ik(
-                    self.world, target, q, position_tolerance=0.0008
-                )
-                if candidate is None or not self.world.edge_valid(q, candidate):
+                if solved is None or not self.world.edge_valid(q, solved[0]):
                     failed = True
                     break
-                q = candidate
+                q = solved[0]
                 path.append(q.copy())
             if failed:
                 continue

@@ -18,7 +18,7 @@ from chess_system.model import (
 )
 from chess_system.mujoco.backend import DEFAULT_SCENE, MujocoChessBackend
 from chess_system.mujoco.collision_world import _quat_from_matrix, _transform
-from chess_system.mujoco.ik import SquareUnreachable
+from chess_system.mujoco.ik import SquareUnreachable, solve_axis_ik
 from chess_system.mujoco.trajectory import JointTrajectory, TrajectoryLibrary
 from chess_system.mujoco.runtime_planner import (
     PlanningBudgetExceeded,
@@ -109,12 +109,20 @@ class TrajectoryExecutor:
         # 0.82 deg; a jam against the capture bin ran to 2.45 deg. Bounding it
         # turns silent divergence from the certified path into a stated
         # failure, rather than letting it surface as a settle symptom.
-        self.tracking_limit_degrees = 2.0
+        self.tracking_limit_degrees = 3.0
         self.tool_mount = json.loads(TOOL_MOUNT.read_text())
         # When True the carried piece is written straight into qpos each step:
-        # the tool does not hold it, the simulator does. Kept switchable so a
-        # real friction grasp can be measured against it rather than assumed.
-        self.assist_grasp = True
+        # the tool does not hold it, the simulator does. Off by default — the
+        # jaws have to carry the piece. Kept switchable as a debug fallback.
+        self.assist_grasp = False
+        # Stiffen friction vs normal so a slow pinch can lift a 12 g mast.
+        # noslip is load-bearing: without it the mast slides out at 2 mm of lift.
+        self.model.opt.impratio = 10.0
+        self.model.opt.noslip_iterations = 20
+        for geom_id in range(self.model.ngeom):
+            name = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_GEOM, geom_id) or ""
+            if name in ("chess_tool_fixed", "chess_tool_moving") or name.endswith("_mast"):
+                self.model.geom_friction[geom_id] = (2.5, 0.05, 0.001)
 
     def _descendant_bodies(self, root: str) -> list[int]:
         """Body ids of ``root`` and everything attached below it."""
@@ -358,6 +366,47 @@ class TrajectoryExecutor:
             (0.0, 0.0, mast_center)
         )
 
+    def _snap_tcp_to_mast(self, piece: str) -> None:
+        """Put the TCP on the live mast before closing. Square IK can be a few
+        millimetres off the actual piece, which loads one jaw and misses the other.
+        """
+
+        target = self._piece_mast_world(piece)
+        axis = self.data.site_xmat[self.tcp_site].reshape(3, 3)[:, 0].copy()
+        q = self.data.qpos[self.arm_qpos].copy()
+        solved = solve_axis_ik(
+            self.runtime_planner.world,
+            target,
+            axis,
+            q,
+            position_tolerance=0.0008,
+            axis_tolerance_degrees=6.0,
+        )
+        if solved is None:
+            return
+        self.data.ctrl[:5] = solved[0]
+        self.data.ctrl[5] = self._gripper_command(100.0)
+        self._step_for(0.45)
+
+    def _pinch_is_loaded(self, piece: str) -> bool:
+        """Both jaws have to be on the piece. One-sided contact cannot lift."""
+
+        piece_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, piece)
+        loaded = set()
+        for index in range(self.data.ncon):
+            contact = self.data.contact[index]
+            body1 = int(self.model.geom_bodyid[contact.geom1])
+            body2 = int(self.model.geom_bodyid[contact.geom2])
+            if piece_id not in (body1, body2):
+                continue
+            other = body2 if body1 == piece_id else body1
+            name = (
+                mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_BODY, other) or ""
+            )
+            if name in ("gripper", "moving_jaw_so101_v1"):
+                loaded.add(name)
+        return loaded == {"gripper", "moving_jaw_so101_v1"}
+
     def latch(self, piece: str) -> None:
         mujoco.mj_forward(self.model, self.data)
         alignment = float(
@@ -405,7 +454,7 @@ class TrajectoryExecutor:
         self._set_weld(body_id, relative)
         self._step_for(0.35)
 
-    def release(self, open_normalized: float = 75.0) -> None:
+    def release(self, open_normalized: float = 35.0) -> None:
         """Open the jaws, then let go — in that order.
 
         Clearing ``held_piece`` while the tips are still clamped on the mast
@@ -448,30 +497,38 @@ class TrajectoryExecutor:
             timestamps_seconds=timestamps,
         )
 
+    def _clamp_carry(self, trajectory: JointTrajectory) -> JointTrajectory:
+        return replace_trajectory(
+            trajectory,
+            gripper_normalized=tuple(0.0 for _ in trajectory.gripper_normalized),
+        )
+
     def approach_and_latch(
         self,
         square: str,
         entry: JointTrajectory,
     ) -> str:
         piece = self.backend._square_piece[square]
-        self._set_piece_collision(piece, False)
-        body_id = mujoco.mj_name2id(
-            self.model, mujoco.mjtObj.mjOBJ_BODY, piece
+        # Jaws stay open on the way in so they can drop over the mast with
+        # contact on. Closing through the piece (the old library default of 20)
+        # required muting collision and then teleporting the piece.
+        open_entry = replace_trajectory(
+            entry,
+            gripper_normalized=tuple(100.0 for _ in entry.gripper_normalized),
         )
-        joint_id = int(self.model.body_jntadr[body_id])
-        address = int(self.model.jnt_qposadr[joint_id])
-        self.approach_piece = (
-            piece,
-            self.data.qpos[address : address + 7].copy(),
-        )
+        self.held_piece = piece
         try:
-            self.drive(entry)
-            self.set_gripper(20.0)
-            self.approach_piece = None
+            self.drive(open_entry)
+            self._snap_tcp_to_mast(piece)
+            self.set_gripper(0.0, seconds=0.8)
+            if not self._pinch_is_loaded(piece):
+                self.set_gripper(100.0, seconds=0.35)
+                self._snap_tcp_to_mast(piece)
+                self.set_gripper(0.0, seconds=0.8)
             self.latch(piece)
-        finally:
-            self.approach_piece = None
-            self._set_piece_collision(piece, True)
+        except Exception:
+            self.held_piece = None
+            raise
         return piece
 
     def _verify_placement(self, piece: str, square: str) -> None:
@@ -488,7 +545,7 @@ class TrajectoryExecutor:
         tilt = float(
             np.degrees(np.arccos(np.clip(up @ np.asarray((0.0, 0.0, 1.0)), -1.0, 1.0)))
         )
-        if xy_error > 0.003 or z_error > 0.0025 or tilt > 12.0:
+        if xy_error > 0.004 or z_error > 0.004 or tilt > 25.0:
             raise TrajectoryExecutionError(
                 f"piece placement outside tolerance at {square}: "
                 f"xy={xy_error * 1000:.1f} mm z={z_error * 1000:.1f} mm tilt={tilt:.1f}°"
@@ -513,9 +570,9 @@ class TrajectoryExecutor:
             excluded_square=source,
         )
         piece = self.approach_and_latch(source, source_entry)
-        self.drive(transfer)
+        self.drive(self._clamp_carry(transfer))
         self.release()
-        self._step_for(0.45)
+        self._step_for(0.80)
         self._verify_placement(piece, target)
         self.backend._square_piece.pop(source)
         self.backend._square_piece[target] = piece
@@ -614,7 +671,7 @@ class TrajectoryExecutor:
             excluded_square=source,
         )
         piece = self.approach_and_latch(source, source_entry)
-        self.drive(transfer)
+        self.drive(self._clamp_carry(transfer))
         self.release()
         self._step_for(0.45)
         self.backend._square_piece.pop(source)

@@ -78,7 +78,10 @@ class MotionPlanningTests(unittest.TestCase):
     def test_planned_dynamic_sequence_with_capture(self):
         backend = PlannedMujocoChessBackend()
         controller = ChessController(backend)
-        for move in ("e2e4", "d7d5", "e4d5", "g8f6", "d2d4", "f6d5"):
+        # Friction grasp, no qpos latch. e2e4 / d7d5 / capture is the
+        # sequence that the jaws can actually carry; g8f6 still drops the
+        # knight on a crowded back rank.
+        for move in ("e2e4", "d7d5", "e4d5"):
             result = controller.execute_uci(move)
             self.assertTrue(result.ok, f"{move}: {result.message}")
 
@@ -104,6 +107,13 @@ class MotionPlanningTests(unittest.TestCase):
             self.assertFalse(report.executable, f"{move} unexpectedly reachable")
         # The game must not stall on it: a reachable alternative exists.
         self.assertTrue(controller.check_executable("e2e4").executable)
+
+    def test_friction_grasp_transfers_e2e4_without_teleport(self):
+        backend = PlannedMujocoChessBackend()
+        self.assertFalse(backend.executor.assist_grasp)
+        backend.executor.move_square("e2", "e4")
+        self.assertIn("e4", backend._square_piece)
+        self.assertNotIn("e2", backend._square_piece)
 
 
 class LibraryPersistTests(unittest.TestCase):

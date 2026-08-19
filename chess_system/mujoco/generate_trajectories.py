@@ -17,7 +17,7 @@ from chess_system.mujoco.ik import (
     SquareUnreachable,
     choose_bin_endpoint,
     choose_square_endpoint,
-    solve_position_ik,
+    solve_axis_ik,
 )
 from chess_system.mujoco.rrt import PlanResult, RRTConnect, resample_path, shortcut_path
 from chess_system.mujoco.trajectory import (
@@ -49,10 +49,17 @@ def _vertical_escape_path(
         target = endpoint.tcp_target_xyz + np.asarray(
             (0.0, 0.0, millimeter / 1000)
         )
-        candidate = solve_position_ik(world, target, q)
-        if candidate is None or not world.edge_valid(q, candidate):
+        solved = solve_axis_ik(
+            world,
+            target,
+            endpoint.target_axis,
+            q,
+            position_tolerance=0.0008,
+            axis_tolerance_degrees=6.0,
+        )
+        if solved is None or not world.edge_valid(q, solved[0]):
             return None
-        q = candidate
+        q = solved[0]
         path.append(q.copy())
         if world.edge_valid(q, world.ready):
             path.append(world.ready.copy())
