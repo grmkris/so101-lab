@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import time
 from pathlib import Path
 from typing import Callable
@@ -30,6 +31,16 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LIBRARY = (
     ROOT / "chess_system" / "mujoco" / "generated" / "trajectory_library.json"
 )
+TOOL_MOUNT = ROOT / "chess_system" / "mujoco" / "generated" / "tool_mount.json"
+
+
+STRUCTURE_PREFIXES = ("chess_board", "capture_bin_", "discard_tray_")
+
+
+def _is_structure(body_name: str) -> bool:
+    """Fixed furniture the arm must never touch: board, capture bins, trays."""
+
+    return body_name.startswith(STRUCTURE_PREFIXES)
 
 
 class TrajectoryExecutionError(RuntimeError):
@@ -87,7 +98,39 @@ class TrajectoryExecutor:
             self.model, mujoco.mjtObj.mjOBJ_EQUALITY, "chess_piece_latch"
         )
         self.held_piece: str | None = None
+        self.released_piece: str | None = None
         self.approach_piece: tuple[str, np.ndarray] | None = None
+        # Resolved from the model rather than a hardcoded id range, which
+        # silently shifts whenever a body is added to the scene.
+        self._robot_bodies = frozenset(self._descendant_bodies("base"))
+        # Collision checking validates the planned waypoints, but the servo
+        # follows them only approximately: what the arm actually sweeps is not
+        # what was cleared. Measured peak deviation over 36 clean drives was
+        # 0.82 deg; a jam against the capture bin ran to 2.45 deg. Bounding it
+        # turns silent divergence from the certified path into a stated
+        # failure, rather than letting it surface as a settle symptom.
+        self.tracking_limit_degrees = 2.0
+        self.tool_mount = json.loads(TOOL_MOUNT.read_text())
+        # When True the carried piece is written straight into qpos each step:
+        # the tool does not hold it, the simulator does. Kept switchable so a
+        # real friction grasp can be measured against it rather than assumed.
+        self.assist_grasp = True
+
+    def _descendant_bodies(self, root: str) -> list[int]:
+        """Body ids of ``root`` and everything attached below it."""
+
+        root_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, root)
+        if root_id < 0:
+            raise RuntimeError(f"body missing from scene: {root}")
+        members = {root_id}
+        for body_id in range(self.model.nbody):
+            parent = body_id
+            while parent > 0:
+                if parent in members:
+                    members.add(body_id)
+                    break
+                parent = int(self.model.body_parentid[parent])
+        return sorted(members)
 
     def _sync(self) -> None:
         if self.frame_callback:
@@ -117,7 +160,7 @@ class TrajectoryExecutor:
         self.data.qvel[velocity : velocity + 6] = 0
 
     def _update_upright_latch(self) -> None:
-        if self.held_piece is None:
+        if self.held_piece is None or not self.assist_grasp:
             return
         body_id = mujoco.mj_name2id(
             self.model, mujoco.mjtObj.mjOBJ_BODY, self.held_piece
@@ -136,6 +179,11 @@ class TrajectoryExecutor:
         self.data.qvel[velocity : velocity + 6] = 0
 
     def _check_non_target_contacts(self) -> None:
+        allowed = {
+            mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, name)
+            for name in (self.held_piece, self.released_piece)
+            if name
+        }
         held_body = (
             mujoco.mj_name2id(
                 self.model, mujoco.mjtObj.mjOBJ_BODY, self.held_piece
@@ -161,13 +209,26 @@ class TrajectoryExecutor:
             )
             first_piece = name1.startswith("piece_")
             second_piece = name2.startswith("piece_")
-            first_robot = body1 in range(1, 8)
-            second_robot = body2 in range(1, 8)
-            if first_piece and second_robot and body1 != held_body:
+            first_robot = body1 in self._robot_bodies
+            second_robot = body2 in self._robot_bodies
+            first_structure = _is_structure(name1)
+            second_structure = _is_structure(name2)
+            # The arm driving into fixed structure used to surface only as a
+            # servo symptom ("failed to settle"): the monitor watched pieces
+            # and ignored the board, the capture bins and the trays. A jam
+            # against the black bin therefore reported a 2.45 deg tracking
+            # error instead of the collision that caused it.
+            if (first_robot and second_structure) or (second_robot and first_structure):
+                structure = name2 if first_robot else name1
+                member = name1 if first_robot else name2
+                raise TrajectoryExecutionError(
+                    f"arm contacted fixed structure: {member} with {structure}"
+                )
+            if first_piece and second_robot and body1 not in allowed:
                 raise TrajectoryExecutionError(
                     f"non-target contact: {name1} with {name2}"
                 )
-            if second_piece and first_robot and body2 != held_body:
+            if second_piece and first_robot and body2 not in allowed:
                 raise TrajectoryExecutionError(
                     f"non-target contact: {name2} with {name1}"
                 )
@@ -178,8 +239,20 @@ class TrajectoryExecutor:
                 )
 
     def _gripper_command(self, normalized: float) -> float:
-        low, high = map(float, self.model.actuator_ctrlrange[5])
-        return low + (high - low) * normalized / 100.0
+        """Map 0-100 onto the *chess working band*, not the joint's full range.
+
+        The extensions hang off a rotating jaw, so tip separation is a steep
+        function of the joint angle: the usable band is about 7 deg of a 110 deg
+        joint. Mapping 0-100 across the whole joint — as this did — turned a
+        carry command of 20 into +12 deg, which stands the tips 45 mm apart and
+        sweeps them through neighbouring pieces.
+
+        0 = fully closed (clamping), 100 = open just enough to clear a mast.
+        """
+
+        low = self.tool_mount["closed_angle_radians"]
+        high = self.tool_mount["open_angle_radians"]
+        return low + (high - low) * float(normalized) / 100.0
 
     def reset_ready(self, *, settle_seconds: float = 0.4) -> None:
         mujoco.mj_resetData(self.model, self.data)
@@ -213,6 +286,14 @@ class TrajectoryExecutor:
         for tick in range(ticks + 1):
             elapsed = min(duration, tick * period)
             target = self._interpolate_trajectory(trajectory, elapsed)
+            deviation = float(
+                np.max(np.abs(np.degrees(self.data.qpos[self.arm_qpos] - target)))
+            )
+            if deviation > self.tracking_limit_degrees:
+                raise TrajectoryExecutionError(
+                    f"arm deviated from {trajectory.trajectory_id} by "
+                    f"{deviation:.2f}° (limit {self.tracking_limit_degrees:.2f}°)"
+                )
             self.data.ctrl[:5] = target
             self.data.ctrl[5] = self._gripper_command(
                 float(trajectory.gripper_normalized[min(tick, len(trajectory.gripper_normalized) - 1)])
@@ -262,6 +343,7 @@ class TrajectoryExecutor:
             self.drive(trajectory)
         finally:
             self.approach_piece = None
+            self.released_piece = None
             self._set_piece_collision(piece, True)
 
     def _piece_mast_world(self, piece: str) -> np.ndarray:
@@ -322,6 +404,29 @@ class TrajectoryExecutor:
         )
         self._set_weld(body_id, relative)
         self._step_for(0.35)
+
+    def release(self, open_normalized: float = 75.0) -> None:
+        """Open the jaws, then let go — in that order.
+
+        Clearing ``held_piece`` while the tips are still clamped on the mast
+        turns the grasp itself into a "non-target contact" the instant the
+        piece stops being the target. Releasing therefore means opening first,
+        letting the tips clear the mast, and only then dropping the hold.
+
+        The ordering only started to matter once the tool actually closed on
+        the piece; while the extensions were frozen 19 mm apart there was
+        never any contact to release.
+        """
+
+        # Opening swings only the moving tip; the piece is left resting
+        # against the fixed one until the arm physically retreats. That
+        # grazing contact is part of releasing, so it stays permitted until
+        # the retreat clears it — muting the piece instead would drop it
+        # through the board during the settle.
+        self.released_piece = self.held_piece
+        self.set_gripper(open_normalized)
+        self._step_for(0.20)
+        self.unlatch()
 
     def unlatch(self) -> None:
         self.data.eq_active[self.latch_id] = 0
@@ -409,8 +514,7 @@ class TrajectoryExecutor:
         )
         piece = self.approach_and_latch(source, source_entry)
         self.drive(transfer)
-        self.unlatch()
-        self.set_gripper(75.0)
+        self.release()
         self._step_for(0.45)
         self._verify_placement(piece, target)
         self.backend._square_piece.pop(source)
@@ -511,8 +615,7 @@ class TrajectoryExecutor:
         )
         piece = self.approach_and_latch(source, source_entry)
         self.drive(transfer)
-        self.unlatch()
-        self.set_gripper(75.0)
+        self.release()
         self._step_for(0.45)
         self.backend._square_piece.pop(source)
         self.backend._piece_square[piece] = None

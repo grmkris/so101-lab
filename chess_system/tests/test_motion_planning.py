@@ -76,9 +76,32 @@ class MotionPlanningTests(unittest.TestCase):
     def test_planned_dynamic_sequence_with_capture(self):
         backend = PlannedMujocoChessBackend()
         controller = ChessController(backend)
-        for move in ("e2e4", "d7d5", "e4d5", "g8f6", "g1f3", "f6d5"):
+        for move in ("e2e4", "d7d5", "e4d5", "g8f6", "d2d4", "f6d5"):
             result = controller.execute_uci(move)
             self.assertTrue(result.ok, f"{move}: {result.message}")
+
+    def test_crowded_back_rank_knights_are_out_of_reach_at_the_start(self):
+        """Both white knights are unreachable from the opening position.
+
+        This is a cost of modelling the tool honestly. The finger extensions
+        are asymmetric — one is fixed to the gripper body, the other swings on
+        the jaw — so grasping a back-rank piece sweeps the moving tip through
+        whichever neighbour sits on the swing side. The earlier symmetric
+        model, with both extensions frozen 19 mm apart on the static body,
+        showed no such conflict because it could not move at all.
+
+        Recorded rather than worked around: it is real reachability
+        information about the 23 mm board, and move selection is expected to
+        route around it instead of failing.
+        """
+
+        backend = PlannedMujocoChessBackend()
+        controller = ChessController(backend)
+        for move in ("g1f3", "b1c3"):
+            report = controller.check_executable(move)
+            self.assertFalse(report.executable, f"{move} unexpectedly reachable")
+        # The game must not stall on it: a reachable alternative exists.
+        self.assertTrue(controller.check_executable("e2e4").executable)
 
 
 if __name__ == "__main__":

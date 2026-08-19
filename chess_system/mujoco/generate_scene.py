@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import math
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from chess_system.geometry import FILES, RANKS, load_geometry
+from chess_system.mujoco.tool_mount import solve_tool_mount
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -14,49 +16,74 @@ BASE_ROBOT = ROOT / "sim" / "model" / "so101_new_calib.xml"
 ROBOT_OUT = ROOT / "sim" / "model" / "so101_chess.xml"
 SCENE_OUT = ROOT / "sim" / "model" / "chess_scene.xml"
 PLANNING_SCENE_OUT = ROOT / "sim" / "model" / "chess_planning_scene.xml"
+TOOL_MOUNT_OUT = ROOT / "chess_system" / "mujoco" / "generated" / "tool_mount.json"
 
 BACK_RANK = ("rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook")
 
 
 def _augment_robot_model() -> None:
+    """Attach the finger extensions to the jaws that actually carry them.
+
+    Mount poses are solved from the SO-101's own mesh geometry rather than
+    assumed constants — see :mod:`chess_system.mujoco.tool_mount` for why the
+    previous hand-placed version could never close.
+    """
+
     geometry = load_geometry()
-    half_open = float(geometry.tool["maximum_open_outer_width"]) / 2
     tip_half_thickness = float(geometry.tool["tip_thickness"]) / 2
     tip_half_width = float(geometry.tool["tip_width"]) / 2
-    extension_half = float(geometry.tool["extension_length"]) / 2
+    extension = float(geometry.tool["extension_length"])
+    mount = solve_tool_mount(
+        BASE_ROBOT,
+        mast_diameter=float(geometry.piece["grasp_mast_diameter"]),
+        mast_height=float(geometry.piece["grasp_mast_height"]),
+        tip_thickness=float(geometry.tool["tip_thickness"]),
+        extension_length=extension,
+        open_separation=(
+            float(geometry.tool["maximum_open_outer_width"])
+            - float(geometry.tool["tip_thickness"])
+        ),
+    )
+
     tree = ET.parse(BASE_ROBOT)
     root = tree.getroot()
     gripper = root.find(".//body[@name='gripper']")
     if gripper is None:
         raise RuntimeError("gripper body missing from SO-101 model")
+    jaw = gripper.find("body[@name='moving_jaw_so101_v1']")
+    if jaw is None:
+        raise RuntimeError("moving jaw body missing from SO-101 model")
 
-    # The stock gripperframe lies at local z=-98 mm. These conservative boxes
-    # model the two extension tips at their maximum-open 21 mm envelope. They
-    # are a clearance model, not an actuator model; grasp dynamics are validated
-    # with the physical coupon before full-set fabrication.
+    size = f"{tip_half_thickness:.6f} {tip_half_width:.6f} {extension / 2:.6f}"
+    centre_z = mount.jaw_tip_z - extension / 2
+
+    # Static jaw: the extension hangs straight down from the fixed tip.
     fixed = ET.Element(
         "geom",
         {
             "name": "chess_tool_fixed",
             "type": "box",
-            "pos": f"-0.0079 {-half_open:.6f} {-0.0981 - extension_half:.6f}",
-            "size": f"{extension_half:.6f} {tip_half_thickness:.6f} {tip_half_width:.6f}",
-            "quat": "0.707107 0 -0.707107 0",
+            "pos": f"{mount.fixed_x:.6f} {mount.tcp_pos[1]:.6f} {centre_z:.6f}",
+            "size": size,
             "rgba": "0.95 0.36 0.08 1",
             "mass": "0.009",
+            "friction": "1.4 0.02 0.001",
             "group": "3",
         },
     )
+    # Moving jaw: same extension, on the body the gripper joint drives, posed
+    # so it hangs parallel to the fixed one at the clamping angle.
     moving = ET.Element(
         "geom",
         {
             "name": "chess_tool_moving",
             "type": "box",
-            "pos": f"-0.0079 {half_open:.6f} {-0.0981 - extension_half:.6f}",
-            "size": f"{extension_half:.6f} {tip_half_thickness:.6f} {tip_half_width:.6f}",
-            "quat": "0.707107 0 -0.707107 0",
+            "pos": " ".join(f"{v:.6f}" for v in mount.moving_local_pos),
+            "quat": " ".join(f"{v:.6f}" for v in mount.moving_local_quat),
+            "size": size,
             "rgba": "0.95 0.36 0.08 1",
             "mass": "0.009",
+            "friction": "1.4 0.02 0.001",
             "group": "3",
         },
     )
@@ -64,7 +91,7 @@ def _augment_robot_model() -> None:
         "site",
         {
             "name": "chess_tcp",
-            "pos": f"-0.0079 -0.000218 {-0.0981 - float(geometry.tool['extension_length']):.6f}",
+            "pos": " ".join(f"{v:.6f}" for v in mount.tcp_pos),
             "quat": "0.707107 0 0.707107 0",
             "size": "0.004",
             "rgba": "0.1 0.9 0.2 0.8",
@@ -80,18 +107,46 @@ def _augment_robot_model() -> None:
             "fovy": "62",
         },
     )
-    # Insert immediately before the moving-jaw child so generated diffs remain
-    # understandable and all tool elements live on the gripper body.
+
     moving_jaw_index = next(
-        (i for i, child in enumerate(gripper) if child.tag == "body" and child.get("name") == "moving_jaw_so101_v1"),
+        (
+            i
+            for i, child in enumerate(gripper)
+            if child.tag == "body" and child.get("name") == "moving_jaw_so101_v1"
+        ),
         len(gripper),
     )
-    for element in (fixed, moving, tcp, wrist_cam):
+    for element in (fixed, tcp, wrist_cam):
         gripper.insert(moving_jaw_index, element)
         moving_jaw_index += 1
+    jaw.append(moving)
 
     ET.indent(tree, space="  ")
     tree.write(ROBOT_OUT, encoding="utf-8", xml_declaration=True)
+    # Consumers must not re-derive these; the working band is a 7 deg slice of
+    # a 110 deg joint and getting it wrong sweeps the tool through the board.
+    TOOL_MOUNT_OUT.parent.mkdir(parents=True, exist_ok=True)
+    TOOL_MOUNT_OUT.write_text(
+        json.dumps(
+            {
+                "closed_angle_radians": mount.closed_angle,
+                "grip_angle_radians": mount.grip_angle,
+                "open_angle_radians": mount.open_angle,
+                "separation_at_grip_m": mount.separation_at_grip,
+                "separation_when_closed_m": mount.separation_when_closed,
+                "jaw_tip_z_m": mount.jaw_tip_z,
+                "tcp_pos_m": list(mount.tcp_pos),
+            },
+            indent=2,
+        )
+        + "\n"
+    )
+    print(
+        f"tool mount: grip {math.degrees(mount.grip_angle):.2f} deg, "
+        f"separation {mount.separation_at_grip * 1000:.2f} mm, "
+        f"closed {mount.separation_when_closed * 1000:.2f} mm, "
+        f"open {math.degrees(mount.open_angle):.2f} deg"
+    )
 
 
 def _piece_geoms(
