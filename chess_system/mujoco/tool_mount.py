@@ -183,3 +183,94 @@ def solve_tool_mount(
         separation_at_grip=float(moving_x - fixed_x),
         separation_when_closed=float(closed_tip[0] - fixed_x),
     )
+
+
+def solve_stock_mount(
+    robot_path: str,
+    *,
+    neck_width: float,
+    approach_clearance: float,
+) -> ToolMount:
+    """Solve the grasp for the SO-101's own jaws, with no finger extensions.
+
+    The extensions existed because the gripper was judged "55-65 mm wide, too
+    bulky for the board". Measured at the height where pieces actually sit,
+    the assembly is 26.4 x 12.2 mm and fits a 23 mm pitch with about 2.8 mm to
+    spare — the original figure was taken ~40 mm up the assembly, where it
+    genuinely is 47 mm wide.
+
+    Rather than assume where the jaws bear, this measures the closest pair of
+    opposing faces between the static jaw and the moving jaw across the joint
+    range, and puts the TCP at that pinch centre.
+    """
+
+    model = mujoco.MjModel.from_xml_path(str(robot_path))
+    data = mujoco.MjData(model)
+    joint = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "gripper")
+    address = int(model.jnt_qposadr[joint])
+    low, high = (float(v) for v in model.jnt_range[joint])
+    gripper_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "gripper")
+    jaw_id = mujoco.mj_name2id(
+        model, mujoco.mjtObj.mjOBJ_BODY, "moving_jaw_so101_v1"
+    )
+
+    jaw_local = _mesh_points(model, jaw_id)
+    static_all = _mesh_points(model, gripper_id)
+    # Only the jaw region of the static body can oppose the moving jaw.
+    static = static_all[static_all[:, 2] < -0.080][::5]
+
+    def pinch(angle: float) -> tuple[float, np.ndarray]:
+        data.qpos[:] = 0
+        data.qpos[address] = angle
+        mujoco.mj_forward(model, data)
+        r_grip = data.xmat[gripper_id].reshape(3, 3).copy()
+        p_grip = data.xpos[gripper_id].copy()
+        r_jaw = data.xmat[jaw_id].reshape(3, 3).copy()
+        p_jaw = data.xpos[jaw_id].copy()
+        moving = (r_grip.T @ (((r_jaw @ jaw_local.T).T + p_jaw) - p_grip).T).T
+        moving = moving[moving[:, 2] < -0.080][::5]
+        if len(moving) == 0:
+            return float("inf"), np.zeros(3)
+        gaps = np.linalg.norm(static[:, None, :] - moving[None, :, :], axis=2)
+        i, j = np.unravel_index(gaps.argmin(), gaps.shape)
+        return float(gaps.min()), (static[i] + moving[j]) / 2
+
+    def angle_for(gap: float) -> float:
+        lower, upper = low, min(high, low + np.radians(25.0))
+        for _ in range(50):
+            middle = (lower + upper) / 2
+            if pinch(middle)[0] < gap:
+                lower = middle
+            else:
+                upper = middle
+        return (lower + upper) / 2
+
+    # The moving jaw swings on an arc, so the pinch centre translates as it
+    # closes. Clamping force needs over-travel past first touch, but that
+    # over-travel walks the pinch away from wherever the piece was placed —
+    # at 0.3-2 deg the contact simply absorbs the servo error and the force
+    # decays, and past that the pinch has moved far enough to shove the piece
+    # out of the jaws. A parallel-jaw gripper has no such conflict.
+    #
+    # So the grasp is defined at the CLAMPED angle: the jaws are asked to
+    # close to an interference fit on the neck, and the TCP is the pinch
+    # centre there. First touch then happens slightly early, and closing the
+    # rest of the way squeezes rather than sweeps.
+    interference = 0.001
+    grip_angle = angle_for(max(neck_width - interference, 0.001))
+    open_angle = angle_for(neck_width + 2 * approach_clearance)
+    gap_at_grip, centre = pinch(grip_angle)
+    closed_gap, _ = pinch(low)
+
+    return ToolMount(
+        grip_angle=float(grip_angle),
+        closed_angle=float(low),
+        open_angle=float(open_angle),
+        fixed_x=float(centre[0]),
+        moving_local_pos=(0.0, 0.0, 0.0),
+        moving_local_quat=(1.0, 0.0, 0.0, 0.0),
+        tcp_pos=tuple(float(v) for v in centre),
+        jaw_tip_z=float(centre[2]),
+        separation_at_grip=float(gap_at_grip),
+        separation_when_closed=float(closed_gap),
+    )

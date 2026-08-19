@@ -71,15 +71,13 @@
                 <geom type="mesh" class="visual" pos="8.32667e-17 -0.000218214 0.000949706" quat="0 1 0 0" mesh="wrist_roll_follower_so101_v1" material="wrist_roll_follower_so101_v1_material" />
                 <geom type="mesh" class="collision" pos="8.32667e-17 -0.000218214 0.000949706" quat="0 1 0 0" mesh="wrist_roll_follower_so101_v1" material="wrist_roll_follower_so101_v1_material" />
                 <site group="3" name="gripperframe" pos="-0.0079 -0.000218121 -0.0981274" quat="0.707107 -0 0.707107 -2.37788e-17" />
-                <geom name="chess_tool_fixed" type="box" pos="-0.008900 -0.000218 -0.114425" size="0.001250 0.002000 0.010000" rgba="0.95 0.36 0.08 1" mass="0.009" friction="1.4 0.02 0.001" group="3" />
-                <site name="chess_tcp" pos="-0.004150 -0.000218 -0.120425" quat="0.707107 0 0.707107 0" size="0.004" rgba="0.1 0.9 0.2 0.8" group="4" />
+                <site name="chess_tcp" pos="-0.004926 0.000765 -0.102702" quat="0.707107 0 0.707107 0" size="0.004" rgba="0.1 0.9 0.2 0.8" group="4" />
                 <camera name="wrist_cam" pos="0.020 -0.045 -0.030" quat="0.707107 0 0.707107 0" fovy="62" />
                 <body name="moving_jaw_so101_v1" pos="0.0202 0.0188 -0.0234" quat="0.707107 0.707107 -1.85362e-08 1.85362e-08">
                   <joint axis="0 0 1" name="gripper" type="hinge" range="-0.17453297762778586 1.7453291995659765" class="sts3215" />
                   <inertial pos="-0.00157495 -0.0300244 0.0192755" mass="0.012" fullinertia="6.61427e-06 1.89032e-06 5.28738e-06 -3.19807e-07 -5.90717e-09 -1.09945e-07" />
                   <geom type="mesh" class="visual" pos="-5.55112e-17 -5.55112e-17 0.0189" quat="1 -0 3.00524e-16 -2.00834e-17" mesh="moving_jaw_so101_v1" material="moving_jaw_so101_v1_material" />
                   <geom type="mesh" class="collision" pos="-5.55112e-17 -5.55112e-17 0.0189" quat="1 -0 3.00524e-16 -2.00834e-17" mesh="moving_jaw_so101_v1" material="moving_jaw_so101_v1_material" />
-                  <geom name="chess_tool_moving" type="box" pos="-0.007311 -0.092824 0.019018" quat="0.705532 -0.705532 -0.047160 0.047160" size="0.001250 0.002000 0.010000" rgba="0.95 0.36 0.08 1" mass="0.009" friction="1.4 0.02 0.001" group="3" />
                 </body>
               </body>
             </body>

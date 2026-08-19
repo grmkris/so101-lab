@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from chess_system.geometry import FILES, RANKS, load_geometry
-from chess_system.mujoco.tool_mount import solve_tool_mount
+from chess_system.mujoco.tool_mount import solve_stock_mount, solve_tool_mount
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,17 +33,25 @@ def _augment_robot_model() -> None:
     tip_half_thickness = float(geometry.tool["tip_thickness"]) / 2
     tip_half_width = float(geometry.tool["tip_width"]) / 2
     extension = float(geometry.tool["extension_length"])
-    mount = solve_tool_mount(
-        BASE_ROBOT,
-        mast_diameter=float(geometry.piece["grasp_mast_diameter"]),
-        mast_height=float(geometry.piece["grasp_mast_height"]),
-        tip_thickness=float(geometry.tool["tip_thickness"]),
-        extension_length=extension,
-        open_separation=(
-            float(geometry.tool["maximum_open_outer_width"])
-            - float(geometry.tool["tip_thickness"])
-        ),
-    )
+    use_extensions = bool(geometry.tool.get("use_finger_extensions", True))
+    if use_extensions:
+        mount = solve_tool_mount(
+            BASE_ROBOT,
+            mast_diameter=float(geometry.piece["grasp_mast_diameter"]),
+            mast_height=float(geometry.piece["grasp_mast_height"]),
+            tip_thickness=float(geometry.tool["tip_thickness"]),
+            extension_length=extension,
+            open_separation=(
+                float(geometry.tool["maximum_open_outer_width"])
+                - float(geometry.tool["tip_thickness"])
+            ),
+        )
+    else:
+        mount = solve_stock_mount(
+            BASE_ROBOT,
+            neck_width=float(geometry.piece["grasp_mast_diameter"]),
+            approach_clearance=float(geometry.tool["approach_clearance"]),
+        )
 
     tree = ET.parse(BASE_ROBOT)
     root = tree.getroot()
@@ -116,10 +124,12 @@ def _augment_robot_model() -> None:
         ),
         len(gripper),
     )
-    for element in (fixed, tcp, wrist_cam):
+    attached = (fixed, tcp, wrist_cam) if use_extensions else (tcp, wrist_cam)
+    for element in attached:
         gripper.insert(moving_jaw_index, element)
         moving_jaw_index += 1
-    jaw.append(moving)
+    if use_extensions:
+        jaw.append(moving)
 
     ET.indent(tree, space="  ")
     tree.write(ROBOT_OUT, encoding="utf-8", xml_declaration=True)
@@ -161,7 +171,8 @@ def _piece_geoms(
     piece = geometry.piece
     base_radius = float(piece["base_diameter"]) / 2
     base_half_height = float(piece["base_height"]) / 2
-    mast_radius = float(piece["grasp_mast_diameter"]) / 2
+    neck_half_width = float(piece["grasp_mast_diameter"]) / 2
+    neck_half_depth = float(piece["grasp_neck_depth"]) / 2
     mast_half_height = float(piece["grasp_mast_height"]) / 2
     mast_center = float(piece["grasp_mast_bottom_z"]) + mast_half_height
     rgba = "0.88 0.89 0.84 1" if color == "white" else "0.045 0.055 0.065 1"
@@ -181,7 +192,11 @@ def _piece_geoms(
         [
             f'<geom name="{name}_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" mass="{mass * 0.72:.6f}" rgba="{rgba}" friction="0.9 0.01 0.001"{contact}/>',
             f'<geom name="{name}_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="{mass * 0.18:.6f}" rgba="{rgba}"{contact}/>',
-            f'<geom name="{name}_mast" type="cylinder" pos="0 0 {mast_center:.6f}" size="{mast_radius:.6f} {mast_half_height:.6f}" mass="{mass * 0.10:.6f}" rgba="{rgba}"{contact}/>',
+            # Flat-sided neck, not a cylinder: the stock jaws bear on a
+            # matching plane. A cylinder pinched by flat jaws touches along a
+            # single vertical line, which measured 5.6 N of clamp and 66x the
+            # friction needed and still would not carry the piece.
+            f'<geom name="{name}_mast" type="box" pos="0 0 {mast_center:.6f}" size="{neck_half_width:.6f} {neck_half_depth:.6f} {mast_half_height:.6f}" mass="{mass * 0.10:.6f}" rgba="{rgba}" friction="1.2 0.02 0.001"{contact}/>',
             marker.format(n=name, c=rgba),
         ]
     )
