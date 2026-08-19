@@ -14,6 +14,24 @@ from scipy.optimize import least_squares
 from chess_system.mujoco.collision_world import CollisionWorld
 
 
+class SquareUnreachable(RuntimeError):
+    """No collision-free way to act on ``square`` in the current occupancy.
+
+    Carries the square because the fact is a property of that square and the
+    surrounding pieces, not of any particular destination. Callers memoize on
+    it: once a piece cannot be grasped or extracted, every move from that
+    square in the same position fails identically, and rediscovering that per
+    candidate move is the dominant cost in a game.
+
+    Subclasses ``RuntimeError`` so existing fallback paths that catch
+    ``RuntimeError`` keep working unchanged.
+    """
+
+    def __init__(self, square: str, message: str):
+        super().__init__(message)
+        self.square = square
+
+
 @dataclass(frozen=True)
 class GraspEndpoint:
     target: str
@@ -181,6 +199,7 @@ def choose_endpoint(
     upright_attachment: bool = False,
     axis_candidates: list[tuple[float, float]] | None = None,
     candidate_validator: Callable[[GraspEndpoint], bool] | None = None,
+    on_candidate: Callable[[], None] | None = None,
 ) -> GraspEndpoint:
     geometry = world.geometry
     tcp_target = np.asarray(piece_xyz, dtype=float).copy()
@@ -205,6 +224,10 @@ def choose_endpoint(
         (tilt, 180.0) for tilt in (0.0, 5.0, 10.0, 15.0, 20.0, 25.0)
     ]
     for tilt, yaw in candidates:
+        # Each candidate runs a full seed sweep of IK solves, so this is the
+        # granularity at which a caller's search budget can be honoured.
+        if on_candidate is not None:
+            on_candidate()
         angle = math.radians(tilt)
         yaw_radians = math.radians(yaw)
         axis = np.asarray(
@@ -269,8 +292,9 @@ def choose_endpoint(
             if candidate_validator is None or candidate_validator(endpoint):
                 return endpoint
     contacts = world.last_forbidden_contacts
-    raise RuntimeError(
-        f"no collision-free grasp endpoint for {target}; last contacts={contacts}"
+    raise SquareUnreachable(
+        target,
+        f"no collision-free grasp endpoint for {target}; last contacts={contacts}",
     )
 
 
@@ -283,6 +307,7 @@ def choose_square_endpoint(
     upright_attachment: bool = False,
     axis_candidates: list[tuple[float, float]] | None = None,
     candidate_validator: Callable[[GraspEndpoint], bool] | None = None,
+    on_candidate: Callable[[], None] | None = None,
 ) -> GraspEndpoint:
     pose = world.geometry.square(square)
     piece_xyz = np.asarray(
@@ -301,6 +326,7 @@ def choose_square_endpoint(
         upright_attachment=upright_attachment,
         axis_candidates=axis_candidates,
         candidate_validator=candidate_validator,
+        on_candidate=on_candidate,
     )
 
 

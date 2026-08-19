@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import time
+from contextlib import contextmanager
 import math
 from dataclasses import replace
 from pathlib import Path
@@ -43,6 +45,16 @@ def occupancy_signature(occupied_squares: set[str]) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:12]
 
 
+class PlanningBudgetExceeded(RuntimeError):
+    """A search was stopped by its wall-clock budget, not by geometry.
+
+    Deliberately distinct from ``SquareUnreachable``: that is a proof about the
+    board, this is only a statement that we declined to keep looking. Never
+    report one as the other — a budget stop must not become evidence that a
+    square is unreachable.
+    """
+
+
 class RuntimeTrajectoryPlanner:
     def __init__(
         self,
@@ -53,6 +65,7 @@ class RuntimeTrajectoryPlanner:
         self.baseline = baseline
         self.world = CollisionWorld()
         self.cache_path = Path(cache_path)
+        self._deadline: float | None = None
         self.cache = (
             TrajectoryLibrary.load(self.cache_path)
             if self.cache_path.exists()
@@ -63,6 +76,27 @@ class RuntimeTrajectoryPlanner:
                 generation={"kind": "runtime_occupancy_cache"},
             )
         )
+
+    @contextmanager
+    def budget(self, seconds: float | None):
+        """Bound the wall-clock cost of searches made inside the block.
+
+        The bound is advisory in granularity: it is checked between candidate
+        endpoints and between planner seeds, so a single very slow candidate
+        can overrun it. That is enough to stop a search that would otherwise
+        enumerate 61 IK candidates for several minutes.
+        """
+
+        previous = self._deadline
+        self._deadline = None if seconds is None else time.monotonic() + float(seconds)
+        try:
+            yield
+        finally:
+            self._deadline = previous
+
+    def _check_budget(self, what: str) -> None:
+        if self._deadline is not None and time.monotonic() > self._deadline:
+            raise PlanningBudgetExceeded(f"planning budget exhausted while {what}")
 
     def _cache_pair(
         self,
@@ -130,6 +164,7 @@ class RuntimeTrajectoryPlanner:
         entry_id = f"runtime_entry:{square}:{signature}"
         if exit_id in self.cache.trajectories:
             return self.cache.require(exit_id), self.cache.require(entry_id)
+        self._check_budget(f"planning square routes for {square}")
 
         baseline_exit = self.baseline.require(f"exit:{square}")
         pose = self.world.geometry.square(square)
@@ -185,6 +220,7 @@ class RuntimeTrajectoryPlanner:
         entry_id = f"runtime_entry:{target}:{signature}"
         if exit_id in self.cache.trajectories:
             return self.cache.require(exit_id), self.cache.require(entry_id)
+        self._check_budget(f"planning arm routes for {target}")
         tcp_xyz = np.asarray(target_xyz, dtype=float).copy()
         tcp_xyz[2] += (
             float(self.world.geometry.piece["grasp_mast_bottom_z"])
@@ -221,6 +257,7 @@ class RuntimeTrajectoryPlanner:
         cache_id = f"runtime_transfer:{source}:{target}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
+        self._check_budget(f"planning transfer {source}->{target}")
         target_pose = self.world.geometry.square(target)
         target_tcp = np.asarray(
             (
@@ -278,6 +315,7 @@ class RuntimeTrajectoryPlanner:
         cache_id = f"runtime_capture:{source}:{color}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
+        self._check_budget(f"planning capture from {source}")
         bin_x, bin_y = self.world.geometry.capture_bin(color)
         bin_tcp = np.asarray(
             (
@@ -358,6 +396,9 @@ class RuntimeTrajectoryPlanner:
             attached=True,
             upright_attachment=True,
             axis_candidates=axes,
+            on_candidate=lambda: self._check_budget(
+                f"searching grasp endpoints for {source}"
+            ),
             candidate_validator=lambda endpoint: self._first_motion_clear(
                 endpoint, destination_tcp, occupied_squares
             ),
@@ -560,6 +601,7 @@ class RuntimeTrajectoryPlanner:
                 attached=True,
                 upright_attachment=True,
             )
+            self._check_budget(f"planning {cache_id} with RRT seeds")
             result = planner.plan(
                 source_endpoint.q_radians,
                 target_endpoint.q_radians,

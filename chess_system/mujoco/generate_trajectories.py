@@ -14,6 +14,7 @@ import numpy as np
 from chess_system.mujoco.collision_world import ARM_JOINTS, CollisionWorld
 from chess_system.mujoco.ik import (
     GraspEndpoint,
+    SquareUnreachable,
     choose_bin_endpoint,
     choose_square_endpoint,
     solve_position_ik,
@@ -256,9 +257,10 @@ def _plan_endpoint(
             tolerance_failures = current_failures
             break
     if result is None or resampled is None:
-        raise RuntimeError(
+        raise SquareUnreachable(
+            endpoint.target,
             f"robust planning failed for {endpoint.target}; "
-            f"candidates={candidate_diagnostics}; contacts={world.last_forbidden_contacts}"
+            f"candidates={candidate_diagnostics}; contacts={world.last_forbidden_contacts}",
         )
 
     timestamps = _timestamps(

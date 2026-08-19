@@ -1,0 +1,292 @@
+{
+  "status": "complete",
+  "result": "*",
+  "termination": "in_progress",
+  "plies": 16,
+  "final_fen": "r3kb1r/pppb1ppp/2n1p1n1/3pq3/8/4PN2/PPPP1PPP/R1BQKB1R w KQkq - 0 9",
+  "elapsed_seconds": 740.2300269603729,
+  "unreachable_rejections": 11,
+  "moves": [
+    {
+      "ply": 1,
+      "color": "white",
+      "uci": "b1c3",
+      "san": "Nc3",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.0005152225494384766,
+      "execution_seconds": 9.05445909500122
+    },
+    {
+      "ply": 2,
+      "color": "black",
+      "uci": "b8c6",
+      "san": "Nc6",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.0003120899200439453,
+      "execution_seconds": 11.903606176376343
+    },
+    {
+      "ply": 3,
+      "color": "white",
+      "uci": "c3d5",
+      "san": "Nd5",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.0002980232238769531,
+      "execution_seconds": 4.855832099914551
+    },
+    {
+      "ply": 4,
+      "color": "black",
+      "uci": "e7e6",
+      "san": "e6",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.00028586387634277344,
+      "execution_seconds": 8.345916986465454
+    },
+    {
+      "ply": 5,
+      "color": "white",
+      "uci": "d5f4",
+      "san": "Nf4",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.0003428459167480469,
+      "execution_seconds": 4.636234998703003
+    },
+    {
+      "ply": 6,
+      "color": "black",
+      "uci": "d8f6",
+      "san": "Qf6",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.0002961158752441406,
+      "execution_seconds": 13.303056716918945
+    },
+    {
+      "ply": 7,
+      "color": "white",
+      "uci": "f4h5",
+      "san": "Nh5",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.7467958927154541,
+      "execution_seconds": 4.608954191207886
+    },
+    {
+      "ply": 8,
+      "color": "black",
+      "uci": "f6e5",
+      "san": "Qe5",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 3.1086740493774414,
+      "execution_seconds": 9.731122016906738
+    },
+    {
+      "ply": 9,
+      "color": "white",
+      "uci": "e2e3",
+      "san": "e3",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.9709031581878662,
+      "execution_seconds": 5.453931093215942
+    },
+    {
+      "ply": 10,
+      "color": "black",
+      "uci": "g8e7",
+      "san": "Nge7",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 22.91425895690918,
+      "execution_seconds": 13.119471788406372
+    },
+    {
+      "ply": 11,
+      "color": "white",
+      "uci": "h5f4",
+      "san": "Nf4",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 0.899442195892334,
+      "execution_seconds": 5.2090370655059814
+    },
+    {
+      "ply": 12,
+      "color": "black",
+      "uci": "d7d5",
+      "san": "d5",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 0,
+      "rejected": [],
+      "planning_seconds": 1.0426239967346191,
+      "execution_seconds": 6.091108083724976
+    },
+    {
+      "ply": 13,
+      "color": "white",
+      "uci": "g1f3",
+      "san": "Nf3",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 1,
+      "rejected": [
+        {
+          "uci": "f1b5",
+          "executable": false,
+          "reason": "move f1->b5: no collision-free grasp endpoint for f1; last contacts=(('chess_tool_moving', 'planning_obstacle_f2_upper'), ('geom#32', 'planning_obstacle_g2_upper'))",
+          "blocked_step": 0,
+          "planning_seconds": 410.8720510005951
+        }
+      ],
+      "planning_seconds": 415.6474070549011,
+      "execution_seconds": 13.299296140670776
+    },
+    {
+      "ply": 14,
+      "color": "black",
+      "uci": "c8d7",
+      "san": "Bd7",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 5,
+      "rejected": [
+        {
+          "uci": "e5e4",
+          "executable": false,
+          "reason": "move e5->e4: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.227463960647583
+        },
+        {
+          "uci": "e5f5",
+          "executable": false,
+          "reason": "move e5->f5: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.152023077011108
+        },
+        {
+          "uci": "e5f6",
+          "executable": false,
+          "reason": "move e5->f6: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.577509164810181
+        },
+        {
+          "uci": "e5d6",
+          "executable": false,
+          "reason": "move e5->d6: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.578665256500244
+        },
+        {
+          "uci": "e5f4",
+          "executable": false,
+          "reason": "move e5->f4: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 1,
+          "planning_seconds": 9.605093002319336
+        }
+      ],
+      "planning_seconds": 40.45390319824219,
+      "execution_seconds": 7.028994083404541
+    },
+    {
+      "ply": 15,
+      "color": "white",
+      "uci": "f4g6",
+      "san": "Ng6",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 1,
+      "rejected": [
+        {
+          "uci": "f3e5",
+          "executable": false,
+          "reason": "capture e5->None: deterministic transfer candidates exhausted",
+          "blocked_step": 0,
+          "planning_seconds": 46.44412183761597
+        }
+      ],
+      "planning_seconds": 47.28841185569763,
+      "execution_seconds": 4.3144450187683105
+    },
+    {
+      "ply": 16,
+      "color": "black",
+      "uci": "e7g6",
+      "san": "Nxg6",
+      "status": "verified",
+      "message": "move executed, visually verified, and committed",
+      "engine_rank": 4,
+      "rejected": [
+        {
+          "uci": "e5e4",
+          "executable": false,
+          "reason": "move e5->e4: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.146090984344482
+        },
+        {
+          "uci": "e5f5",
+          "executable": false,
+          "reason": "move e5->f5: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.137325048446655
+        },
+        {
+          "uci": "e5f6",
+          "executable": false,
+          "reason": "move e5->f6: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.589735984802246
+        },
+        {
+          "uci": "e5h5",
+          "executable": false,
+          "reason": "move e5->h5: robust planning failed for e5; candidates=[{'seed': 'vertical_escape', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:0', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:1', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:2', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:3', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:4', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:5', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:6', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:7', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:8', 'planning_iterations': 0, 'tolerance_failures': 4}, {'seed': 'vertical_escape:9', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:10', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:11', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:12', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:13', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 'vertical_escape:14', 'planning_iterations': 0, 'tolerance_failures': 1}, {'seed': 'vertical_escape:15', 'postprocess': 'invalid', 'contacts': (('chess_tool_fixed', 'planning_obstacle_e6_upper'),)}, {'seed': 101, 'planning_iterations': 27, 'tolerance_failures': 1}, {'seed': 211, 'planning_iterations': 49, 'tolerance_failures': 3}, {'seed': 307, 'planning_iterations': 16, 'tolerance_failures': 7}]; contacts=()",
+          "blocked_step": 0,
+          "planning_seconds": 7.241821765899658
+        }
+      ],
+      "planning_seconds": 56.400282859802246,
+      "execution_seconds": 27.535404205322266
+    }
+  ],
+  "recording": {
+    "path": "chess_system/mujoco/generated/game_recording.mp4",
+    "frames": 4155,
+    "fps": 30,
+    "seconds": 138.5,
+    "camera": "free",
+    "wall_clock_seconds": 740.3
+  }
+}

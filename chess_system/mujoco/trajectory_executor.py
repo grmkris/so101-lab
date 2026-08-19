@@ -17,8 +17,13 @@ from chess_system.model import (
 )
 from chess_system.mujoco.backend import DEFAULT_SCENE, MujocoChessBackend
 from chess_system.mujoco.collision_world import _quat_from_matrix, _transform
+from chess_system.mujoco.ik import SquareUnreachable
 from chess_system.mujoco.trajectory import JointTrajectory, TrajectoryLibrary
-from chess_system.mujoco.runtime_planner import RuntimeTrajectoryPlanner
+from chess_system.mujoco.runtime_planner import (
+    PlanningBudgetExceeded,
+    RuntimeTrajectoryPlanner,
+    occupancy_signature,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,13 +44,18 @@ class TrajectoryExecutor:
         *,
         control_hz: int = 30,
         frame_callback: Callable[[], None] | None = None,
+        cache_path: str | Path | None = None,
     ):
         self.backend = backend
         self.model = backend.model
         self.data = backend.data
         self.geometry = backend.geometry
         self.library = library
-        self.runtime_planner = RuntimeTrajectoryPlanner(library)
+        self.runtime_planner = (
+            RuntimeTrajectoryPlanner(library, cache_path=cache_path)
+            if cache_path is not None
+            else RuntimeTrajectoryPlanner(library)
+        )
         self.control_hz = int(control_hz)
         self.frame_callback = frame_callback
         self.arm_joint_ids = [
@@ -549,14 +559,20 @@ class PlannedMujocoChessBackend(MujocoChessBackend):
         library_path: str | Path = DEFAULT_LIBRARY,
         *,
         frame_callback: Callable[[], None] | None = None,
+        cache_path: str | Path | None = None,
+        preflight_budget_seconds: float | None = 25.0,
     ):
         super().__init__(scene)
+        self.preflight_budget_seconds = preflight_budget_seconds
         self.trajectory_library = TrajectoryLibrary.load(library_path)
         self.executor = TrajectoryExecutor(
             self,
             self.trajectory_library,
             frame_callback=frame_callback,
+            cache_path=cache_path,
         )
+        # (square, occupancy signature) pairs already proven unactionable.
+        self._unreachable_squares: dict[tuple[str, str], str] = {}
         self.executor.reset_ready()
 
     def can_execute(self, plan: MovePlan) -> ExecutabilityReport:
@@ -565,31 +581,55 @@ class PlannedMujocoChessBackend(MujocoChessBackend):
         Occupancy is advanced step by step, so a capture-then-move plan is
         probed the way it will actually run: the moving piece is planned into a
         square its victim has already vacated.
+
+        Two results are memoized against ``(square, occupancy)``, and they mean
+        different things. ``SquareUnreachable`` is a geometric proof — nothing
+        on that square can be acted on in this position, so every candidate
+        move from it fails identically. A budget stop is only a decision to
+        stop looking; it is recorded so sibling candidates do not each pay the
+        full budget, and labelled so it is never mistaken for the proof.
         """
 
         occupied = set(self._square_piece)
         started = time.time()
-        for index, step in enumerate(plan.steps):
-            try:
-                if step.kind == "capture":
-                    self.executor.plan_capture_to_bin(
-                        step.source or "", step.capture_bin or "black", occupied
+        with self.executor.runtime_planner.budget(self.preflight_budget_seconds):
+            for index, step in enumerate(plan.steps):
+                signature = occupancy_signature(occupied)
+                memo = self._unreachable_squares.get((step.source or "", signature))
+                if memo is not None:
+                    return ExecutabilityReport(
+                        uci=plan.uci,
+                        executable=False,
+                        reason=f"{step.kind} {step.source}->{step.target}: {memo} (memoized)",
+                        blocked_step=index,
+                        planning_seconds=time.time() - started,
                     )
-                    occupied.discard(step.source or "")
-                elif step.kind in ("move", "castle_rook"):
-                    self.executor.plan_move_square(
-                        step.source or "", step.target or "", occupied
+                try:
+                    if step.kind == "capture":
+                        self.executor.plan_capture_to_bin(
+                            step.source or "", step.capture_bin or "black", occupied
+                        )
+                        occupied.discard(step.source or "")
+                    elif step.kind in ("move", "castle_rook"):
+                        self.executor.plan_move_square(
+                            step.source or "", step.target or "", occupied
+                        )
+                        occupied.discard(step.source or "")
+                        occupied.add(step.target or "")
+                except Exception as exc:
+                    if isinstance(exc, SquareUnreachable) and exc.square == step.source:
+                        self._unreachable_squares[(exc.square, signature)] = str(exc)
+                    elif isinstance(exc, PlanningBudgetExceeded):
+                        self._unreachable_squares[(step.source or "", signature)] = (
+                            f"budget stop (not proven unreachable): {exc}"
+                        )
+                    return ExecutabilityReport(
+                        uci=plan.uci,
+                        executable=False,
+                        reason=f"{step.kind} {step.source}->{step.target}: {exc}",
+                        blocked_step=index,
+                        planning_seconds=time.time() - started,
                     )
-                    occupied.discard(step.source or "")
-                    occupied.add(step.target or "")
-            except Exception as exc:
-                return ExecutabilityReport(
-                    uci=plan.uci,
-                    executable=False,
-                    reason=f"{step.kind} {step.source}->{step.target}: {exc}",
-                    blocked_step=index,
-                    planning_seconds=time.time() - started,
-                )
         return ExecutabilityReport(
             uci=plan.uci,
             executable=True,

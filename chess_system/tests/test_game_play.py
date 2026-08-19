@@ -127,5 +127,61 @@ class PreflightOccupancyTests(unittest.TestCase):
         self.assertEqual(plan.steps[1].target, "d5")
 
 
+class BudgetAndMemoTests(unittest.TestCase):
+    """Preflight cost controls, and the distinction between them.
+
+    ``SquareUnreachable`` is a geometric proof about the board. A budget stop is
+    only a decision to stop searching. Both suppress a move, but conflating
+    them would turn "we did not look long enough" into "the board makes this
+    impossible", which is exactly the claim the physical gates must not inherit.
+    """
+
+    def test_budget_exceeded_is_not_a_geometric_proof(self):
+        from chess_system.mujoco.ik import SquareUnreachable
+        from chess_system.mujoco.runtime_planner import PlanningBudgetExceeded
+
+        self.assertFalse(issubclass(PlanningBudgetExceeded, SquareUnreachable))
+        self.assertTrue(issubclass(PlanningBudgetExceeded, RuntimeError))
+        self.assertTrue(issubclass(SquareUnreachable, RuntimeError))
+
+    def test_square_unreachable_carries_its_square(self):
+        from chess_system.mujoco.ik import SquareUnreachable
+
+        error = SquareUnreachable("e5", "no collision-free grasp endpoint for e5")
+        self.assertEqual(error.square, "e5")
+
+    def test_zero_budget_stops_immediately_and_labels_itself(self):
+        from chess_system.mujoco.trajectory_executor import PlannedMujocoChessBackend
+
+        backend = PlannedMujocoChessBackend(
+            cache_path="/tmp/claude-501/test_budget_cache.json",
+            preflight_budget_seconds=0.0,
+        )
+        controller = ChessController(backend)
+
+        report = controller.check_executable("b1c3")
+
+        self.assertFalse(report.executable)
+        self.assertIn("budget", report.reason)
+        # A budget stop must never present itself as proof about the board.
+        self.assertNotIn("no collision-free grasp endpoint", report.reason)
+
+    def test_budget_stop_is_memoized_per_source_and_position(self):
+        from chess_system.mujoco.trajectory_executor import PlannedMujocoChessBackend
+
+        backend = PlannedMujocoChessBackend(
+            cache_path="/tmp/claude-501/test_budget_cache2.json",
+            preflight_budget_seconds=0.0,
+        )
+        controller = ChessController(backend)
+
+        controller.check_executable("b1c3")
+        sibling = controller.check_executable("b1a3")
+
+        self.assertFalse(sibling.executable)
+        self.assertIn("(memoized)", sibling.reason)
+        self.assertIn("not proven unreachable", sibling.reason)
+
+
 if __name__ == "__main__":
     unittest.main()

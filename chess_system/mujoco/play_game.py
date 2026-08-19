@@ -100,7 +100,10 @@ def play_game(
         # piece is already the promoted type, so the pause resolves itself —
         # recorded explicitly so the runbook difference stays visible.
         if verbose:
-            print(f"  promotion at {square} -> {piece_type} (auto-resolved in sim)")
+            print(
+                f"  promotion at {square} -> {piece_type} (auto-resolved in sim)",
+                flush=True,
+            )
         return True
 
     controller = ChessController(backend, promotion_handler=auto_promotion)
@@ -122,7 +125,8 @@ def play_game(
             if verbose:
                 print(
                     f"stopped at ply {len(records)}: every legal move is "
-                    f"mechanically unreachable ({len(rejected)} rejected)"
+                    f"mechanically unreachable ({len(rejected)} rejected)",
+                    flush=True,
                 )
             break
 
@@ -150,13 +154,14 @@ def play_game(
             note = f" (engine choice #{len(rejected) + 1})" if rejected else ""
             print(
                 f"{len(records):3d}. {colour:5s} {san:8s} {result.status}"
-                f" plan {planning_seconds:5.1f}s exec {execution_seconds:5.1f}s{note}"
+                f" plan {planning_seconds:5.1f}s exec {execution_seconds:5.1f}s{note}",
+                flush=True,
             )
 
         if result.status != ResultStatus.VERIFIED:
             status = f"halted_{result.status}"
             if verbose:
-                print(f"halted: {result.message}")
+                print(f"halted: {result.message}", flush=True)
             break
 
     outcome = board.outcome(claim_draw=True)
