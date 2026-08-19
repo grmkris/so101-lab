@@ -9,7 +9,12 @@ from typing import Callable
 import mujoco
 import numpy as np
 
-from chess_system.model import ManipulationResult, MovePlan, ResultStatus
+from chess_system.model import (
+    ExecutabilityReport,
+    ManipulationResult,
+    MovePlan,
+    ResultStatus,
+)
 from chess_system.mujoco.backend import DEFAULT_SCENE, MujocoChessBackend
 from chess_system.mujoco.collision_world import _quat_from_matrix, _transform
 from chess_system.mujoco.trajectory import JointTrajectory, TrajectoryLibrary
@@ -416,6 +421,68 @@ class TrajectoryExecutor:
         )
         self.drive_release_retreat(exit_trajectory, piece)
 
+    def plan_move_square(self, source: str, target: str, occupied: set[str]) -> None:
+        """Plan every route ``move_square`` will need, without moving anything.
+
+        Routes land in the runtime planner's cache, so a successful preflight
+        makes the subsequent execution a cache hit rather than a second search.
+        """
+
+        if target in occupied:
+            raise TrajectoryExecutionError(f"destination occupied: {target}")
+        transfer = self.runtime_planner.transfer_route(source, target, occupied)
+        source_q = np.radians(np.asarray(transfer.waypoints_degrees[0]))
+        source_pose = self.geometry.square(
+            source, z=float(self.geometry.board["nominal_top_z"])
+        )
+        self.runtime_planner.arm_routes_to_endpoint(
+            source,
+            source_q,
+            np.asarray(source_pose.xyz()),
+            occupied,
+            excluded_square=source,
+        )
+        after = (occupied - {source}) | {target}
+        target_q = np.radians(np.asarray(transfer.waypoints_degrees[-1]))
+        target_pose = self.geometry.square(
+            target, z=float(self.geometry.board["nominal_top_z"])
+        )
+        self.runtime_planner.arm_routes_to_endpoint(
+            target,
+            target_q,
+            np.asarray(target_pose.xyz()),
+            after,
+            excluded_square=target,
+        )
+
+    def plan_capture_to_bin(self, source: str, color: str, occupied: set[str]) -> None:
+        """Plan every route ``capture_to_bin`` will need, without moving anything."""
+
+        transfer = self.runtime_planner.capture_transfer_route(source, color, occupied)
+        source_q = np.radians(np.asarray(transfer.waypoints_degrees[0]))
+        source_pose = self.geometry.square(
+            source, z=float(self.geometry.board["nominal_top_z"])
+        )
+        self.runtime_planner.arm_routes_to_endpoint(
+            source,
+            source_q,
+            np.asarray(source_pose.xyz()),
+            occupied,
+            excluded_square=source,
+        )
+        target_q = np.radians(np.asarray(transfer.waypoints_degrees[-1]))
+        x, y = self.geometry.capture_bin(color)
+        bin_xyz = np.asarray(
+            (x, y, float(self.geometry.board["nominal_top_z"]) + 0.003)
+        )
+        self.runtime_planner.arm_routes_to_endpoint(
+            f"bin:{color}",
+            target_q,
+            bin_xyz,
+            occupied - {source},
+            excluded_square=None,
+        )
+
     def capture_to_bin(self, source: str, color: str) -> None:
         occupied = set(self.backend._square_piece)
         transfer = self.runtime_planner.capture_transfer_route(
@@ -491,6 +558,43 @@ class PlannedMujocoChessBackend(MujocoChessBackend):
             frame_callback=frame_callback,
         )
         self.executor.reset_ready()
+
+    def can_execute(self, plan: MovePlan) -> ExecutabilityReport:
+        """Plan every step of ``plan`` against the live occupancy without moving.
+
+        Occupancy is advanced step by step, so a capture-then-move plan is
+        probed the way it will actually run: the moving piece is planned into a
+        square its victim has already vacated.
+        """
+
+        occupied = set(self._square_piece)
+        started = time.time()
+        for index, step in enumerate(plan.steps):
+            try:
+                if step.kind == "capture":
+                    self.executor.plan_capture_to_bin(
+                        step.source or "", step.capture_bin or "black", occupied
+                    )
+                    occupied.discard(step.source or "")
+                elif step.kind in ("move", "castle_rook"):
+                    self.executor.plan_move_square(
+                        step.source or "", step.target or "", occupied
+                    )
+                    occupied.discard(step.source or "")
+                    occupied.add(step.target or "")
+            except Exception as exc:
+                return ExecutabilityReport(
+                    uci=plan.uci,
+                    executable=False,
+                    reason=f"{step.kind} {step.source}->{step.target}: {exc}",
+                    blocked_step=index,
+                    planning_seconds=time.time() - started,
+                )
+        return ExecutabilityReport(
+            uci=plan.uci,
+            executable=True,
+            planning_seconds=time.time() - started,
+        )
 
     def execute_plan(self, plan: MovePlan) -> ManipulationResult:
         completed = 0

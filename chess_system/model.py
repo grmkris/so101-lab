@@ -41,6 +41,23 @@ class MovePlan:
 
 
 @dataclass(frozen=True)
+class ExecutabilityReport:
+    """Whether the arm can physically realize a legal plan from the current state.
+
+    Chess legality and mechanical reachability are independent. A bishop on f1
+    is legally free to reach e2 while f2 is occupied, but every collision-free
+    grasp branch sweeps an extension through that pawn before the arm can lift.
+    Move selection has to treat this as a constraint, not an execution error.
+    """
+
+    uci: str
+    executable: bool
+    reason: str = ""
+    blocked_step: int | None = None
+    planning_seconds: float = 0.0
+
+
+@dataclass(frozen=True)
 class ManipulationResult:
     status: ResultStatus
     move_id: str

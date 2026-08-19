@@ -4,11 +4,18 @@ from __future__ import annotations
 
 import copy
 import uuid
+from dataclasses import asdict
 from collections.abc import Callable
 
 from .backend import ChessBackend
 from .geometry import FILES, RANKS, load_geometry
-from .model import ManipulationResult, MovePlan, MoveStep, ResultStatus
+from .model import (
+    ExecutabilityReport,
+    ManipulationResult,
+    MovePlan,
+    MoveStep,
+    ResultStatus,
+)
 from .verification import ALL_SQUARES, verify_occupancy
 
 try:
@@ -117,6 +124,38 @@ class ChessController:
         self.promotion_handler = promotion_handler
         self.geometry = load_geometry()
 
+    def check_executable(self, move) -> ExecutabilityReport:
+        """Ask the backend whether a legal move is also mechanically reachable.
+
+        Backends without a preflight are optimistic: the move is reported
+        executable and any real obstruction surfaces from ``execute_plan``.
+        """
+
+        _require_python_chess()
+        if isinstance(move, str):
+            move = chess.Move.from_uci(move)
+        probe = getattr(self.backend, "can_execute", None)
+        if probe is None:
+            return ExecutabilityReport(uci=move.uci(), executable=True)
+        return probe(plan_move(self.board, move))
+
+    def select_move(self, ranked_moves) -> tuple[object | None, tuple[ExecutabilityReport, ...]]:
+        """Return the first mechanically executable move from a ranked list.
+
+        Probing is lazy and in rank order because a preflight costs a real
+        motion-planning search. A strong engine's top choice is usually
+        reachable, so a turn normally pays for one probe, not one per legal
+        move.
+        """
+
+        rejected: list[ExecutabilityReport] = []
+        for move in ranked_moves:
+            report = self.check_executable(move)
+            if report.executable:
+                return move, tuple(rejected)
+            rejected.append(report)
+        return None, tuple(rejected)
+
     def execute_uci(self, uci: str) -> ManipulationResult:
         move = chess.Move.from_uci(uci)
         plan = plan_move(self.board, move)
@@ -131,6 +170,16 @@ class ChessController:
                 ResultStatus.OPERATOR_REQUIRED,
                 plan.move_id,
                 message=f"board pose outside tolerance: {translation * 1000:.1f} mm / {rotation:.2f} deg",
+            )
+
+        reachability = self.check_executable(move)
+        if not reachability.executable:
+            self.backend.hold()
+            return ManipulationResult(
+                ResultStatus.OPERATOR_REQUIRED,
+                plan.move_id,
+                message=f"legal but mechanically unreachable: {reachability.reason}",
+                diagnostics={"executability": asdict(reachability)},
             )
 
         physical = self.backend.execute_plan(plan)

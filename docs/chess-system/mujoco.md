@@ -78,3 +78,54 @@ Before full-set fabrication, complete the remaining path gate:
 5. Replace the conservative moving-tool proxy with measured jaw-root geometry after the fit coupon.
 
 MuJoCo’s imported SO-101 meshes report several adjacent-link self-contacts in neutral poses. Do not count those known mesh overlaps as task collisions; create explicit simplified robot collision proxies before treating this as a certified collision gate.
+
+## Playing a full game
+
+```bash
+# headless, writes chess_system/mujoco/generated/game_report.json
+sim/.venv/bin/python -m chess_system.mujoco.play_game --max-moves 200
+
+# with the native viewer (macOS needs mjpython)
+sim/.venv/bin/mjpython -m chess_system.mujoco.play_game --viewer
+```
+
+The arm plays both colours — it is the only actuator on the board, so every
+ply is a physical transfer it must plan, execute and verify. Each turn runs:
+
+```text
+engine ranks every legal move (chess_system/engine.py, deterministic)
+        ↓
+controller probes the ranked list in order (can_execute)
+        ↓
+first mechanically reachable move is executed and occupancy-verified
+```
+
+`chess_system/engine.py` is a small alpha-beta engine rather than Stockfish for
+two reasons: the same position must always produce the same ranked list so a
+failed game replays exactly, and the caller needs *all* legal moves ranked, not
+one best move, because it walks the list past unreachable ones.
+
+### Legality is not reachability
+
+Some legal moves cannot be executed from the current position. A bishop on `f1`
+is legally free to reach `e2` while `f2` is occupied, but every collision-free
+grasp branch sweeps a finger extension through that pawn before the arm can
+lift. This is a property of the position, not a planner defect.
+
+`ChessBackend.can_execute(plan)` preflights a plan by running the real motion
+planner over each step — advancing occupancy step by step, so a capture-then-move
+plan is probed the way it will run — without moving anything. Because the
+planner caches by occupancy signature, a successful preflight makes the
+subsequent execution a cache hit rather than a second search.
+
+Probing is lazy and in rank order: a preflight costs a real planning search
+(0.4–6 s), so probing all ~30 legal moves every turn would dominate wall-clock.
+A strong engine's top choice is usually reachable, so a turn normally pays for
+one probe.
+
+Backends that do not implement `can_execute` are treated as optimistic — the
+move is attempted and any obstruction surfaces from `execute_plan`.
+
+When *no* legal move is reachable, the game runner stops with
+`no_executable_move` rather than crashing. That state is a real result about the
+board design, and it belongs in the report.
