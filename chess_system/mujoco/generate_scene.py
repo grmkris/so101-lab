@@ -65,10 +65,10 @@ def _augment_robot_model() -> None:
             "type": "box",
             "pos": f"{mount.fixed_x:.6f} {mount.tcp_pos[1]:.6f} {centre_z:.6f}",
             "size": size,
-            "rgba": "0.95 0.36 0.08 1",
+            "rgba": "1.0 0.25 0.0 1",
             "mass": "0.009",
             "friction": "1.4 0.02 0.001",
-            "group": "3",
+            "group": "2",
         },
     )
     # Moving jaw: same extension, on the body the gripper joint drives, posed
@@ -81,10 +81,10 @@ def _augment_robot_model() -> None:
             "pos": " ".join(f"{v:.6f}" for v in mount.moving_local_pos),
             "quat": " ".join(f"{v:.6f}" for v in mount.moving_local_quat),
             "size": size,
-            "rgba": "0.95 0.36 0.08 1",
+            "rgba": "1.0 0.25 0.0 1",
             "mass": "0.009",
             "friction": "1.4 0.02 0.001",
-            "group": "3",
+            "group": "2",
         },
     )
     tcp = ET.Element(
