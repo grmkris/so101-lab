@@ -189,7 +189,9 @@ class CollisionWorld:
     def _set_carried_pose(self) -> None:
         if not self.attached:
             address = self.carried_qpos_address
-            self.data.qpos[address : address + 3] = (100.0, 100.0, 100.0)
+            # High +X so it stays off the infinite floor and off the
+            # (100+i, 100, 100) unused-obstacle pile.
+            self.data.qpos[address : address + 3] = (250.0, 0.0, 250.0)
             self.data.qpos[address + 3 : address + 7] = (1.0, 0.0, 0.0, 0.0)
             return
         address = self.carried_qpos_address

@@ -256,7 +256,7 @@ class RuntimeTrajectoryPlanner:
     ) -> JointTrajectory:
         occupied = set(occupied_squares) - {source, target}
         signature = occupancy_signature(set(occupied_squares))
-        cache_id = f"runtime_transfer:hover:{source}:{target}:{signature}"
+        cache_id = f"runtime_transfer:stock2:{source}:{target}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
         self._check_budget(f"planning transfer {source}->{target}")
@@ -314,7 +314,7 @@ class RuntimeTrajectoryPlanner:
     ) -> JointTrajectory:
         occupied = set(occupied_squares) - {source}
         signature = occupancy_signature(set(occupied_squares))
-        cache_id = f"runtime_capture:axis:{source}:{color}:{signature}"
+        cache_id = f"runtime_capture:stock:{source}:{color}:{signature}"
         if cache_id in self.cache.trajectories:
             return self.cache.require(cache_id)
         self._check_budget(f"planning capture from {source}")
@@ -455,7 +455,7 @@ class RuntimeTrajectoryPlanner:
                 float(config["maximum_acceleration_degrees_s2"]),
             )
             timestamps = self._stretch_for_tcp_speed(
-                cartesian, timestamps, maximum_speed_m_s=0.008
+                cartesian, timestamps, maximum_speed_m_s=0.005
             )
             metrics = TrajectoryMetrics(
                 planning_attempt=1,

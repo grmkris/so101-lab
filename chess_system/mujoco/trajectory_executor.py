@@ -119,10 +119,21 @@ class TrajectoryExecutor:
         # noslip is load-bearing: without it the mast slides out at 2 mm of lift.
         self.model.opt.impratio = 10.0
         self.model.opt.noslip_iterations = 20
+        jaw_bodies = {self.gripper_body}
+        moving_jaw = mujoco.mj_name2id(
+            self.model, mujoco.mjtObj.mjOBJ_BODY, "moving_jaw_so101_v1"
+        )
+        if moving_jaw >= 0:
+            jaw_bodies.add(moving_jaw)
         for geom_id in range(self.model.ngeom):
             name = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_GEOM, geom_id) or ""
-            if name in ("chess_tool_fixed", "chess_tool_moving") or name.endswith("_mast"):
-                self.model.geom_friction[geom_id] = (2.5, 0.05, 0.001)
+            on_jaw = int(self.model.geom_bodyid[geom_id]) in jaw_bodies
+            if (
+                name in ("chess_tool_fixed", "chess_tool_moving")
+                or name.endswith("_mast")
+                or on_jaw
+            ):
+                self.model.geom_friction[geom_id] = (3.5, 0.08, 0.002)
 
     def _descendant_bodies(self, root: str) -> list[int]:
         """Body ids of ``root`` and everything attached below it."""
@@ -288,6 +299,16 @@ class TrajectoryExecutor:
         return np.radians(points[lower] + (points[upper] - points[lower]) * alpha)
 
     def drive(self, trajectory: JointTrajectory) -> None:
+        first = np.radians(np.asarray(trajectory.waypoints_degrees[0]))
+        start = self.data.qpos[self.arm_qpos].copy()
+        if float(np.max(np.abs(np.degrees(start - first)))) > 1.0:
+            # Closing the jaws can shove the arm off the planned start.
+            for alpha in np.linspace(0.0, 1.0, max(2, int(self.control_hz * 0.4))):
+                self.data.ctrl[:5] = start + (first - start) * alpha
+                self.data.ctrl[5] = self._gripper_command(
+                    float(trajectory.gripper_normalized[0])
+                )
+                self._step_for(1.0 / self.control_hz)
         duration = float(trajectory.timestamps_seconds[-1])
         period = 1.0 / self.control_hz
         ticks = max(1, int(np.ceil(duration / period)))
@@ -531,6 +552,54 @@ class TrajectoryExecutor:
             raise
         return piece
 
+    def _physics_carry(self, target: str) -> None:
+        """Lift-translate-lower from the live pinch. No planner edge checks.
+
+        The pinched pose is in collision by definition, so a planned cartesian
+        from it is rejected. 2 mm axis-locked steps are what actually carry.
+        """
+
+        axis = self.data.site_xmat[self.tcp_site].reshape(3, 3)[:, 0].copy()
+        start = self.data.site_xpos[self.tcp_site].copy()
+        dest = self.geometry.square(
+            target, z=float(self.geometry.board["nominal_top_z"])
+        )
+        dest_tcp = np.asarray(dest.xyz(), dtype=float)
+        dest_tcp[2] += (
+            float(self.geometry.piece["grasp_mast_bottom_z"])
+            + float(self.geometry.piece["grasp_mast_height"]) / 2
+        )
+        hover = 0.020
+        q = self.data.qpos[self.arm_qpos].copy()
+        world = self.runtime_planner.world
+        waypoints = []
+        lift_steps = 10
+        for step in range(1, lift_steps + 1):
+            p = start.copy()
+            p[2] += hover * step / lift_steps
+            waypoints.append(p)
+        hover_src = start.copy(); hover_src[2] += hover
+        hover_dst = dest_tcp.copy(); hover_dst[2] += hover
+        across = max(8, int(round(float(np.linalg.norm(hover_dst[:2] - hover_src[:2])) / 0.004)))
+        for step in range(1, across + 1):
+            a = step / across
+            waypoints.append(hover_src * (1 - a) + hover_dst * a)
+        for step in range(1, lift_steps + 1):
+            p = dest_tcp.copy()
+            p[2] += hover * (1 - step / lift_steps)
+            waypoints.append(p)
+        for point in waypoints:
+            solved = solve_axis_ik(
+                world, point, axis, q,
+                position_tolerance=0.0015, axis_tolerance_degrees=6.0,
+            )
+            if solved is None:
+                raise TrajectoryExecutionError(f"physics carry IK missed on the way to {target}")
+            q = solved[0]
+            self.data.ctrl[:5] = q
+            self.data.ctrl[5] = self._gripper_command(0.0)
+            self._step_for(0.12)
+
     def _verify_placement(self, piece: str, square: str) -> None:
         body_id = mujoco.mj_name2id(
             self.model, mujoco.mjtObj.mjOBJ_BODY, piece
@@ -570,7 +639,7 @@ class TrajectoryExecutor:
             excluded_square=source,
         )
         piece = self.approach_and_latch(source, source_entry)
-        self.drive(self._clamp_carry(transfer))
+        self._physics_carry(target)
         self.release()
         self._step_for(0.80)
         self._verify_placement(piece, target)

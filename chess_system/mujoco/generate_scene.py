@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from chess_system.geometry import FILES, RANKS, load_geometry
-from chess_system.mujoco.tool_mount import solve_tool_mount
+from chess_system.mujoco.tool_mount import solve_stock_mount, solve_tool_mount
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,28 +22,32 @@ BACK_RANK = ("rook", "knight", "bishop", "queen", "king", "bishop", "knight", "r
 
 
 def _augment_robot_model() -> None:
-    """Attach the finger extensions to the jaws that actually carry them.
+    """Place ``chess_tcp`` on the jaws that actually close.
 
-    Mount poses are solved from the SO-101's own mesh geometry rather than
-    assumed constants — see :mod:`chess_system.mujoco.tool_mount` for why the
-    previous hand-placed version could never close.
+    With ``use_finger_extensions`` the 20 mm printed pads are mounted on the
+    moving/static jaws. Without it the stock SO-101 meshes are the tool.
     """
 
     geometry = load_geometry()
-    tip_half_thickness = float(geometry.tool["tip_thickness"]) / 2
-    tip_half_width = float(geometry.tool["tip_width"]) / 2
-    extension = float(geometry.tool["extension_length"])
-    mount = solve_tool_mount(
-        BASE_ROBOT,
-        mast_diameter=float(geometry.piece["grasp_mast_diameter"]),
-        mast_height=float(geometry.piece["grasp_mast_height"]),
-        tip_thickness=float(geometry.tool["tip_thickness"]),
-        extension_length=extension,
-        open_separation=(
-            float(geometry.tool["maximum_open_outer_width"])
-            - float(geometry.tool["tip_thickness"])
-        ),
-    )
+    use_extensions = bool(geometry.tool.get("use_finger_extensions", True))
+    if use_extensions:
+        mount = solve_tool_mount(
+            BASE_ROBOT,
+            mast_diameter=float(geometry.piece["grasp_mast_diameter"]),
+            mast_height=float(geometry.piece["grasp_mast_height"]),
+            tip_thickness=float(geometry.tool["tip_thickness"]),
+            extension_length=float(geometry.tool["extension_length"]),
+            open_separation=(
+                float(geometry.tool["maximum_open_outer_width"])
+                - float(geometry.tool["tip_thickness"])
+            ),
+        )
+    else:
+        mount = solve_stock_mount(
+            BASE_ROBOT,
+            neck_width=float(geometry.piece["grasp_mast_diameter"]),
+            approach_clearance=float(geometry.tool.get("approach_clearance", 0.004)),
+        )
 
     tree = ET.parse(BASE_ROBOT)
     root = tree.getroot()
@@ -54,39 +58,45 @@ def _augment_robot_model() -> None:
     if jaw is None:
         raise RuntimeError("moving jaw body missing from SO-101 model")
 
-    size = f"{tip_half_thickness:.6f} {tip_half_width:.6f} {extension / 2:.6f}"
-    centre_z = mount.jaw_tip_z - extension / 2
+    attached = []
+    if use_extensions:
+        tip_half_thickness = float(geometry.tool["tip_thickness"]) / 2
+        tip_half_width = float(geometry.tool["tip_width"]) / 2
+        extension = float(geometry.tool["extension_length"])
+        size = f"{tip_half_thickness:.6f} {tip_half_width:.6f} {extension / 2:.6f}"
+        centre_z = mount.jaw_tip_z - extension / 2
+        attached.append(
+            ET.Element(
+                "geom",
+                {
+                    "name": "chess_tool_fixed",
+                    "type": "box",
+                    "pos": f"{mount.fixed_x:.6f} {mount.tcp_pos[1]:.6f} {centre_z:.6f}",
+                    "size": size,
+                    "rgba": "1.0 0.25 0.0 1",
+                    "mass": "0.009",
+                    "friction": "1.4 0.02 0.001",
+                    "group": "2",
+                },
+            )
+        )
+        jaw.append(
+            ET.Element(
+                "geom",
+                {
+                    "name": "chess_tool_moving",
+                    "type": "box",
+                    "pos": " ".join(f"{v:.6f}" for v in mount.moving_local_pos),
+                    "quat": " ".join(f"{v:.6f}" for v in mount.moving_local_quat),
+                    "size": size,
+                    "rgba": "1.0 0.25 0.0 1",
+                    "mass": "0.009",
+                    "friction": "1.4 0.02 0.001",
+                    "group": "2",
+                },
+            )
+        )
 
-    # Static jaw: the extension hangs straight down from the fixed tip.
-    fixed = ET.Element(
-        "geom",
-        {
-            "name": "chess_tool_fixed",
-            "type": "box",
-            "pos": f"{mount.fixed_x:.6f} {mount.tcp_pos[1]:.6f} {centre_z:.6f}",
-            "size": size,
-            "rgba": "1.0 0.25 0.0 1",
-            "mass": "0.009",
-            "friction": "1.4 0.02 0.001",
-            "group": "2",
-        },
-    )
-    # Moving jaw: same extension, on the body the gripper joint drives, posed
-    # so it hangs parallel to the fixed one at the clamping angle.
-    moving = ET.Element(
-        "geom",
-        {
-            "name": "chess_tool_moving",
-            "type": "box",
-            "pos": " ".join(f"{v:.6f}" for v in mount.moving_local_pos),
-            "quat": " ".join(f"{v:.6f}" for v in mount.moving_local_quat),
-            "size": size,
-            "rgba": "1.0 0.25 0.0 1",
-            "mass": "0.009",
-            "friction": "1.4 0.02 0.001",
-            "group": "2",
-        },
-    )
     tcp = ET.Element(
         "site",
         {
@@ -116,10 +126,9 @@ def _augment_robot_model() -> None:
         ),
         len(gripper),
     )
-    for element in (fixed, tcp, wrist_cam):
+    for element in (*attached, tcp, wrist_cam):
         gripper.insert(moving_jaw_index, element)
         moving_jaw_index += 1
-    jaw.append(moving)
 
     ET.indent(tree, space="  ")
     tree.write(ROBOT_OUT, encoding="utf-8", xml_declaration=True)
@@ -161,9 +170,11 @@ def _piece_geoms(
     piece = geometry.piece
     base_radius = float(piece["base_diameter"]) / 2
     base_half_height = float(piece["base_height"]) / 2
-    mast_radius = float(piece["grasp_mast_diameter"]) / 2
+    mast_half_width = float(piece["grasp_mast_diameter"]) / 2
+    mast_half_depth = float(piece.get("grasp_neck_depth", piece["grasp_mast_diameter"])) / 2
     mast_half_height = float(piece["grasp_mast_height"]) / 2
     mast_center = float(piece["grasp_mast_bottom_z"]) + mast_half_height
+    use_extensions = bool(geometry.tool.get("use_finger_extensions", True))
     rgba = "0.88 0.89 0.84 1" if color == "white" else "0.045 0.055 0.065 1"
     marker = {
         "pawn": '<geom name="{n}_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="{c}" contype="0" conaffinity="0"/>',
@@ -181,7 +192,17 @@ def _piece_geoms(
         [
             f'<geom name="{name}_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" mass="{mass * 0.72:.6f}" rgba="{rgba}" friction="0.9 0.01 0.001"{contact}/>',
             f'<geom name="{name}_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="{mass * 0.18:.6f}" rgba="{rgba}"{contact}/>',
-            f'<geom name="{name}_mast" type="cylinder" pos="0 0 {mast_center:.6f}" size="{mast_radius:.6f} {mast_half_height:.6f}" mass="{mass * 0.10:.6f}" rgba="{rgba}"{contact}/>',
+            (
+                f'<geom name="{name}_mast" type="cylinder" pos="0 0 {mast_center:.6f}" '
+                f'size="{mast_half_width:.6f} {mast_half_height:.6f}" mass="{mass * 0.10:.6f}" '
+                f'rgba="{rgba}"{contact}/>'
+                if use_extensions
+                else (
+                    f'<geom name="{name}_mast" type="box" pos="0 0 {mast_center:.6f}" '
+                    f'size="{mast_half_width:.6f} {mast_half_depth:.6f} {mast_half_height:.6f}" '
+                    f'mass="{mass * 0.10:.6f}" rgba="{rgba}" friction="1.2 0.02 0.001"{contact}/>'
+                )
+            ),
             marker.format(n=name, c=rgba),
         ]
     )

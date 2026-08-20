@@ -183,3 +183,75 @@ def solve_tool_mount(
         separation_at_grip=float(moving_x - fixed_x),
         separation_when_closed=float(closed_tip[0] - fixed_x),
     )
+
+
+def solve_stock_mount(
+    robot_path: str,
+    *,
+    neck_width: float,
+    approach_clearance: float,
+) -> ToolMount:
+    """Grasp pose for the SO-101's own jaws, no finger extensions.
+
+    At piece height the jaw assembly is ~26 × 12 mm and fits a 23 mm pitch.
+    The TCP is the pinch centre at the *clamped* angle so over-travel squeezes
+    instead of walking the piece out on the jaw arc.
+    """
+
+    model = mujoco.MjModel.from_xml_path(str(robot_path))
+    data = mujoco.MjData(model)
+    joint = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, "gripper")
+    address = int(model.jnt_qposadr[joint])
+    low, high = (float(v) for v in model.jnt_range[joint])
+    gripper_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "gripper")
+    jaw_id = mujoco.mj_name2id(
+        model, mujoco.mjtObj.mjOBJ_BODY, "moving_jaw_so101_v1"
+    )
+
+    jaw_local = _mesh_points(model, jaw_id)
+    static_all = _mesh_points(model, gripper_id)
+    static = static_all[static_all[:, 2] < -0.080][::5]
+
+    def pinch(angle: float) -> tuple[float, np.ndarray]:
+        data.qpos[:] = 0
+        data.qpos[address] = angle
+        mujoco.mj_forward(model, data)
+        r_grip = data.xmat[gripper_id].reshape(3, 3).copy()
+        p_grip = data.xpos[gripper_id].copy()
+        r_jaw = data.xmat[jaw_id].reshape(3, 3).copy()
+        p_jaw = data.xpos[jaw_id].copy()
+        moving = (r_grip.T @ (((r_jaw @ jaw_local.T).T + p_jaw) - p_grip).T).T
+        moving = moving[moving[:, 2] < -0.080][::5]
+        if len(moving) == 0:
+            return float("inf"), np.zeros(3)
+        gaps = np.linalg.norm(static[:, None, :] - moving[None, :, :], axis=2)
+        i, j = np.unravel_index(gaps.argmin(), gaps.shape)
+        return float(gaps.min()), (static[i] + moving[j]) / 2
+
+    def angle_for(gap: float) -> float:
+        lower, upper = low, min(high, low + np.radians(25.0))
+        for _ in range(50):
+            middle = (lower + upper) / 2
+            if pinch(middle)[0] < gap:
+                lower = middle
+            else:
+                upper = middle
+        return (lower + upper) / 2
+
+    interference = 0.001
+    grip_angle = angle_for(max(neck_width - interference, 0.001))
+    open_angle = angle_for(neck_width + 2 * approach_clearance)
+    gap_at_grip, centre = pinch(grip_angle)
+    closed_gap, _ = pinch(low)
+    return ToolMount(
+        grip_angle=float(grip_angle),
+        closed_angle=float(low),
+        open_angle=float(open_angle),
+        fixed_x=float(centre[0]),
+        moving_local_pos=(0.0, 0.0, 0.0),
+        moving_local_quat=(1.0, 0.0, 0.0, 0.0),
+        tcp_pos=tuple(float(v) for v in centre),
+        jaw_tip_z=float(centre[2]),
+        separation_at_grip=float(gap_at_grip),
+        separation_when_closed=float(closed_gap),
+    )

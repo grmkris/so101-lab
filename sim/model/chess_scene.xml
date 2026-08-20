@@ -110,224 +110,224 @@
   <freejoint name="piece_white_pawn_a_joint"/>
   <geom name="piece_white_pawn_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_a_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_a_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_b" pos="0.119500 0.057500 -0.013400">
   <freejoint name="piece_white_pawn_b_joint"/>
   <geom name="piece_white_pawn_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_b_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_b_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_c" pos="0.119500 0.034500 -0.013400">
   <freejoint name="piece_white_pawn_c_joint"/>
   <geom name="piece_white_pawn_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_c_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_c_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_d" pos="0.119500 0.011500 -0.013400">
   <freejoint name="piece_white_pawn_d_joint"/>
   <geom name="piece_white_pawn_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_d_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_d_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_e" pos="0.119500 -0.011500 -0.013400">
   <freejoint name="piece_white_pawn_e_joint"/>
   <geom name="piece_white_pawn_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_e_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_e_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_f" pos="0.119500 -0.034500 -0.013400">
   <freejoint name="piece_white_pawn_f_joint"/>
   <geom name="piece_white_pawn_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_f_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_f_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_g" pos="0.119500 -0.057500 -0.013400">
   <freejoint name="piece_white_pawn_g_joint"/>
   <geom name="piece_white_pawn_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_g_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_g_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_h" pos="0.119500 -0.080500 -0.013400">
   <freejoint name="piece_white_pawn_h_joint"/>
   <geom name="piece_white_pawn_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_pawn_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_pawn_h_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_pawn_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_pawn_h_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_rook_a" pos="0.096500 0.080500 -0.013400">
   <freejoint name="piece_white_rook_a_joint"/>
   <geom name="piece_white_rook_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_rook_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_rook_a_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_rook_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_rook_a_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_knight_b" pos="0.096500 0.057500 -0.013400">
   <freejoint name="piece_white_knight_b_joint"/>
   <geom name="piece_white_knight_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_knight_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_knight_b_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_knight_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_knight_b_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_bishop_c" pos="0.096500 0.034500 -0.013400">
   <freejoint name="piece_white_bishop_c_joint"/>
   <geom name="piece_white_bishop_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_bishop_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_bishop_c_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_bishop_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_bishop_c_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_queen_d" pos="0.096500 0.011500 -0.013400">
   <freejoint name="piece_white_queen_d_joint"/>
   <geom name="piece_white_queen_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_queen_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_queen_d_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_queen_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_queen_d_marker" type="cylinder" pos="0 0 0.023" size="0.0045 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_king_e" pos="0.096500 -0.011500 -0.013400">
   <freejoint name="piece_white_king_e_joint"/>
   <geom name="piece_white_king_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_king_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_king_e_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_king_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_king_e_marker" type="box" pos="0 0 0.022" size="0.003 0.0025 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_bishop_f" pos="0.096500 -0.034500 -0.013400">
   <freejoint name="piece_white_bishop_f_joint"/>
   <geom name="piece_white_bishop_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_bishop_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_bishop_f_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_bishop_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_bishop_f_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_knight_g" pos="0.096500 -0.057500 -0.013400">
   <freejoint name="piece_white_knight_g_joint"/>
   <geom name="piece_white_knight_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_knight_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_knight_g_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_knight_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_knight_g_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_rook_h" pos="0.096500 -0.080500 -0.013400">
   <freejoint name="piece_white_rook_h_joint"/>
   <geom name="piece_white_rook_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_white_rook_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1"/>
-<geom name="piece_white_rook_h_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1"/>
+<geom name="piece_white_rook_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_white_rook_h_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_a" pos="0.234500 0.080500 -0.013400">
   <freejoint name="piece_black_pawn_a_joint"/>
   <geom name="piece_black_pawn_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_a_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_a_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_b" pos="0.234500 0.057500 -0.013400">
   <freejoint name="piece_black_pawn_b_joint"/>
   <geom name="piece_black_pawn_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_b_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_b_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_c" pos="0.234500 0.034500 -0.013400">
   <freejoint name="piece_black_pawn_c_joint"/>
   <geom name="piece_black_pawn_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_c_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_c_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_d" pos="0.234500 0.011500 -0.013400">
   <freejoint name="piece_black_pawn_d_joint"/>
   <geom name="piece_black_pawn_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_d_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_d_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_e" pos="0.234500 -0.011500 -0.013400">
   <freejoint name="piece_black_pawn_e_joint"/>
   <geom name="piece_black_pawn_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_e_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_e_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_f" pos="0.234500 -0.034500 -0.013400">
   <freejoint name="piece_black_pawn_f_joint"/>
   <geom name="piece_black_pawn_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_f_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_f_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_g" pos="0.234500 -0.057500 -0.013400">
   <freejoint name="piece_black_pawn_g_joint"/>
   <geom name="piece_black_pawn_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_g_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_g_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_h" pos="0.234500 -0.080500 -0.013400">
   <freejoint name="piece_black_pawn_h_joint"/>
   <geom name="piece_black_pawn_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_pawn_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_pawn_h_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_pawn_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_pawn_h_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_rook_a" pos="0.257500 0.080500 -0.013400">
   <freejoint name="piece_black_rook_a_joint"/>
   <geom name="piece_black_rook_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_rook_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_rook_a_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_rook_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_rook_a_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_knight_b" pos="0.257500 0.057500 -0.013400">
   <freejoint name="piece_black_knight_b_joint"/>
   <geom name="piece_black_knight_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_knight_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_knight_b_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_knight_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_knight_b_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_bishop_c" pos="0.257500 0.034500 -0.013400">
   <freejoint name="piece_black_bishop_c_joint"/>
   <geom name="piece_black_bishop_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_bishop_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_bishop_c_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_bishop_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_bishop_c_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_queen_d" pos="0.257500 0.011500 -0.013400">
   <freejoint name="piece_black_queen_d_joint"/>
   <geom name="piece_black_queen_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_queen_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_queen_d_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_queen_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_queen_d_marker" type="cylinder" pos="0 0 0.023" size="0.0045 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_king_e" pos="0.257500 -0.011500 -0.013400">
   <freejoint name="piece_black_king_e_joint"/>
   <geom name="piece_black_king_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_king_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_king_e_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_king_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_king_e_marker" type="box" pos="0 0 0.022" size="0.003 0.0025 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_bishop_f" pos="0.257500 -0.034500 -0.013400">
   <freejoint name="piece_black_bishop_f_joint"/>
   <geom name="piece_black_bishop_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_bishop_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_bishop_f_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_bishop_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_bishop_f_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_knight_g" pos="0.257500 -0.057500 -0.013400">
   <freejoint name="piece_black_knight_g_joint"/>
   <geom name="piece_black_knight_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_knight_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_knight_g_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_knight_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_knight_g_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_rook_h" pos="0.257500 -0.080500 -0.013400">
   <freejoint name="piece_black_rook_h_joint"/>
   <geom name="piece_black_rook_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001"/>
 <geom name="piece_black_rook_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1"/>
-<geom name="piece_black_rook_h_mast" type="cylinder" pos="0 0 0.014000" size="0.003500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1"/>
+<geom name="piece_black_rook_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001"/>
 <geom name="piece_black_rook_h_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
     <body name="planning_obstacle_a1" pos="0.096500 0.080500 -0.013400">
