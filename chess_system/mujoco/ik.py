@@ -248,7 +248,7 @@ def choose_endpoint(
             )
             if solved is None:
                 continue
-            coarse_q, _, _, coarse_iterations = solved
+            coarse_q, position_error, axis_error, coarse_iterations = solved
             world.configure(
                 target,
                 coarse_q,
@@ -260,24 +260,41 @@ def choose_endpoint(
             )
             if not world.state_valid(coarse_q):
                 continue
+            q = coarse_q
+            iterations = coarse_iterations
+            # Refine is an improvement, not a gate. On a crowded 23 mm board it
+            # often walks a valid 2 mm / 6° grasp into a gripper self-collision
+            # or a neighbour mast, and discarding that grasp was why e2e4
+            # looked unreachable after the lollipop pieces already cleared.
             refined = refine_axis_ik(
                 world, tcp_target, axis, coarse_q
             )
-            if refined is None:
-                continue
-            q, position_error, axis_error, refinement_iterations = refined
-            world.configure(
-                target,
-                q,
-                target_xyz=piece_xyz,
-                excluded_square=excluded_square,
-                occupied_squares=occupied_squares,
-                attached=attached,
-                upright_attachment=upright_attachment,
-            )
-            if not world.state_valid(q):
-                continue
-            iterations = coarse_iterations + refinement_iterations
+            if refined is not None:
+                refined_q, refined_pos, refined_axis, refined_iters = refined
+                world.configure(
+                    target,
+                    refined_q,
+                    target_xyz=piece_xyz,
+                    excluded_square=excluded_square,
+                    occupied_squares=occupied_squares,
+                    attached=attached,
+                    upright_attachment=upright_attachment,
+                )
+                if world.state_valid(refined_q):
+                    q = refined_q
+                    position_error = refined_pos
+                    axis_error = refined_axis
+                    iterations = coarse_iterations + refined_iters
+                else:
+                    world.configure(
+                        target,
+                        coarse_q,
+                        target_xyz=piece_xyz,
+                        excluded_square=excluded_square,
+                        occupied_squares=occupied_squares,
+                        attached=attached,
+                        upright_attachment=upright_attachment,
+                    )
             endpoint = GraspEndpoint(
                 target=target,
                 q_radians=q,

@@ -124,28 +124,24 @@ def join_objects(objects: list, name: str):
 
 
 def add_top_marker(piece_type: str, mat) -> list:
-    """Small type-specific marker above the common grasp mast.
+    """Small type-specific marker on top of the grasp mast."""
 
-    All markers stay inside the 12 mm upper-body limit. They are intentionally
-    geometric rather than font-dependent so STL output is reproducible.
-    """
-
+    cap_z = float(SPEC["piece"]["total_height"]) - 0.002
     if piece_type == "pawn":
-        return [add_uv_sphere("pawn_marker", 0.0020, (0, 0, 0.022), mat)]
+        return [add_uv_sphere("pawn_marker", 0.0020, (0, 0, cap_z), mat)]
     if piece_type == "rook":
-        return [add_cube("rook_marker", (0.006, 0.006, 0.002), (0, 0, 0.023), mat)]
+        return [add_cube("rook_marker", (0.006, 0.006, 0.002), (0, 0, cap_z), mat)]
     if piece_type == "knight":
-        obj = add_cone("knight_marker", 0.0040, 0.0, 0.004, 0.022, vertices=3, mat=mat)
+        obj = add_cone("knight_marker", 0.0035, 0.0, 0.004, cap_z, vertices=3, mat=mat)
         obj.rotation_euler.z = math.radians(90)
         return [obj]
     if piece_type == "bishop":
-        return [add_cone("bishop_marker", 0.0040, 0.0, 0.004, 0.022, vertices=24, mat=mat)]
+        return [add_cone("bishop_marker", 0.0035, 0.0, 0.004, cap_z, vertices=24, mat=mat)]
     if piece_type == "queen":
-        return [add_cone("queen_marker", 0.0045, 0.0028, 0.002, 0.023, vertices=8, mat=mat)]
-    # king: a compact cross, kept narrower than the common envelope.
+        return [add_cone("queen_marker", 0.0035, 0.0028, 0.002, cap_z, vertices=8, mat=mat)]
     return [
-        add_cube("king_marker_v", (0.0025, 0.005, 0.004), (0, 0, 0.022), mat),
-        add_cube("king_marker_h", (0.006, 0.0025, 0.002), (0, 0, 0.023), mat),
+        add_cube("king_marker_v", (0.0025, 0.005, 0.004), (0, 0, cap_z), mat),
+        add_cube("king_marker_h", (0.006, 0.0025, 0.002), (0, 0, cap_z + 0.001), mat),
     ]
 
 
@@ -154,7 +150,6 @@ def create_piece(piece_type: str, color: str):
     mat = WHITE if color == "white" else BLACK
     components = [
         add_cylinder("base", mm(piece["base_diameter"]) / 2, mm(piece["base_height"]), mm(piece["base_height"]) / 2, mat=mat),
-        add_cone("lower_body", 0.0050, 0.0033, 0.005, 0.0075, vertices=40, mat=mat),
         add_cylinder(
             "grasp_mast",
             mm(piece["grasp_mast_diameter"]) / 2,
@@ -163,10 +158,19 @@ def create_piece(piece_type: str, color: str):
             mat=mat,
         ),
     ]
-    # A subtle type band below the standard mast aids rendered recognition while
-    # preserving the identical grasp interface.
+    # Type band on the stump, below jaw height, mast-thin so stock jaws clear.
     band_sides = {"pawn": 32, "rook": 4, "knight": 3, "bishop": 24, "queen": 8, "king": 6}
-    components.append(add_cylinder("identity_band", 0.0050, 0.002, 0.009, vertices=band_sides[piece_type], mat=mat))
+    band_z = mm(piece["base_height"]) - 0.001
+    components.append(
+        add_cylinder(
+            "identity_band",
+            mm(piece["grasp_mast_diameter"]) / 2,
+            0.002,
+            band_z,
+            vertices=band_sides[piece_type],
+            mat=mat,
+        )
+    )
     components.extend(add_top_marker(piece_type, mat))
     return join_objects(components, f"{color}_{piece_type}")
 

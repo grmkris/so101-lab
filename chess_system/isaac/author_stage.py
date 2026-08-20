@@ -106,7 +106,6 @@ def main() -> None:
                 )
         for name, radius, height, z in (
             ("Base", float(piece["base_diameter"]) / 2, float(piece["base_height"]), float(piece["base_height"]) / 2),
-            ("Body", 0.0050, 0.005, 0.0075),
             ("Mast", float(piece["grasp_mast_diameter"]) / 2, float(piece["grasp_mast_height"]), float(piece["grasp_mast_bottom_z"]) + float(piece["grasp_mast_height"]) / 2),
         ):
             cylinder = UsdGeom.Cylinder.Define(stage, f"{path}/Collision/{name}")

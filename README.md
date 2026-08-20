@@ -11,6 +11,8 @@ Lab notebook + tooling for my SO-101 arm (LeRobot). Everything I learn doing imi
 - `notes/` — hard-won practices: the three reliability levers, eval checklist, command crib sheet, friend onboarding.
 - `scripts/` — small helpers (motor ping, wiggle smoke test, camera preview, dataset frame review).
 - `sim/` — MuJoCo learning experiments (ECE 4560 exercises). The *production* sim is `app/driver/backends/sim.py`, not this.
+- `chess_system/` — fixed 8×8 micro-chess engineering package: one geometry contract, printable parts, Blender twins, MuJoCo, Isaac/Runpod, teleoperation, vision verification, and legal-move orchestration. Start with [`docs/chess-system/README.md`](docs/chess-system/README.md).
+- `docs/chess-system/` — master specification plus fabrication, MuJoCo, Isaac, teleoperation, and validation runbooks.
 - `phone_teleop/` — iPhone (ARKit) teleop scripts; also supplies the SO-101 URDF the driver's IK uses.
 
 ## The three reliability levers

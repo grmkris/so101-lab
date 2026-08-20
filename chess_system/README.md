@@ -6,7 +6,7 @@ This directory is the executable companion to the [micro-chess system specificat
 
 - 23 mm squares, 184 mm playfield, 204 mm carrier.
 - All 64 square centers are 97–270 mm from the pan pivot and pass the model-based vertical-grasp gate: ≤3 mm error, ≥5° joint margin, downward TCP, and no board contact.
-- Blender generator produces printable pieces, two fit-check finger extensions, a crowded-clearance coupon, OBJ assets, a `.blend` source, USD, and a preview.
+- Blender generator produces printable lollipop pieces (14 mm × 8 mm stump + 7 mm mast), leftover fit-check finger-extension STLs, a crowded-clearance coupon, OBJ assets, a `.blend` source, USD, and a preview. Stock jaws, no pads.
 - MuJoCo scene loads with the SO-101, tool-clearance model, board, 32 dynamic pieces, capture zones, and two cameras.
 - Python Chess orchestration handles moves, captures, castling, en passant, illegal moves, operator-assisted promotion, and commit-after-verification.
 - ZMQ leader packets are versioned, ordered, latest-only, and protected by a 250 ms watchdog.

@@ -108,488 +108,456 @@
     </body>
     <body name="piece_white_pawn_a" pos="0.119500 0.080500 -0.013400">
   <freejoint name="piece_white_pawn_a_joint"/>
-  <geom name="piece_white_pawn_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_a_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_a_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_a_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_a_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_b" pos="0.119500 0.057500 -0.013400">
   <freejoint name="piece_white_pawn_b_joint"/>
-  <geom name="piece_white_pawn_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_b_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_b_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_b_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_b_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_c" pos="0.119500 0.034500 -0.013400">
   <freejoint name="piece_white_pawn_c_joint"/>
-  <geom name="piece_white_pawn_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_c_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_c_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_c_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_c_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_d" pos="0.119500 0.011500 -0.013400">
   <freejoint name="piece_white_pawn_d_joint"/>
-  <geom name="piece_white_pawn_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_d_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_d_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_d_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_d_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_e" pos="0.119500 -0.011500 -0.013400">
   <freejoint name="piece_white_pawn_e_joint"/>
-  <geom name="piece_white_pawn_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_e_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_e_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_e_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_e_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_f" pos="0.119500 -0.034500 -0.013400">
   <freejoint name="piece_white_pawn_f_joint"/>
-  <geom name="piece_white_pawn_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_f_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_f_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_f_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_f_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_g" pos="0.119500 -0.057500 -0.013400">
   <freejoint name="piece_white_pawn_g_joint"/>
-  <geom name="piece_white_pawn_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_g_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_g_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_g_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_g_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_pawn_h" pos="0.119500 -0.080500 -0.013400">
   <freejoint name="piece_white_pawn_h_joint"/>
-  <geom name="piece_white_pawn_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_pawn_h_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_pawn_h_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_h_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_pawn_h_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_rook_a" pos="0.096500 0.080500 -0.013400">
   <freejoint name="piece_white_rook_a_joint"/>
-  <geom name="piece_white_rook_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_a_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_rook_a_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_rook_a_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_rook_a_marker" type="box" pos="0 0 0.028" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_knight_b" pos="0.096500 0.057500 -0.013400">
   <freejoint name="piece_white_knight_b_joint"/>
-  <geom name="piece_white_knight_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_b_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_knight_b_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_knight_b_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_knight_b_marker" type="ellipsoid" pos="0 0 0.028" size="0.0035 0.0025 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_bishop_c" pos="0.096500 0.034500 -0.013400">
   <freejoint name="piece_white_bishop_c_joint"/>
-  <geom name="piece_white_bishop_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_c_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_bishop_c_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_bishop_c_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_bishop_c_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_queen_d" pos="0.096500 0.011500 -0.013400">
   <freejoint name="piece_white_queen_d_joint"/>
-  <geom name="piece_white_queen_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_queen_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_queen_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_queen_d_marker" type="cylinder" pos="0 0 0.023" size="0.0045 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_queen_d_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_queen_d_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_queen_d_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_king_e" pos="0.096500 -0.011500 -0.013400">
   <freejoint name="piece_white_king_e_joint"/>
-  <geom name="piece_white_king_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_king_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_king_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_king_e_marker" type="box" pos="0 0 0.022" size="0.003 0.0025 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_king_e_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_king_e_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_king_e_marker" type="box" pos="0 0 0.028" size="0.003 0.0025 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_bishop_f" pos="0.096500 -0.034500 -0.013400">
   <freejoint name="piece_white_bishop_f_joint"/>
-  <geom name="piece_white_bishop_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_bishop_f_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_bishop_f_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_bishop_f_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_bishop_f_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_knight_g" pos="0.096500 -0.057500 -0.013400">
   <freejoint name="piece_white_knight_g_joint"/>
-  <geom name="piece_white_knight_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_knight_g_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_knight_g_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_knight_g_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_knight_g_marker" type="ellipsoid" pos="0 0 0.028" size="0.0035 0.0025 0.002" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_white_rook_h" pos="0.096500 -0.080500 -0.013400">
   <freejoint name="piece_white_rook_h_joint"/>
-  <geom name="piece_white_rook_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_white_rook_h_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
+  <geom name="piece_white_rook_h_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.88 0.89 0.84 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_rook_h_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.88 0.89 0.84 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_white_rook_h_marker" type="box" pos="0 0 0.028" size="0.003 0.003 0.001" rgba="0.88 0.89 0.84 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_a" pos="0.234500 0.080500 -0.013400">
   <freejoint name="piece_black_pawn_a_joint"/>
-  <geom name="piece_black_pawn_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_a_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_a_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_a_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_a_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_b" pos="0.234500 0.057500 -0.013400">
   <freejoint name="piece_black_pawn_b_joint"/>
-  <geom name="piece_black_pawn_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_b_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_b_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_b_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_b_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_c" pos="0.234500 0.034500 -0.013400">
   <freejoint name="piece_black_pawn_c_joint"/>
-  <geom name="piece_black_pawn_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_c_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_c_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_c_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_c_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_d" pos="0.234500 0.011500 -0.013400">
   <freejoint name="piece_black_pawn_d_joint"/>
-  <geom name="piece_black_pawn_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_d_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_d_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_d_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_d_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_e" pos="0.234500 -0.011500 -0.013400">
   <freejoint name="piece_black_pawn_e_joint"/>
-  <geom name="piece_black_pawn_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_e_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_e_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_e_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_e_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_f" pos="0.234500 -0.034500 -0.013400">
   <freejoint name="piece_black_pawn_f_joint"/>
-  <geom name="piece_black_pawn_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_f_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_f_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_f_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_f_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_g" pos="0.234500 -0.057500 -0.013400">
   <freejoint name="piece_black_pawn_g_joint"/>
-  <geom name="piece_black_pawn_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_g_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_g_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_g_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_g_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_pawn_h" pos="0.234500 -0.080500 -0.013400">
   <freejoint name="piece_black_pawn_h_joint"/>
-  <geom name="piece_black_pawn_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_pawn_h_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_pawn_h_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_h_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_pawn_h_marker" type="sphere" pos="0 0 0.028" size="0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_rook_a" pos="0.257500 0.080500 -0.013400">
   <freejoint name="piece_black_rook_a_joint"/>
-  <geom name="piece_black_rook_a_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_a_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_a_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_a_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_rook_a_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_rook_a_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_rook_a_marker" type="box" pos="0 0 0.028" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_knight_b" pos="0.257500 0.057500 -0.013400">
   <freejoint name="piece_black_knight_b_joint"/>
-  <geom name="piece_black_knight_b_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_b_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_b_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_b_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_knight_b_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_knight_b_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_knight_b_marker" type="ellipsoid" pos="0 0 0.028" size="0.0035 0.0025 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_bishop_c" pos="0.257500 0.034500 -0.013400">
   <freejoint name="piece_black_bishop_c_joint"/>
-  <geom name="piece_black_bishop_c_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_c_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_c_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_c_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_bishop_c_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_bishop_c_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_bishop_c_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_queen_d" pos="0.257500 0.011500 -0.013400">
   <freejoint name="piece_black_queen_d_joint"/>
-  <geom name="piece_black_queen_d_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_queen_d_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_queen_d_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_queen_d_marker" type="cylinder" pos="0 0 0.023" size="0.0045 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_queen_d_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_queen_d_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_queen_d_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_king_e" pos="0.257500 -0.011500 -0.013400">
   <freejoint name="piece_black_king_e_joint"/>
-  <geom name="piece_black_king_e_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_king_e_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_king_e_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_king_e_marker" type="box" pos="0 0 0.022" size="0.003 0.0025 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_king_e_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_king_e_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_king_e_marker" type="box" pos="0 0 0.028" size="0.003 0.0025 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_bishop_f" pos="0.257500 -0.034500 -0.013400">
   <freejoint name="piece_black_bishop_f_joint"/>
-  <geom name="piece_black_bishop_f_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_f_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_f_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_bishop_f_marker" type="cylinder" pos="0 0 0.022" size="0.004 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_bishop_f_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_bishop_f_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_bishop_f_marker" type="cylinder" pos="0 0 0.028" size="0.0035 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_knight_g" pos="0.257500 -0.057500 -0.013400">
   <freejoint name="piece_black_knight_g_joint"/>
-  <geom name="piece_black_knight_g_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_g_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_g_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_knight_g_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_knight_g_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_knight_g_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_knight_g_marker" type="ellipsoid" pos="0 0 0.028" size="0.0035 0.0025 0.002" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
 <body name="piece_black_rook_h" pos="0.257500 -0.080500 -0.013400">
   <freejoint name="piece_black_rook_h_joint"/>
-  <geom name="piece_black_rook_h_base" type="cylinder" pos="0 0 0.002500" size="0.007000 0.002500" mass="0.008640" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_h_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="0.002160" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_h_mast" type="box" pos="0 0 0.014000" size="0.003500 0.004500 0.006000" mass="0.001200" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
-<geom name="piece_black_rook_h_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
+  <geom name="piece_black_rook_h_base" type="cylinder" pos="0 0 0.004000" size="0.007000 0.004000" mass="0.010200" rgba="0.045 0.055 0.065 1" friction="0.9 0.01 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_rook_h_mast" type="box" pos="0 0 0.019000" size="0.003500 0.003500 0.009000" mass="0.001800" rgba="0.045 0.055 0.065 1" friction="1.2 0.02 0.001" contype="0" conaffinity="0"/>
+<geom name="piece_black_rook_h_marker" type="box" pos="0 0 0.028" size="0.003 0.003 0.001" rgba="0.045 0.055 0.065 1" contype="0" conaffinity="0"/>
 </body>
     <body name="planning_obstacle_a1" pos="0.096500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b1" pos="0.096500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c1" pos="0.096500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d1" pos="0.096500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e1" pos="0.096500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f1" pos="0.096500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g1" pos="0.096500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h1" pos="0.096500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h1_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h1_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h1_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h1_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a2" pos="0.119500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b2" pos="0.119500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c2" pos="0.119500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d2" pos="0.119500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e2" pos="0.119500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f2" pos="0.119500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g2" pos="0.119500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h2" pos="0.119500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h2_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h2_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h2_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h2_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a3" pos="0.142500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b3" pos="0.142500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c3" pos="0.142500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d3" pos="0.142500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e3" pos="0.142500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f3" pos="0.142500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g3" pos="0.142500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h3" pos="0.142500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h3_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h3_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h3_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h3_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a4" pos="0.165500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b4" pos="0.165500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c4" pos="0.165500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d4" pos="0.165500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e4" pos="0.165500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f4" pos="0.165500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g4" pos="0.165500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h4" pos="0.165500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h4_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h4_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h4_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h4_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a5" pos="0.188500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b5" pos="0.188500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c5" pos="0.188500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d5" pos="0.188500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e5" pos="0.188500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f5" pos="0.188500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g5" pos="0.188500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h5" pos="0.188500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h5_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h5_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h5_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h5_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a6" pos="0.211500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b6" pos="0.211500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c6" pos="0.211500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d6" pos="0.211500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e6" pos="0.211500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f6" pos="0.211500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g6" pos="0.211500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h6" pos="0.211500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h6_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h6_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h6_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h6_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a7" pos="0.234500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b7" pos="0.234500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c7" pos="0.234500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d7" pos="0.234500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e7" pos="0.234500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f7" pos="0.234500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g7" pos="0.234500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h7" pos="0.234500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h7_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h7_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h7_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h7_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_a8" pos="0.257500 0.080500 -0.013400">
-      <geom name="planning_obstacle_a8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_a8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_a8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_b8" pos="0.257500 0.057500 -0.013400">
-      <geom name="planning_obstacle_b8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_b8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_b8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_c8" pos="0.257500 0.034500 -0.013400">
-      <geom name="planning_obstacle_c8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_c8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_c8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_d8" pos="0.257500 0.011500 -0.013400">
-      <geom name="planning_obstacle_d8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_d8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_d8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_e8" pos="0.257500 -0.011500 -0.013400">
-      <geom name="planning_obstacle_e8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_e8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_e8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_f8" pos="0.257500 -0.034500 -0.013400">
-      <geom name="planning_obstacle_f8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_f8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_f8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_g8" pos="0.257500 -0.057500 -0.013400">
-      <geom name="planning_obstacle_g8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_g8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_g8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_obstacle_h8" pos="0.257500 -0.080500 -0.013400">
-      <geom name="planning_obstacle_h8_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_h8_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h8_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_h8_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
 <body name="planning_carried_piece" pos="0 0 -1">
       <freejoint name="planning_carried_piece_joint"/>
-      <geom name="planning_carried_piece_base" type="cylinder" pos="0 0 0.003500" size="0.009000 0.003500" mass="0.010" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
-      <geom name="planning_carried_piece_upper" type="cylinder" pos="0 0 0.014000" size="0.007000 0.014000" mass="0.002" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_carried_piece_base" type="cylinder" pos="0 0 0.005000" size="0.009000 0.005000" mass="0.010" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
+      <geom name="planning_carried_piece_upper" type="cylinder" pos="0 0 0.019000" size="0.005500 0.010000" mass="0.002" contype="1" conaffinity="1" group="5" rgba="0 0 0 0"/>
     </body>
     <camera name="workspace_cam" mode="targetbody" target="chess_board" pos="0.18 -0.42 0.48" fovy="48"/>
   </worldbody>

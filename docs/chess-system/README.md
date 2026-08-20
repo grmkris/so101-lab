@@ -14,15 +14,14 @@ One fixed SO-101 arm will manipulate a complete 8×8 chess position. A normal 34
 | Playfield near edge | **85 mm from pan pivot** |
 | Carrier near edge | **75 mm from pan pivot** |
 | Square-center reach | **97–270 mm** |
-| Piece base | **14 mm diameter** |
-| Piece height | **24 mm** |
-| Common grasp mast | **7 mm diameter** |
-| Finger extension | **20 mm nominal** |
-| Open tool envelope | **≤19 mm** |
+| Piece base | **14 mm diameter × 8 mm tall** |
+| Piece height | **30 mm** |
+| Common grasp mast | **7 mm diameter × 18 mm, starting 10 mm up** |
+| Tool | **stock SO-101 jaws** (finger extensions off) |
 | Chute mouth | **(150, ±128) mm, 40 × 40 mm** |
 | Discard tray | **(90, ±360) mm, 16 slots at 18 mm pitch** |
 
-The 4 mm open-tool clearance is intentional but tight. It makes the five-piece crowded-clearance coupon a blocking gate before full-set fabrication.
+The 23 mm pitch vs stock jaws is the tight gate. The five-piece crowded-clearance coupon is still blocking before full-set fabrication.
 
 ## System architecture
 
@@ -66,22 +65,21 @@ All consumers call `ChessGeometry.square()`; they must not reproduce this formul
 
 ## Physical concept
 
-The stock wrist/jaw assembly is wider than the board pitch. Two removable keyed extensions act as short tweezers. Only their narrow tips descend among neighboring pieces; the stock jaw remains about 10 mm above the common 24 mm piece height.
+The stock wrist/jaw assembly is wider than the 23 mm pitch, so the pieces — not the tool — take the clearance. Each piece is a short 14 mm stump with a 7 mm mast the jaws close on above neighbour bodies. Neighbour masts at jaw height are 7 mm, so the ~26×12 mm stock jaw envelope can wrap one mast without clipping the next. The 8×8 / 23 mm board is unchanged; a 34 mm-pitch 8×8 still does not fit the 300 mm reach envelope.
 
 ```text
-stock gripper body
+stock SO-101 jaws          ~26 × 12 mm at grasp height
  ┌─────────────────┐
- └─┐             ┌─┘   keyed + M3 retained
-   │             │     20 mm nominal extensions
-   │             │
-   └─▌ 7 mm mast▐─┘   ≤19 mm open envelope
+ └─┐             ┌─┘
+   │    7 mm     │     close above the stumps
+   └─▌  mast    ▐─┘
          ║
-      chess piece      14 mm weighted base
+      8 mm stump           14 mm weighted base
    ┌───────────┐
    └───────────┘
 ```
 
-The generated extension roots are fit-check prototypes because the physical jaw interfaces have not yet been caliper-measured. Their tip envelope, piece mast, and board pitch are contractual; revise only the root fit during the coupon iteration.
+Finger-extension STLs remain in the asset pack as fit-check prototypes; `use_finger_extensions` is false.
 
 ## Move transaction
 

@@ -23,10 +23,11 @@ REPORT = ROOT / "chess_system" / "mujoco" / "generated" / "trajectory_report.jso
 class MotionPlanningTests(unittest.TestCase):
     def test_library_is_complete_and_tolerance_clean(self):
         library = TrajectoryLibrary.load(LIBRARY)
-        # Stock jaws (no 20 mm pads): e1 and the black capture bin do not
-        # currently have a robust empty-board route. 63 squares × 2 + white bin.
-        self.assertEqual(len(library.trajectories), 127)
-        skip = {"e1"}
+        # Lollipop pieces + stock jaws: d1 is the remaining empty-board hole
+        # (robust-planning / tolerance replay, not a missing grasp). 63 squares
+        # × 2 + both capture bins.
+        self.assertEqual(len(library.trajectories), 128)
+        skip = {"d1"}
         for square_file in "abcdefgh":
             for rank in "12345678":
                 square = f"{square_file}{rank}"
@@ -36,7 +37,7 @@ class MotionPlanningTests(unittest.TestCase):
                 self.assertIn(f"exit:{square}", library.trajectories)
                 self.assertIn(f"entry:{square}", library.trajectories)
         self.assertIn("capture_bin:white", library.trajectories)
-        self.assertNotIn("capture_bin:black", library.trajectories)
+        self.assertIn("capture_bin:black", library.trajectories)
         for trajectory in library.trajectories.values():
             self.assertEqual(trajectory.metrics.tolerance_failures, 0)
             self.assertGreaterEqual(
@@ -50,7 +51,7 @@ class MotionPlanningTests(unittest.TestCase):
         report = json.loads(REPORT.read_text(encoding="utf-8"))
         tilts = {detail["target"]: detail["tilt_degrees"] for detail in report["details"]}
         self.assertEqual(tilts["a1"], 0.0)
-        for square in ("c1", "d1", "f1"):
+        for square in ("c1", "e1", "f1"):
             self.assertGreater(tilts[square], 0.0)
 
     def test_rrt_is_deterministic_when_direct_edge_is_blocked(self):
@@ -82,10 +83,10 @@ class MotionPlanningTests(unittest.TestCase):
         np.testing.assert_allclose(np.asarray(first.path), np.asarray(second.path))
 
     def test_planned_dynamic_sequence_with_capture(self):
-        # Crowded 23 mm pitch: stock jaws clip the neighbour on e2e4.
-        # Planning still has to offer a legal alternative.
+        # Lollipop masts let stock jaws close on e2 without clipping d2/f2.
         backend = PlannedMujocoChessBackend()
         controller = ChessController(backend)
+        self.assertTrue(controller.check_executable("e2e4").executable)
         self.assertTrue(controller.check_executable("d2d4").executable)
 
     def test_crowded_back_rank_knights_are_out_of_reach_at_the_start(self):

@@ -176,13 +176,14 @@ def _piece_geoms(
     mast_center = float(piece["grasp_mast_bottom_z"]) + mast_half_height
     use_extensions = bool(geometry.tool.get("use_finger_extensions", True))
     rgba = "0.88 0.89 0.84 1" if color == "white" else "0.045 0.055 0.065 1"
+    cap_z = float(piece["total_height"]) - 0.002
     marker = {
-        "pawn": '<geom name="{n}_marker" type="sphere" pos="0 0 0.022" size="0.002" rgba="{c}" contype="0" conaffinity="0"/>',
-        "rook": '<geom name="{n}_marker" type="box" pos="0 0 0.023" size="0.003 0.003 0.001" rgba="{c}" contype="0" conaffinity="0"/>',
-        "knight": '<geom name="{n}_marker" type="ellipsoid" pos="0 0 0.022" size="0.004 0.0028 0.002" rgba="{c}" contype="0" conaffinity="0"/>',
-        "bishop": '<geom name="{n}_marker" type="cone" pos="0 0 0.022" size="0.004 0.002" rgba="{c}" contype="0" conaffinity="0"/>',
-        "queen": '<geom name="{n}_marker" type="cylinder" pos="0 0 0.023" size="0.0045 0.001" rgba="{c}" contype="0" conaffinity="0"/>',
-        "king": '<geom name="{n}_marker" type="box" pos="0 0 0.022" size="0.003 0.0025 0.002" rgba="{c}" contype="0" conaffinity="0"/>',
+        "pawn": f'<geom name="{{n}}_marker" type="sphere" pos="0 0 {cap_z:.3f}" size="0.002" rgba="{{c}}" contype="0" conaffinity="0"/>',
+        "rook": f'<geom name="{{n}}_marker" type="box" pos="0 0 {cap_z:.3f}" size="0.003 0.003 0.001" rgba="{{c}}" contype="0" conaffinity="0"/>',
+        "knight": f'<geom name="{{n}}_marker" type="ellipsoid" pos="0 0 {cap_z:.3f}" size="0.0035 0.0025 0.002" rgba="{{c}}" contype="0" conaffinity="0"/>',
+        "bishop": f'<geom name="{{n}}_marker" type="cone" pos="0 0 {cap_z:.3f}" size="0.0035 0.002" rgba="{{c}}" contype="0" conaffinity="0"/>',
+        "queen": f'<geom name="{{n}}_marker" type="cylinder" pos="0 0 {cap_z:.3f}" size="0.0035 0.001" rgba="{{c}}" contype="0" conaffinity="0"/>',
+        "king": f'<geom name="{{n}}_marker" type="box" pos="0 0 {cap_z:.3f}" size="0.003 0.0025 0.002" rgba="{{c}}" contype="0" conaffinity="0"/>',
     }[piece_type]
     # MuJoCo has no cone primitive geom in older builds. Use cylinders for the
     # collision/visual twin and keep detailed silhouettes in Blender/Isaac.
@@ -190,17 +191,16 @@ def _piece_geoms(
     contact = "" if collidable else ' contype="0" conaffinity="0"'
     return "\n".join(
         [
-            f'<geom name="{name}_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" mass="{mass * 0.72:.6f}" rgba="{rgba}" friction="0.9 0.01 0.001"{contact}/>',
-            f'<geom name="{name}_body" type="cylinder" pos="0 0 0.0075" size="0.005 0.0025" mass="{mass * 0.18:.6f}" rgba="{rgba}"{contact}/>',
+            f'<geom name="{name}_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" mass="{mass * 0.85:.6f}" rgba="{rgba}" friction="0.9 0.01 0.001"{contact}/>',
             (
                 f'<geom name="{name}_mast" type="cylinder" pos="0 0 {mast_center:.6f}" '
-                f'size="{mast_half_width:.6f} {mast_half_height:.6f}" mass="{mass * 0.10:.6f}" '
+                f'size="{mast_half_width:.6f} {mast_half_height:.6f}" mass="{mass * 0.15:.6f}" '
                 f'rgba="{rgba}"{contact}/>'
                 if use_extensions
                 else (
                     f'<geom name="{name}_mast" type="box" pos="0 0 {mast_center:.6f}" '
                     f'size="{mast_half_width:.6f} {mast_half_depth:.6f} {mast_half_height:.6f}" '
-                    f'mass="{mass * 0.10:.6f}" rgba="{rgba}" friction="1.2 0.02 0.001"{contact}/>'
+                    f'mass="{mass * 0.15:.6f}" rgba="{rgba}" friction="1.2 0.02 0.001"{contact}/>'
                 )
             ),
             marker.format(n=name, c=rgba),
@@ -252,10 +252,12 @@ def _planning_proxies(*, enabled: bool) -> str:
     geometry = load_geometry()
     board_z = float(geometry.board["nominal_top_z"])
     clearance = float(geometry.motion_planning["nominal_clearance"])
-    base_radius = float(geometry.piece["base_diameter"]) / 2 + clearance
-    base_half_height = float(geometry.piece["base_height"]) / 2 + clearance / 2
-    upper_radius = float(geometry.piece["maximum_upper_width"]) / 2 + clearance
-    total_half_height = float(geometry.piece["total_height"]) / 2 + clearance
+    piece = geometry.piece
+    base_radius = float(piece["base_diameter"]) / 2 + clearance
+    base_half_height = float(piece["base_height"]) / 2 + clearance / 2
+    upper_radius = float(piece["maximum_upper_width"]) / 2 + clearance
+    mast_half_height = float(piece["grasp_mast_height"]) / 2 + clearance / 2
+    mast_center = float(piece["grasp_mast_bottom_z"]) + float(piece["grasp_mast_height"]) / 2
     bodies = []
     contact = (
         'contype="1" conaffinity="1"'
@@ -266,14 +268,14 @@ def _planning_proxies(*, enabled: bool) -> str:
         bodies.append(
             f'''<body name="planning_obstacle_{square.square}" pos="{square.x:.6f} {square.y:.6f} {board_z:.6f}">
       <geom name="planning_obstacle_{square.square}_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" {contact} group="5" rgba="0 0 0 0"/>
-      <geom name="planning_obstacle_{square.square}_upper" type="cylinder" pos="0 0 {total_half_height:.6f}" size="{upper_radius:.6f} {total_half_height:.6f}" {contact} group="5" rgba="0 0 0 0"/>
+      <geom name="planning_obstacle_{square.square}_upper" type="cylinder" pos="0 0 {mast_center:.6f}" size="{upper_radius:.6f} {mast_half_height:.6f}" {contact} group="5" rgba="0 0 0 0"/>
     </body>'''
         )
     bodies.append(
         f'''<body name="planning_carried_piece" pos="0 0 -1">
       <freejoint name="planning_carried_piece_joint"/>
       <geom name="planning_carried_piece_base" type="cylinder" pos="0 0 {base_half_height:.6f}" size="{base_radius:.6f} {base_half_height:.6f}" mass="0.010" {contact} group="5" rgba="0 0 0 0"/>
-      <geom name="planning_carried_piece_upper" type="cylinder" pos="0 0 {total_half_height:.6f}" size="{upper_radius:.6f} {total_half_height:.6f}" mass="0.002" {contact} group="5" rgba="0 0 0 0"/>
+      <geom name="planning_carried_piece_upper" type="cylinder" pos="0 0 {mast_center:.6f}" size="{upper_radius:.6f} {mast_half_height:.6f}" mass="0.002" {contact} group="5" rgba="0 0 0 0"/>
     </body>'''
     )
     return "\n".join(bodies)
