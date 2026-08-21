@@ -250,7 +250,10 @@ class DeskServe:
     def hold_torque(self):
         if self.robot is None:
             return
-        self.robot.send_action({f"{k}.pos": v for k, v in self.hold.items()})
+        try:
+            self.robot.send_action({f"{k}.pos": v for k, v in self.hold.items()})
+        except ConnectionError as exc:
+            print(f"hold_torque serial blip: {exc}", flush=True)
 
     def move_to(self, target: dict, seconds: float = 2.0):
         tgt = dict(self.hold)
