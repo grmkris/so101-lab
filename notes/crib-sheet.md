@@ -31,6 +31,19 @@ for i in range(3):
 ! ~/.local/share/uv/tools/lelab/bin/python ~/Code/github-com/so101-lab/scripts/camview.py 0   # Q to quit
 ```
 
+## Agent desk jog (persistent CLI, no ACT)
+Driver venv (same `PY` as `gemini_er/README.md`). Do not start serve unless pick/place was requested. Recipe: `.grok/skills/so101-desk/SKILL.md`.
+```bash
+$PY gemini_er/desk.py serve          # once; holds torque.  --dry = no serial
+python gemini_er/desk.py cams        # probe + snap; required before motion
+python gemini_er/desk.py pose
+python gemini_er/desk.py snap both
+python gemini_er/desk.py delta shoulder_pan=-4 gripper=80
+python gemini_er/desk.py goto ready
+python gemini_er/desk.py stop        # disconnect
+```
+Do not run alongside `gemini_er/arm_daemon.py`.
+
 ## Calibrate (only if arm base/servos were physically remounted)
 ```bash
 lerobot-calibrate --robot.type=so101_follower --robot.port=/dev/tty.usbmodem5AE60832001 --robot.id=arm

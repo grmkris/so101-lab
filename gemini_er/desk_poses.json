@@ -1,0 +1,10 @@
+{
+  "ready": {
+    "shoulder_pan": 3.3,
+    "shoulder_lift": -34.3,
+    "elbow_flex": 31.4,
+    "wrist_flex": 56.0,
+    "wrist_roll": -11.5,
+    "gripper": 50.0
+  }
+}
