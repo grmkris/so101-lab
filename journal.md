@@ -2,6 +2,14 @@
 
 Newest on top. Template:
 
+## 2026-08-21 — desk CLI live: tub-in/out blocked by piece-on-rim
+
+lerobot 0.6.0, driver venv, C922=0 / Innomaker=1. Scripted `gemini_er/desk.py serve` (no ACT).
+- Pickup of the white block **beside the tub** failed: two closes latched the **tub rim** (wrist confirmed; opened immediately). Piece never left the mat.
+- Wrist cam hang froze serve twice (Innomaker). Patched: snap via `capture.py` subprocess timeout; hold **commanded** pose not measured (gravity droop).
+- Arm left hovering (pan ~−5, lift ~2.5, gripper open). Piece still against tub wall.
+- Next: nudge piece ~3 cm off the rim, then pick in open space → over-mouth place → extract.
+
 ## 2026-08-13 (afternoon close) — v2 mission complete: cube placed in box autonomously
 
 Session wrap after ~22h total. Afternoon highlights:

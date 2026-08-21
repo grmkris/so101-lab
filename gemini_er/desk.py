@@ -257,11 +257,12 @@ class DeskServe:
         tgt.update(target)
         if self.dry:
             self.robot.send_action({f"{k}.pos": v for k, v in tgt.items()})
-            self.hold = joints_of(self.robot)
+            self.hold = dict(tgt)
             return
         arr = [tgt[n] for n in JOINTS]
         self.arm.move_joints(self.robot, arr, seconds=seconds, gripper=tgt["gripper"])
-        self.hold = joints_of(self.robot)
+        # Hold the command, not the measured pose — gravity droop otherwise compounds.
+        self.hold = dict(tgt)
 
     def ee_ok(self, target: dict) -> str | None:
         if self.dry or self.kin is None or self.arm is None:
@@ -294,13 +295,21 @@ class DeskServe:
                 cv2.imwrite(str(latest), img)
                 cv2.imwrite(str(hist), img)
             else:
-                sys.path.insert(0, str(HERE))
-                import cv2
-                from capture import grab
+                import shutil
+                import subprocess
 
-                frame = grab(idx)
-                cv2.imwrite(str(latest), frame)
-                cv2.imwrite(str(hist), frame)
+                cap = HERE / "capture.py"
+                try:
+                    subprocess.run(
+                        [sys.executable, str(cap), str(idx), str(latest)],
+                        check=True,
+                        timeout=8,
+                    )
+                except (subprocess.TimeoutExpired, subprocess.CalledProcessError) as exc:
+                    files[f"{name}_error"] = f"grab failed: {exc}"
+                    continue
+                if latest.exists():
+                    shutil.copy(latest, hist)
             files[name] = str(latest)
             files[f"{name}_hist"] = str(hist)
         return files
