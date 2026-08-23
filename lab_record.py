@@ -80,9 +80,19 @@ def restore_preview_service() -> None:
     subprocess.run(["sudo", "-n", "systemctl", "start", PREVIEW_SERVICE], capture_output=True)
 
 
-def build_devices(args):
+# The mesh-free derivative: FK is bit-identical (verified over 200 random configs)
+# and it loads without the 15 MB of gitignored STLs, so a fresh checkout works.
+URDF = str(Path(__file__).resolve().parent / "phone_teleop/SO101/so101_kinematics.urdf")
+
+# The arm's own reach, measured by FK over this URDF: well-conditioned 63-300 mm
+# from the pan axis. Clamping here is what stops a wild headset gesture from
+# commanding a pose the IK will contort to reach.
+EE_BOUNDS = {"min": [-0.32, -0.32, -0.02], "max": [0.32, 0.32, 0.34]}
+EE_STEP = {"x": 1.0, "y": 1.0, "z": 1.0}   # headset metres -> robot metres
+
+
+def build_robot(args):
     from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
-    from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
     from lerobot.cameras.opencv.configuration_opencv import OpenCVCameraConfig
 
     sys.path.insert(0, str(Path(__file__).resolve().parent / "gemini_er"))
@@ -94,11 +104,66 @@ def build_devices(args):
         "wrist_cam": OpenCVCameraConfig(index_or_path=dev.camera("wrist"),
                                         width=args.width, height=args.height, fps=args.fps),
     }
-    robot = SO101Follower(SO101FollowerConfig(
+    return SO101Follower(SO101FollowerConfig(
         port=dev.follower_port(), id=args.robot_id, cameras=cams, use_degrees=True,
         max_relative_target=args.max_relative_target))
-    teleop = SO101Leader(SO101LeaderConfig(port=dev.leader_port(), id=args.teleop_id))
-    return robot, teleop
+
+
+def build_leader(args):
+    from lerobot.teleoperators.so_leader import SO101Leader, SO101LeaderConfig
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "gemini_er"))
+    import devices as dev
+    return SO101Leader(SO101LeaderConfig(port=dev.leader_port(), id=args.teleop_id)), None
+
+
+def build_quest(args, robot):
+    """Meta Quest over WebXR, using lerobot 0.6.0's own phone teleoperator.
+
+    lerobot's "Android phone" path is really a generic WebXR 6-DoF pose source
+    (`from teleop import Teleop`), and the SpesRobotics `teleop` package it
+    drives explicitly supports VR headsets. So the Quest needs no fork and no
+    extra IK stack -- every stage below ships with the pinned lerobot:
+
+        AndroidPhone (WebXR)  -> phone.pos / phone.rot / raw_inputs / enabled
+        MapPhoneActionToRobotAction -> target_x..wz + gripper_vel
+        EEReferenceAndDelta   -> absolute EE target from the deltas
+        EEBoundsAndSafety     -> clip to the arm's real reach, reject jumps
+        GripperVelocityToJoint-> A/B buttons -> gripper
+        InverseKinematicsEEToJoints (placo) -> joint targets
+
+    Right controller: hold GRIP to engage (dead-man - release and the arm
+    stops following), A/B open/close the gripper, thumbstick scales motion.
+    """
+    from lerobot.model.kinematics import RobotKinematics
+    from lerobot.processor import RobotProcessorPipeline
+    from lerobot.processor.converters import (
+        robot_action_observation_to_transition, transition_to_robot_action)
+    from lerobot.robots.so_follower.robot_kinematic_processor import (
+        EEBoundsAndSafety, EEReferenceAndDelta, GripperVelocityToJoint,
+        InverseKinematicsEEToJoints)
+    from lerobot.teleoperators.phone.config_phone import PhoneConfig, PhoneOS
+    from lerobot.teleoperators.phone.phone_processor import MapPhoneActionToRobotAction
+    from lerobot.teleoperators.phone.teleop_phone import Phone
+
+    teleop = Phone(PhoneConfig(phone_os=PhoneOS.ANDROID))
+    motor_names = list(robot.bus.motors)
+    kin = RobotKinematics(urdf_path=URDF, target_frame_name="gripper_frame_link",
+                          joint_names=[m for m in motor_names if m != "gripper"])
+    steps = [
+        MapPhoneActionToRobotAction(platform=PhoneOS.ANDROID),
+        EEReferenceAndDelta(kinematics=kin, end_effector_step_sizes=EE_STEP,
+                            motor_names=motor_names, use_latched_reference=True),
+        EEBoundsAndSafety(end_effector_bounds=EE_BOUNDS, max_ee_step_m=args.max_ee_step),
+        GripperVelocityToJoint(speed_factor=args.gripper_speed),
+        InverseKinematicsEEToJoints(kinematics=kin, motor_names=motor_names),
+    ]
+    pipeline = RobotProcessorPipeline[tuple[dict, dict], dict](
+        steps=steps,
+        to_transition=robot_action_observation_to_transition,
+        to_output=transition_to_robot_action,
+    )
+    return teleop, pipeline
 
 
 def main() -> int:
@@ -112,6 +177,11 @@ def main() -> int:
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--width", type=int, default=640)
     ap.add_argument("--height", type=int, default=480)
+    ap.add_argument("--teleop", choices=["leader", "quest"], default="leader",
+                    help="leader arm, or a Meta Quest over WebXR (lerobot's phone teleop)")
+    ap.add_argument("--max-ee-step", type=float, default=0.05,
+                    help="quest: reject end-effector jumps larger than this (m)")
+    ap.add_argument("--gripper-speed", type=float, default=20.0)
     ap.add_argument("--robot-id", default="arm")
     ap.add_argument("--teleop-id", default="arm")
     ap.add_argument("--max-relative-target", type=float, default=None,
@@ -144,7 +214,11 @@ def run(args, lock) -> int:
     from lerobot.scripts.lerobot_record import record_loop
     from lerobot.utils.feature_utils import hw_to_dataset_features
 
-    robot, teleop = build_devices(args)
+    robot = build_robot(args)
+    if args.teleop == "quest":
+        teleop, quest_pipeline = build_quest(args, robot)
+    else:
+        teleop, quest_pipeline = build_leader(args)
     tee = None
     if not args.no_preview:
         tee = RecordTee()
@@ -152,6 +226,8 @@ def run(args, lock) -> int:
         print(f"preview (live recording frames) on http://0.0.0.0:{args.preview_port}/")
 
     tap, rap, rop = make_default_processors()
+    if quest_pipeline is not None:
+        rap = quest_pipeline   # pose -> EE target -> IK -> joints
     if tee is not None:
         inner = rop
 

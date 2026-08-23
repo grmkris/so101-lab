@@ -15,7 +15,14 @@ import devices
 
 # Resolved per host: the udev name on lab-pi, the old usbmodem path on the Mac.
 PORT = devices.follower_port()
-URDF = str(Path(__file__).resolve().parent.parent / "phone_teleop/SO101/so101_new_calib.urdf")
+_ROOT = Path(__file__).resolve().parent.parent
+# Prefer the mesh-free URDF: FK is bit-identical to so101_new_calib.urdf (verified
+# over 200 random configs) but it loads without the gitignored STL assets, which a
+# fresh checkout does not have. placo resolves mesh paths relative to the PROCESS
+# CWD, not the URDF directory, so the full one fails in surprising places.
+URDF = str(_ROOT / "phone_teleop/SO101/so101_kinematics.urdf")
+if not Path(URDF).exists():
+    URDF = str(_ROOT / "phone_teleop/SO101/so101_new_calib.urdf")
 FPS = 30
 # Same EE box phone_teleop + the driver's ee_chain enforce (metres, URDF base frame).
 EE_MIN = np.array([-0.5, -0.5, -0.1])
