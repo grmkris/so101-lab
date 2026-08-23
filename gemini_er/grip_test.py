@@ -8,6 +8,7 @@ held/empty threshold.
 import time
 
 import arm
+import devices
 
 robot = arm.connect()
 try:
@@ -23,7 +24,7 @@ try:
     subprocess.run(["say", "hold the block between the jaws, then press space in the window"])
     import cv2
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(devices.camera("wrist"))
     cv2.namedWindow("block in jaws? then SPACE")
     while True:
         ok, f = cap.read()

@@ -30,7 +30,9 @@ CMDS = DEBUG / "arm_cmds.jsonl"
 STATUS = DEBUG / "arm_status.json"
 EPISODES = DEBUG / "arm_episodes.jsonl"
 
-PORT = "/dev/tty.usbmodem5AE60832001"
+import devices
+
+PORT = devices.follower_port()
 SERVER = os.environ["SERVER"]
 CAM0_IDX = int(os.environ.get("CAM0_IDX", "0"))
 CAM1_IDX = int(os.environ.get("CAM1_IDX", "1"))

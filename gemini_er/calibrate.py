@@ -22,6 +22,7 @@ import cv2
 import numpy as np
 
 import arm
+import devices
 
 CALIB_PATH = Path(__file__).resolve().parent / "calib.json"
 
@@ -33,9 +34,26 @@ def on_mouse(event, x, y, flags, param):
         _click["pt"] = (x, y)
 
 
+def _open(cam):
+    """Open a camera by role name, device path, or legacy index — MJPG asserted.
+
+    Not routed through `lab_cameras` because these scripts need an interactive
+    cv2 window, which only exists in the GUI cv2 build (i.e. the Mac).
+    """
+    dev = devices.camera(cam)
+    cap = cv2.VideoCapture(dev)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    if not cap.isOpened():
+        raise SystemExit(f"cannot open camera {cam} ({dev})")
+    return cap
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--cam", type=int, default=0)
+    ap.add_argument("--cam", default="workspace",
+                    help="role name, /dev path, or legacy index")
     args = ap.parse_args()
 
     robot = arm.connect()
@@ -43,9 +61,7 @@ def main():
     print("Torque OFF — arm is limp, hand-guide it. Support it so it can't fall.")
     kin = arm.kinematics(robot)
 
-    cap = cv2.VideoCapture(args.cam)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap = _open(args.cam)
 
     pairs = []  # (px, py, X, Y, Z)
     home = None

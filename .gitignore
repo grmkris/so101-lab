@@ -18,3 +18,16 @@ chess_system/.local/
 
 # regenerable memoization cache — churns every run, grows unboundedly during a game
 chess_system/mujoco/generated/runtime_trajectory_cache.json
+
+# MuJoCo render artifacts — regenerable, and large
+chess_system/mujoco/generated/*.mp4
+chess_system/mujoco/generated/*.jpg
+chess_system/mujoco/generated/*.png
+chess_system/mujoco/generated/*.gif
+chess_system/mujoco/generated/*.failed.json
+.DS_Store
+
+# gemini_er run output
+gemini_er/debug/
+gemini_er/logs/
+logs/

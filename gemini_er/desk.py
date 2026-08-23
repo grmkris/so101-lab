@@ -29,6 +29,9 @@ import uuid
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+
+import devices  # noqa: E402  (local module, needs HERE on the path)
 DEBUG = HERE / "debug"
 POSES_PATH = HERE / "desk_poses.json"
 CMDS = DEBUG / "desk_cmds.jsonl"
@@ -78,16 +81,14 @@ def save_poses(poses: dict) -> None:
     POSES_PATH.write_text(json.dumps(poses, indent=2) + "\n")
 
 
-def load_cam_indexes() -> tuple[int, int]:
-    calib = HERE / "calib.json"
-    workspace, wrist = 0, 1
-    if calib.exists():
-        c = json.loads(calib.read_text())
-        workspace = int(c.get("camera_index", 0))
-        wrist = int(c.get("wrist", {}).get("camera_index", 1))
-    workspace = int(os.environ.get("DESK_CAM_WORKSPACE", workspace))
-    wrist = int(os.environ.get("DESK_CAM_WRIST", wrist))
-    return workspace, wrist
+def load_cam_specs() -> tuple:
+    """Resolve both cameras to whatever cv2 accepts on THIS host.
+
+    On lab-pi that is a stable udev name; on the Mac it is still the legacy
+    integer index, which is why hard-won lever #4 (verify indexes every session)
+    only retires on the room host.
+    """
+    return devices.camera("workspace"), devices.camera("wrist")
 
 
 def serve_alive() -> bool:
@@ -191,7 +192,8 @@ class DeskServe:
         self.kin = None
         self.arm = None
         self.cams_ok = False
-        self.cam_w, self.cam_r = load_cam_indexes()
+        self.cam_w, self.cam_r = load_cam_specs()
+        self.cams = None  # a lab_cameras.CameraOwner once serve owns the devices
         self.last_close: float | None = None
         self.hold: dict[str, float] = dict(DEFAULT_READY)
         self.cmd_offset = 0
@@ -208,13 +210,42 @@ class DeskServe:
             self.robot = DryRobot()
             self.hold = joints_of(self.robot)
             return
-        sys.path.insert(0, str(HERE))
+        self.open_cams()
         import arm as arm_mod
 
         self.arm = arm_mod
         self.robot = arm_mod.connect(max_relative_target=12.0)
         self.kin = arm_mod.kinematics(self.robot)
         self.hold = joints_of(self.robot)
+
+    def open_cams(self) -> None:
+        """Take ownership of the cameras for the life of the serve loop.
+
+        Worth it: the subprocess fallback pays ~1.2s of interpreter + UVC warmup
+        per snap, inside the primary agent-facing tool. In-process it is ~1ms.
+        If another process already owns them (a recording), fall back silently —
+        a snap failing loudly is better than serve refusing to start.
+        """
+        if os.environ.get("DESK_HOLD_CAMS", "1") == "0" or not devices.named_cameras():
+            return
+        try:
+            sys.path.insert(0, str(HERE.parent))
+            from lab_cameras import CameraOwner
+        except ImportError:
+            return
+        try:
+            self.cams = CameraOwner(mode="desk", owner=f"desk.py[{os.getpid()}]").__enter__()
+            print(f"desk owns the cameras: {self.cams.names()}", flush=True)
+        except Exception as exc:  # busy, or a camera is unhealthy
+            self.cams = None
+            print(f"desk could not take the cameras ({exc}); falling back to capture.py", flush=True)
+
+    def close_cams(self) -> None:
+        if self.cams is not None:
+            try:
+                self.cams.close()
+            finally:
+                self.cams = None
 
     def shutdown(self, *_args):
         self._stopping = True
@@ -227,8 +258,9 @@ class DeskServe:
                     "pid": os.getpid(),
                     "dry": self.dry,
                     "cams_ok": self.cams_ok,
-                    "cam_workspace": self.cam_w,
-                    "cam_wrist": self.cam_r,
+                    "cam_workspace": str(self.cam_w),
+                    "cam_wrist": str(self.cam_r),
+                    "cams_owned": self.cams is not None,
                     "pose": {k: round(v, 2) for k, v in pose.items()},
                     "grip_state": classify_grip(pose.get("gripper", 50.0), self.last_close),
                     "t": time.strftime("%H:%M:%S"),
@@ -282,7 +314,6 @@ class DeskServe:
         files = {}
         want = ("workspace", "wrist") if which == "both" else (which,)
         for name in want:
-            idx = self.cam_w if name == "workspace" else self.cam_r
             latest = DEBUG / f"desk_{name}.jpg"
             hist = SNAP_DIR / f"{stamp}_{name}.jpg"
             if self.dry:
@@ -297,6 +328,17 @@ class DeskServe:
                 img = np.full((480, 640, 3), 80 if name == "wrist" else 160, np.uint8)
                 cv2.imwrite(str(latest), img)
                 cv2.imwrite(str(hist), img)
+            elif self.cams is not None:
+                import cv2
+
+                try:
+                    frame = self.cams.latest(name, max_age_ms=1000)
+                except Exception as exc:
+                    files[f"{name}_error"] = f"grab failed: {exc}"
+                    continue
+                cv2.imwrite(str(latest), frame.bgr)
+                cv2.imwrite(str(hist), frame.bgr)
+                files[f"{name}_seq"] = frame.seq
             else:
                 import shutil
                 import subprocess
@@ -304,7 +346,7 @@ class DeskServe:
                 cap = HERE / "capture.py"
                 try:
                     subprocess.run(
-                        [sys.executable, str(cap), str(idx), str(latest)],
+                        [sys.executable, str(cap), str(name), str(latest)],
                         check=True,
                         timeout=8,
                     )
@@ -322,8 +364,8 @@ class DeskServe:
         self.cams_ok = True
         return {
             "files": files,
-            "cam_workspace": self.cam_w,
-            "cam_wrist": self.cam_r,
+            "cam_workspace": str(self.cam_w),
+            "cam_wrist": str(self.cam_r),
             "note": "confirm C922=workspace, Innomaker=wrist before any motion",
         }
 
@@ -465,6 +507,7 @@ class DeskServe:
                 self.hold_torque()
                 time.sleep(0.05)
         finally:
+            self.close_cams()
             if self.robot is not None and not self.dry:
                 self.robot.disconnect()
             if PID_PATH.exists():

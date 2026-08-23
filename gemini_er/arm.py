@@ -11,7 +11,10 @@ from lerobot.model.kinematics import RobotKinematics
 from lerobot.robots.so_follower import SO101Follower, SO101FollowerConfig
 from lerobot.utils.robot_utils import precise_sleep
 
-PORT = "/dev/tty.usbmodem5AE60832001"
+import devices
+
+# Resolved per host: the udev name on lab-pi, the old usbmodem path on the Mac.
+PORT = devices.follower_port()
 URDF = str(Path(__file__).resolve().parent.parent / "phone_teleop/SO101/so101_new_calib.urdf")
 FPS = 30
 # Same EE box phone_teleop + the driver's ee_chain enforce (metres, URDF base frame).

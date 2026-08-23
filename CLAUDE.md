@@ -27,8 +27,22 @@ Key facts: transport = 20 Hz HTTP polling + MJPEG re-serve (deliberate — no WS
 1. **Version match** — record/train/infer on the SAME lerobot version. Mismatch silently under-scales actions. `lerobot-replay` first when debugging (isolates policy vs hardware).
 2. **Lighting** — lock it. Policies trained at one brightness fail at another (~120 works, ~50 fails).
 3. **Coverage + orientation** — a ~40-ep dataset can't learn position AND orientation invariance. Keep object orientation consistent; spread positions evenly (incl. corners) or the thin regions fail. Proven: act_v3 failed left-of-center because only 5/20 eps were left.
-4. **macOS shuffles camera indexes on replug** — ALWAYS verify indexes before a session (console `GET /api/cameras/probe`, or the snippet in crib-sheet). Currently overhead C922=0, wrist Innomaker=1, but they swap.
+4. **macOS shuffles camera indexes on replug** — ALWAYS verify indexes before a session (console `GET /api/cameras/probe`, or the snippet in crib-sheet). Currently overhead C922=0, wrist Innomaker=1, but they swap. **Retired on `lab-pi`**, where udev gives every device a stable name (`/dev/cam_context`, `/dev/cam_wrist`, `/dev/so101_follower`, `/dev/so101_leader`) — `gemini_er/devices.py` resolves by role on either host.
 5. **lerobot degree zero = mid of calibrated range** — any consumer with a different frame (MJCF, URDF) must offset per joint or poses land ~90° off (bit us on shoulder_lift/elbow_flex in the sim; fixed in `backends/sim.py`). wrist_roll zero is calibration-pose-relative across devices — unresolved wart for cross-device leader→follower.
+
+## The room host — `lab-pi` (2026-08-23)
+Pi 4B 4GB, SSD at `/data`, lerobot 0.6.0 + placo, LCD status display. Full build log and
+every measured number: `notes/lab-setup-2026-08.md`. The four that bite:
+- **`lab_cameras/` owns the cameras.** No code outside that package may call
+  `cv2.VideoCapture` on `/dev/cam_*`. It asserts MJPG on open (a YUYV dual-camera open hangs
+  the Innomaker and USB-resets the C922) and holds an `flock`, which `kill -9` releases.
+- **Never set `CAP_PROP_BUFFERSIZE`** — measured, it halves the Innomaker and can stop it
+  delivering entirely while looking like a dead camera.
+- **The lerobot default video encoder is unusable here** (libsvtav1 `g=2` = 0.4× realtime).
+  Use `--dataset.rgb_encoder.vcodec=h264 --dataset.rgb_encoder.preset=ultrafast
+  --dataset.streaming_encoding=true`, and never `--display_data=true` on the Pi.
+- **The Pi throttles to 1231 MHz (−18%) after ~1 min of 4-thread load**, so real encoder
+  headroom is ~1.2× realtime for two cameras, not 1.44×. It needs a fan.
 
 ## Current state (2026-07-25)
 - **Platform v1 LIVE**: hub on Railway; sim rig (`kris-sim`) + real follower (`kris-arm`) both registered and driven over the internet — browser keyboard AND a real leader through `controller.py`. Remaining: the actual two-person test (friend's follower/leader — `notes/friend-setup.md` is ready), wrist_roll handshake, stale queued hub commands delivered on rig re-register.

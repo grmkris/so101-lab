@@ -21,6 +21,7 @@ import cv2
 import numpy as np
 
 import arm
+import devices
 from capture import grab
 
 CALIB_PATH = Path(__file__).resolve().parent / "calib.json"
@@ -41,9 +42,26 @@ def er_point(frame_path, desc):
     return (pts[0]["x"], pts[0]["y"]) if pts else None
 
 
+def _open(cam):
+    """Open a camera by role name, device path, or legacy index — MJPG asserted.
+
+    Not routed through `lab_cameras` because these scripts need an interactive
+    cv2 window, which only exists in the GUI cv2 build (i.e. the Mac).
+    """
+    dev = devices.camera(cam)
+    cap = cv2.VideoCapture(dev)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    if not cap.isOpened():
+        raise SystemExit(f"cannot open camera {cam} ({dev})")
+    return cap
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--wrist-cam", type=int, required=True)
+    ap.add_argument("--wrist-cam", default="wrist",
+                    help="role name, /dev path, or legacy index")
     ap.add_argument("--hover", type=float, default=0.08)
     ap.add_argument("--object", default="the small test object on the black mat")
     ap.add_argument("--center-only", action="store_true",
@@ -60,7 +78,7 @@ def main():
         robot.bus.disable_torque()
         print("Torque OFF. Hand-place the jaws AROUND the test object at grasp height, "
               "then press SPACE in the preview window.")
-        cap = cv2.VideoCapture(args.wrist_cam)
+        cap = _open(args.wrist_cam)
         win = "wrist view — jaws around object, then SPACE"
         cv2.namedWindow(win)
         try:

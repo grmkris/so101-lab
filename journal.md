@@ -2,6 +2,39 @@
 
 Newest on top. Template:
 
+## 2026-08-23 — room host `lab-pi` built; camera layer done; thermal limit found
+
+lerobot 0.6.0 (`~/lab/.venv`, torch 2.11.0+cpu, aarch64), no dataset recorded yet.
+Full detail: `notes/lab-setup-2026-08.md`. Headlines:
+
+- **`lab-pi` is live**: Pi 4B 4GB, 916 GB SSD at `/data`, udev-stable device names, LCD
+  status display, calibration imported, first commanded motion verified (±5° pan, return
+  drift 0.26°).
+- **`lab_cameras/` built and verified.** Dual MJPG 640×480 for 20 s: C922 **30.87 fps**,
+  Innomaker **29.53 fps**, **0 read failures, 0 repeated frames** — the pairing that was
+  unreliable for a year on macOS is clean here. `flock` ownership verified across `kill -9`.
+- **`CAP_PROP_BUFFERSIZE=1` is the bug** that made the Innomaker look dead again (1916
+  failed reads, opened as MJPG, no error). It halves that camera and starves it entirely
+  when the C922 is streaming. Never set it.
+- **Snap latency 1839 ms → 5.3 ms** (347×) by owning the cameras in-process instead of
+  shelling out to `capture.py` per snap.
+- **Health gate baselines**: `so101_pickplace_wall_v1_20260722_174720` and
+  `so101_blue_pegs_v1_20260723_171824` both show **0 frozen runs, cross-camera MAD ~86**.
+  The Innomaker's known frame loss did not corrupt either dataset we trained on.
+- **`placo` installs on aarch64** and `arm.ik_to_xyz` solves in 1–6 ms on the Pi — with cv2
+  4.13 already there, the whole perceive→IK→command loop can run on the room host. No Mac
+  relay needed.
+- ⚠ **Thermal**: 4 busy threads → throttling at 40 s, steady state **84.7 °C / 1231 MHz
+  (−18%)**. The encoder benchmark (h264 ultrafast, 2.88× realtime cold) is really ~2.4×
+  throttled, i.e. **~1.2× for two cameras**. Streaming encoding still keeps up, but the Pi
+  needs a fan before long sessions.
+- `gemini_er/` is now host-portable (`devices.py` resolves arm + cameras by role on either
+  host); `lab_cameras/preview.py` serves a live browser preview and a pixel picker, which is
+  how calibration will click points on a host whose cv2 has no GUI.
+
+Next: reposition + lock the C922 (40–50 cm, 45°, manual exposure/WB/focus, 50 Hz), then the
+first real recording, then re-fit the calibration chain on the new geometry.
+
 ## 2026-08-21 — desk CLI live: tub-in/out blocked by piece-on-rim
 
 lerobot 0.6.0, driver venv, C922=0 / Innomaker=1. Scripted `gemini_er/desk.py serve` (no ACT).
