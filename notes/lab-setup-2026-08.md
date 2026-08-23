@@ -1250,3 +1250,95 @@ design. `release_preview_service()` now waits for **both** the lock and the port
 - `CameraLock` — same flock and `session.json`, **opens nothing**. For recording, where
   lerobot opens the hardware but the mutex must still be held or the preview service will
   take the cameras away mid-episode.
+
+---
+
+# META QUEST TELEOP — works on the pinned lerobot, no fork (2026-08-24)
+
+Requirement: teleoperate from another room with a Meta Quest, while recording datasets.
+
+## The finding: lerobot 0.6.0 already supports it
+
+lerobot's `phone` teleoperator has two variants, and the **"Android" one is really a
+generic WebXR 6-DoF pose source** — `from teleop import Teleop`, and its own calibration
+prompt says *"Touch and move on the **WebXR page**"*. That package is
+[SpesRobotics/teleop](https://github.com/SpesRobotics/teleop): *"Turns your phone **or VR
+headset** into a robot arm teleoperation device by leveraging WebXR."*
+
+The type annotation in lerobot's own `action_features` gives it away:
+`"phone.raw_inputs": dict,  # analogs/buttons or webXR meta`.
+
+**So the Quest needs no lerobot fork and no second IK stack** — which matters, because
+hard-won lever #1 is version match, and every third-party SO-101 VR project is unpinned
+against lerobot.
+
+## The full chain, all stock
+
+```
+Quest browser (WebXR, immersive-ar)   <- right controller, tracked-pointer
+  -> teleop pkg over wss, port 4443
+  -> AndroidPhone            phone.pos / phone.rot / raw_inputs / enabled
+  -> MapPhoneActionToRobotAction      target_x..wz + gripper_vel
+  -> EEReferenceAndDelta              deltas -> absolute EE target
+  -> EEBoundsAndSafety                clip to reach, rate-limit jumps
+  -> GripperVelocityToJoint           A/B -> gripper
+  -> InverseKinematicsEEToJoints      placo, 1-6 ms on this Pi
+  -> SO101Follower
+```
+
+Wired as `python lab_record.py --teleop quest`.
+
+## Controls, read off the shipped WebXR page (`teleop/index.html`)
+
+Right controller only (`handedness === 'right'`, `targetRayMode === 'tracked-pointer'`):
+
+| input | effect |
+|---|---|
+| **grip** (`buttons[1]`) held | **dead-man — engage.** Release and the arm stops following |
+| trigger (`buttons[0]`) | toggle on rising edge |
+| **A / B** (`buttons[4]` / `[5]`) | gripper open / close |
+| thumbstick axis | motion scale, clamped 0.2–1.0 |
+
+## Verified without headset or arm
+
+Synthetic poses pushed through the real pipeline:
+
+```
+headset (m)          -> joints (deg)
+(0,0,0)              -> pan   0.0  lift -100.0  elbow 28.5  ...
+(0.05, 0,    0)      -> pan -15.7                              <- +x pans
+(0.05, 0.05, 0.05)   -> pan -15.7              elbow 13.1      <- +z drops the elbow
+gripper: A -> 70 (open)   B -> 30 (close)   neither -> 50 (hold)
+dead-man released, 20 cm hand move -> joints UNCHANGED          <- the safety that matters
+```
+
+## ⚠️ `raise_on_jump` must be False for remote VR
+
+`EEBoundsAndSafety` defaults to **raising** on an end-effector jump over `max_ee_step_m`,
+which aborts `record_loop`. The headset is on wifi in another room, so a dropped packet
+gives a stale pose and then a jump — that default would **destroy the episode mid-recording**.
+Set `raise_on_jump=False`: the step is rate-limited to the per-frame limit and warned.
+Degrade, don't fail.
+
+## Install (aarch64, done)
+
+```bash
+uv pip install --python ~/lab/.venv/bin/python -c /tmp/pin.txt teleop hebi-py
+```
+Both build on ARM. `hebi-py` is needed only because `AndroidPhone.__init__` requires it
+unconditionally — the WebXR path never touches HEBI. That is a lerobot wart, not a real
+dependency.
+
+Server: `https://<pi-ip>:4443/` (self-signed cert ships with the package; WebXR refuses to
+run outside a secure context, so the Quest browser will show a warning to click through).
+
+## Still unverified — needs the headset
+
+1. **Quest model.** The page requests `immersive-ar`, so it needs passthrough: Quest 2 / 3 /
+   3S / Pro yes, Quest 1 no.
+2. **Latency** across rooms over wifi. Unmeasured. Tailscale is a fallback if the Quest and
+   Pi end up on different networks (the Quest runs Android, so the Tailscale app works).
+3. **Never driven the real arm.** Do the first run with the arm clear and a hand on the PSU.
+4. **`EE_STEP` is 1.0** — one metre of hand motion equals one metre of robot motion, against
+   a ~0.3 m reach. Likely wants lowering; the thumbstick scale (0.2–1.0) compensates
+   meanwhile. Tune on the first live run rather than guessing.

@@ -154,7 +154,12 @@ def build_quest(args, robot):
         MapPhoneActionToRobotAction(platform=PhoneOS.ANDROID),
         EEReferenceAndDelta(kinematics=kin, end_effector_step_sizes=EE_STEP,
                             motor_names=motor_names, use_latched_reference=True),
-        EEBoundsAndSafety(end_effector_bounds=EE_BOUNDS, max_ee_step_m=args.max_ee_step),
+        # raise_on_jump=False: over-limit steps are rate-limited and warned, not
+        # fatal. The headset is on wifi in another room, so a dropped packet gives
+        # a stale pose then a jump -- aborting there would destroy the episode
+        # mid-recording. Rate-limiting degrades instead of failing.
+        EEBoundsAndSafety(end_effector_bounds=EE_BOUNDS, max_ee_step_m=args.max_ee_step,
+                          raise_on_jump=False),
         GripperVelocityToJoint(speed_factor=args.gripper_speed),
         InverseKinematicsEEToJoints(kinematics=kin, motor_names=motor_names),
     ]
