@@ -1193,3 +1193,60 @@ a reasonable upstream contribution for Pi users who are genuinely CPU-bound. We 
 The throttle is real (84.7 °C, 1231 MHz, −18%) and a fan is still worth ~€5 — it just does
 not gate recording. It gates anything that pins all four cores for minutes: training-adjacent
 work, long vision loops, or a session where a browser tab is left streaming the preview.
+
+---
+
+# PREVIEW *DURING* RECORDING — `lab_record.py` (2026-08-24)
+
+Requirement: teleoperate from another room (VR headset) while recording a dataset. That
+means the camera feed must stay up **while lerobot owns the cameras** — which a V4L2 device
+does not allow, because it has exactly one owner.
+
+## How it works
+
+The recorder does not share the devices; it shares the *frames*. `record_loop` only ever
+**calls** the observation processor, so wrapping that processor sees every frame it reads —
+no lerobot patch. The frames are copied out of the control loop into a latest-wins mailbox
+and JPEG-encoded on a worker thread.
+
+Consequence worth stating: the preview shows **exactly the frames going into the dataset**,
+not a second stream that could silently diverge. That is strictly better than re-reading the
+hardware even if re-reading were possible.
+
+```
+python lab_record.py --repo-id kris0/... --task "pick up the block" \
+    --episodes 5 --episode-time 20
+# preview stays at http://lab-pi:8088/ throughout
+```
+
+`lab_record.py` also: stops and restores the `labcam-preview` service around the session,
+holds the camera mutex via `CameraLock` (the flock **without** opening the devices — lerobot
+opens them), applies the measured-good encoder config, and publishes episode/total into
+`/data/session.json` so the LCD shows `RECORDING ep n/N`.
+
+## Verified without the arm
+
+Held the mutex exactly as a recording does, fed the tee synthetic observations at 30 Hz,
+and fetched from the Mac while it ran:
+
+```
+listening       0.0.0.0:8088
+/snap/workspace http=200  3386 bytes          (from the Mac, over the network)
+session.json    {'mode': 'record', 'repo_id': 'test/tee', 'episode': 1, 'total': 3}
+second opener   ERROR: cameras are owned by another process (/run/lock/lab-cams.lock)
+```
+
+## ⚠️ The handoff race (cost one confusing failure)
+
+Stopping `labcam-preview` and immediately starting the recording **fails**: the old process
+releases the flock before its HTTP socket is gone, so binding port 8088 a moment later
+fails and the session records blind — with no error, because the tee swallows everything by
+design. `release_preview_service()` now waits for **both** the lock and the port.
+
+## `CameraLock` vs `CameraOwner`
+
+- `CameraOwner` — opens the devices, runs reader threads. For the vision loop, previews,
+  snaps.
+- `CameraLock` — same flock and `session.json`, **opens nothing**. For recording, where
+  lerobot opens the hardware but the mutex must still be held or the preview service will
+  take the cameras away mid-episode.

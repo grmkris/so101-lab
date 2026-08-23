@@ -11,6 +11,7 @@ the Innomaker and dragging the C922 through a USB reset with it.
 
 from lab_cameras.owner import (  # noqa: F401
     DEFAULT_CAMERAS,
+    CameraLock,
     CameraOwner,
     CamerasBusy,
     CameraStats,
@@ -21,6 +22,7 @@ from lab_cameras.owner import (  # noqa: F401
 )
 
 __all__ = [
+    "CameraLock",
     "CameraOwner",
     "CamerasBusy",
     "CameraStats",

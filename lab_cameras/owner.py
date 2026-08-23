@@ -384,6 +384,98 @@ class CameraOwner:
             pass
 
 
+class CameraLock:
+    """The camera mutex WITHOUT opening the devices.
+
+    During a recording lerobot opens `/dev/video*` itself, so `CameraOwner`
+    would be fighting it for the same file descriptors. But the mutex still has
+    to be held, or the preview server will happily open the cameras mid-episode
+    and take them away. So: same `flock`, same `session.json`, no `VideoCapture`.
+
+        with CameraLock(mode="record", extra={"repo_id": ...}) as lock:
+            ...                       # lerobot owns the hardware
+            lock.update(episode=3)    # the LCD shows it
+    """
+
+    def __init__(self, *, mode: str = "unknown", owner: str | None = None,
+                 cameras: dict | None = None, session_path: str | None = SESSION_PATH,
+                 blocking: bool = False, extra: dict | None = None):
+        self.mode = mode
+        self.owner = owner or f"{os.path.basename(os.sys.argv[0]) or 'python'}[{os.getpid()}]"
+        self.cameras = dict(cameras or DEFAULT_CAMERAS)
+        self.session_path = session_path
+        self.blocking = blocking
+        self._extra = dict(extra or {})
+        self._fd: int | None = None
+        self._started = 0.0
+        self._last_beat = 0.0
+
+    def __enter__(self) -> "CameraLock":
+        os.makedirs(os.path.dirname(LOCK_PATH) or "/", exist_ok=True)
+        fd = os.open(LOCK_PATH, os.O_CREAT | os.O_RDWR, 0o666)
+        flags = fcntl.LOCK_EX if self.blocking else (fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            fcntl.flock(fd, flags)
+        except OSError as e:
+            os.close(fd)
+            if e.errno in (errno.EACCES, errno.EAGAIN):
+                raise CamerasBusy(
+                    f"cameras are owned by another process ({LOCK_PATH}); "
+                    f"current session: {read_session()}"
+                ) from None
+            raise
+        os.ftruncate(fd, 0)
+        os.write(fd, f"{os.getpid()} {self.owner}\n".encode())
+        self._fd = fd
+        self._started = time.time()
+        self.update()
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self.close()
+
+    def update(self, **kw) -> None:
+        self._extra.update({k: v for k, v in kw.items() if v is not None})
+        self._write(force=bool(kw))
+
+    def beat(self) -> None:
+        self._write()
+
+    def _write(self, force: bool = False) -> None:
+        if not self.session_path:
+            return
+        now = time.time()
+        if not force and now - self._last_beat < 1.0:
+            return
+        self._last_beat = now
+        doc = {
+            "owner": self.owner,
+            "pid": os.getpid(),
+            "host": socket.gethostname(),
+            "mode": self.mode,
+            "cameras": {n: str(d) for n, d in self.cameras.items()},
+            "started_at": self._started,
+            "heartbeat": now,
+        }
+        doc.update(self._extra)
+        _atomic_write_json(self.session_path, doc)
+
+    def close(self) -> None:
+        if self.session_path:
+            try:
+                doc = read_session() or {}
+                if doc.get("pid") == os.getpid():
+                    os.unlink(self.session_path)
+            except Exception:
+                pass
+        if self._fd is not None:
+            try:
+                fcntl.flock(self._fd, fcntl.LOCK_UN)
+            finally:
+                os.close(self._fd)
+                self._fd = None
+
+
 def _atomic_write_json(path: str, doc: dict) -> None:
     d = os.path.dirname(path) or "."
     try:
