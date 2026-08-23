@@ -1078,3 +1078,62 @@ battle-tested version: latest-wins single-slot mailbox, encode off-loop, 25 fps 
 it swallows every exception — **a dead preview beats a dead recording**. During a recording
 the server never touches the hardware; the recorder owns the cameras and frames arrive
 through `publish()`.
+
+---
+
+# OPTICS LOCK — `python -m lab_cameras.lock` (2026-08-23)
+
+Autofocus and auto-exposure make a rig unreproducible: a homography (and any intrinsics) is
+only valid at ONE focus, and hard-won lever #2 is that a policy trained at one brightness
+fails at another. macOS never exposed these controls; Linux does — that is half the reason
+the room host exists. Both cameras take full manual control.
+
+```
+python -m lab_cameras.lock show      # what the cameras are doing right now
+python -m lab_cameras.lock apply     # let auto settle, then reproduce that picture, pinned
+python -m lab_cameras.lock apply --install-service   # ...and survive replug + reboot
+python -m lab_cameras.lock rig-json  # provenance only
+```
+
+## Why it matches the picture instead of reading the registers
+
+**You cannot read back what auto-exposure chose.** In auto mode UVC reports the control's
+*default* and marks it `inactive` — the C922 says `exposure_time_absolute=250` no matter what
+the room looks like. So `apply` streams for a few seconds, measures the picture auto produces
+(mean brightness, channel cast, Laplacian-variance sharpness), then sweeps each control to
+reproduce *that picture* with everything pinned.
+
+## ⚠️ ORDER MATTERS, and getting it wrong is silent
+
+First attempt reproduced 104.7 mean brightness as **21.2** — a nearly black frame, with every
+control apparently "locked" and no error anywhere.
+
+Cause: **the C922's auto-exposure drives `gain` internally while reporting `gain=0` the whole
+time.** Pinning gain to its reported value *after* matching exposure throws away most of the
+light. The working order is:
+
+1. **focus, while auto-exposure is still ON** — otherwise the sharpness metric is scoring a
+   dark frame rather than a blurry one
+2. **gain, before exposure** (the bug above)
+3. **exposure**, matched to auto's mean brightness (geometric ladder — exposure is
+   multiplicative in its effect)
+4. **white balance**, matched to auto's `b − r` cast
+5. **re-measure, and re-tune exposure once** if step 4 moved it more than 10%
+
+## Result (at the camera's CURRENT position — re-run after moving it)
+
+| camera | mean (auto → locked) | sharpness (auto → locked) |
+|---|---|---|
+| workspace C922 | 103.7 → **104.8** (+1%) | 544 → **547** |
+| wrist Innomaker | 72.5 → **67.0** (−7.6%) | 335 → 300 (no focus control) |
+
+Locked: C922 `plf=1(50Hz) focus=5 gain=0 exposure=200 wb=2750`, Innomaker
+`plf=1 gain=0 exposure=221 wb=3108`. Note the C922 was on **`power_line_frequency=2` (60 Hz)**
+out of the box — wrong for Europe, and a source of rolling banding under LED light.
+
+Written to **`/data/rig.json`** with resolution, fourcc, serial device paths, mean brightness
+and lerobot version — the provenance block that makes two datasets comparable.
+
+**Not installed as a service yet**, deliberately: these values belong to the camera's current
+(wrong) position. Re-run `apply --install-service` once the C922 is at its final 40–50 cm
+pose, under the working lamp.
