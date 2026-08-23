@@ -1137,3 +1137,59 @@ and lerobot version — the provenance block that makes two datasets comparable.
 **Not installed as a service yet**, deliberately: these values belong to the camera's current
 (wrong) position. Re-run `apply --install-service` once the C922 is at its final 40–50 cm
 pose, under the working lamp.
+
+---
+
+# ✅ CORRECTION — recording is NOT encoder-bound. Measured on REAL frames (2026-08-23)
+
+The earlier encoder table used **random-noise frames**, which are incompressible and the
+worst possible case. The caveat was noted at the time but the magnitude was not: on real
+footage from these cameras the numbers change by more than an order of magnitude, and the
+thermal worry above is **not a blocker**.
+
+## The measurement that decides it: BOTH cameras, encoded concurrently, on a hot Pi
+
+20 s of live capture from both cameras, then `libx264 g=2 crf=30 preset=ultrafast`,
+2 threads each (4 total), run concurrently, starting at **74 °C with the since-boot
+throttle bits already set**:
+
+| | frames | encode | size |
+|---|---|---|---|
+| workspace (C922) | 601 (**30.05 fps**) | 6.30 s | 1.99 MB |
+| wrist (Innomaker) | 591 (**29.55 fps**) | 6.21 s | 2.45 MB |
+| **wall clock** | | **6.30 s for 20 s of footage** | |
+
+**3.17× realtime for both cameras together**, not the 1.18× the noise benchmark implied.
+Streaming encoding keeps up with roughly 3× headroom, so there is no inter-episode gap and
+no reason to hold recording for a fan.
+
+**A 20 s two-camera episode is 4.43 MB. Fifty episodes is 0.22 GB** — against 916 GB of SSD.
+Storage is a non-issue; the earlier 76 MB/episode figure was a noise artifact.
+
+## The Pi's hardware encoder is not worth the patch
+
+`h264_v4l2m2m` was 4.0× vs libx264's 2.88× on noise, which looked like a reason to patch
+lerobot's `HW_VIDEO_CODECS` allowlist. On real frames the gap nearly vanishes, and it comes
+with strings:
+
+| config (300 real frames) | encode | ×RT | size | keyframes | PSNR | seek |
+|---|---|---|---|---|---|---|
+| **libx264 ultrafast g=2 crf=30** | 2.90 s | **3.44×** | 1.3 MB | 150/300 ✅ | 40.1 dB | **1.5 ms** |
+| h264_v4l2m2m g=2 | — | — | — | — | — | **fails outright** |
+| h264_v4l2m2m g=2 b=8M | 2.57 s | 3.89× | 1.8 MB | 150/300 ✅ | 42.2 dB | 5.3 ms |
+
+- It **refuses to encode without an explicit bitrate** (`InvalidDataError`) — it is
+  bitrate-controlled, with no CRF.
+- It does honour `g=2` (150/300 keyframes), so random access survives.
+- Quality is fine (42.2 dB, better than libx264 here) but **seeking is 3.5× slower**
+  (5.3 ms vs 1.5 ms), which costs at *training* time, on every sample.
+- The win is only **13% encode speed** for a patched dependency and a slower dataset.
+
+**Verdict: stay on `h264 + ultrafast`.** The allowlist patch (`configs/video.py:33`) remains
+a reasonable upstream contribution for Pi users who are genuinely CPU-bound. We are not.
+
+## So what is the thermal finding still good for?
+
+The throttle is real (84.7 °C, 1231 MHz, −18%) and a fan is still worth ~€5 — it just does
+not gate recording. It gates anything that pins all four cores for minutes: training-adjacent
+work, long vision loops, or a session where a browser tab is left streaming the preview.

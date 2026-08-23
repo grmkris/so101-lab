@@ -40,9 +40,11 @@ every measured number: `notes/lab-setup-2026-08.md`. The four that bite:
   delivering entirely while looking like a dead camera.
 - **The lerobot default video encoder is unusable here** (libsvtav1 `g=2` = 0.4× realtime).
   Use `--dataset.rgb_encoder.vcodec=h264 --dataset.rgb_encoder.preset=ultrafast
-  --dataset.streaming_encoding=true`, and never `--display_data=true` on the Pi.
-- **The Pi throttles to 1231 MHz (−18%) after ~1 min of 4-thread load**, so real encoder
-  headroom is ~1.2× realtime for two cameras, not 1.44×. It needs a fan.
+  --dataset.streaming_encoding=true`, and never `--display_data=true` on the Pi. With that,
+  both cameras encode at **3.17× realtime on real footage** (4.4 MB per 20 s episode) —
+  benchmark encoders on real frames, never on noise, or you will be off by 10×.
+- **The Pi throttles to 1231 MHz (−18%) after ~1 min of 4-thread load.** It does NOT gate
+  recording (3× headroom), but it gates anything pinning all cores for minutes. A €5 fan.
 
 ## Current state (2026-07-25)
 - **Platform v1 LIVE**: hub on Railway; sim rig (`kris-sim`) + real follower (`kris-arm`) both registered and driven over the internet — browser keyboard AND a real leader through `controller.py`. Remaining: the actual two-person test (friend's follower/leader — `notes/friend-setup.md` is ready), wrist_roll handshake, stale queued hub commands delivered on rig re-register.
