@@ -149,6 +149,11 @@ the architecture is the chess robot.
 Convergence: sim demos augment real demos for fine-tunes; sim chess env
 becomes the rehearsal space for full-board play.
 
+**Deferred visual sim2real spike:** use a metric-aligned Gaussian splat only as
+the simulator's photorealistic visual layer, while MuJoCo/Isaac meshes retain
+physics and collision. Research, paper map, capture protocol, A/B design, and
+go/no-go gates: [`gaussian-splatting-research-2026-08.md`](gaussian-splatting-research-2026-08.md).
+
 ## Runpod infra (provisioned 2026-08-18)
 
 - Network volume: **so101-sim**, 200 GB, **EU-RO-1** (RTX 4090 availability High,

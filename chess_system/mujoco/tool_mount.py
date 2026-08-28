@@ -59,6 +59,10 @@ class ToolMount:
     jaw_tip_z: float
     separation_at_grip: float
     separation_when_closed: float
+    # Inner-face pads for stock jaws. None when using printed extensions.
+    fixed_pad_pos: tuple[float, float, float] | None = None
+    fixed_pad_quat: tuple[float, float, float, float] | None = None
+    pad_size: tuple[float, float, float] | None = None
 
 
 def _mesh_points(model, body_id: int) -> np.ndarray:
@@ -212,7 +216,7 @@ def solve_stock_mount(
     static_all = _mesh_points(model, gripper_id)
     static = static_all[static_all[:, 2] < -0.080][::5]
 
-    def pinch(angle: float) -> tuple[float, np.ndarray]:
+    def frames(angle: float):
         data.qpos[:] = 0
         data.qpos[address] = angle
         mujoco.mj_forward(model, data)
@@ -222,11 +226,15 @@ def solve_stock_mount(
         p_jaw = data.xpos[jaw_id].copy()
         moving = (r_grip.T @ (((r_jaw @ jaw_local.T).T + p_jaw) - p_grip).T).T
         moving = moving[moving[:, 2] < -0.080][::5]
+        return r_grip, p_grip, r_jaw, p_jaw, moving
+
+    def pinch(angle: float) -> tuple[float, np.ndarray, np.ndarray, np.ndarray]:
+        r_grip, p_grip, r_jaw, p_jaw, moving = frames(angle)
         if len(moving) == 0:
-            return float("inf"), np.zeros(3)
+            return float("inf"), np.zeros(3), np.zeros(3), np.zeros(3)
         gaps = np.linalg.norm(static[:, None, :] - moving[None, :, :], axis=2)
         i, j = np.unravel_index(gaps.argmin(), gaps.shape)
-        return float(gaps.min()), (static[i] + moving[j]) / 2
+        return float(gaps.min()), (static[i] + moving[j]) / 2, static[i], moving[j]
 
     def angle_for(gap: float) -> float:
         lower, upper = low, min(high, low + np.radians(25.0))
@@ -241,17 +249,38 @@ def solve_stock_mount(
     interference = 0.001
     grip_angle = angle_for(max(neck_width - interference, 0.001))
     open_angle = angle_for(neck_width + 2 * approach_clearance)
-    gap_at_grip, centre = pinch(grip_angle)
-    closed_gap, _ = pinch(low)
+    gap_at_grip, centre, static_pt, moving_pt = pinch(grip_angle)
+    closed_gap, _, _, _ = pinch(low)
+
+    # Thin pads on the *inner faces* at the pinch. The stock jaw collision
+    # meshes are one convex hull each; contacting those hulls penetrates
+    # several millimetres with non-opposing normals and walks the mast out.
+    half_thickness = 0.00125
+    axis = moving_pt - static_pt
+    axis = axis / float(np.linalg.norm(axis))
+    fixed_pad = static_pt - axis * half_thickness
+    moving_pad_gripper = moving_pt + axis * half_thickness
+    r_grip, p_grip, r_jaw, p_jaw, _ = frames(grip_angle)
+    moving_pad_world = r_grip @ moving_pad_gripper + p_grip
+    moving_local_pos = tuple(float(v) for v in r_jaw.T @ (moving_pad_world - p_jaw))
+    z_axis = np.asarray((0.0, 0.0, 1.0))
+    y_axis = np.cross(z_axis, axis)
+    y_axis = y_axis / float(np.linalg.norm(y_axis))
+    z_axis = np.cross(axis, y_axis)
+    z_axis = z_axis / float(np.linalg.norm(z_axis))
+    rotation = np.column_stack((axis, y_axis, z_axis))
     return ToolMount(
         grip_angle=float(grip_angle),
         closed_angle=float(low),
         open_angle=float(open_angle),
         fixed_x=float(centre[0]),
-        moving_local_pos=(0.0, 0.0, 0.0),
-        moving_local_quat=(1.0, 0.0, 0.0, 0.0),
+        moving_local_pos=moving_local_pos,
+        moving_local_quat=_quat_from_mat(r_jaw.T @ r_grip @ rotation),
         tcp_pos=tuple(float(v) for v in centre),
         jaw_tip_z=float(centre[2]),
         separation_at_grip=float(gap_at_grip),
         separation_when_closed=float(closed_gap),
+        fixed_pad_pos=tuple(float(v) for v in fixed_pad),
+        fixed_pad_quat=_quat_from_mat(rotation),
+        pad_size=(half_thickness, 0.004, 0.006),
     )

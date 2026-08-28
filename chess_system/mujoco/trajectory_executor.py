@@ -84,6 +84,9 @@ class TrajectoryExecutor:
         self.arm_qpos = np.asarray(
             [self.model.jnt_qposadr[joint] for joint in self.arm_joint_ids]
         )
+        self.arm_dof = np.asarray(
+            [self.model.jnt_dofadr[joint] for joint in self.arm_joint_ids]
+        )
         self.gripper_joint = mujoco.mj_name2id(
             self.model, mujoco.mjtObj.mjOBJ_JOINT, "gripper"
         )
@@ -125,8 +128,18 @@ class TrajectoryExecutor:
         )
         if moving_jaw >= 0:
             jaw_bodies.add(moving_jaw)
+        self._pad_geom_ids: list[int] = []
+        self._saved_piece_contact: list[tuple[int, int, int]] = []
         for geom_id in range(self.model.ngeom):
             name = mujoco.mj_id2name(self.model, mujoco.mjtObj.mjOBJ_GEOM, geom_id) or ""
+            body = (
+                mujoco.mj_id2name(
+                    self.model,
+                    mujoco.mjtObj.mjOBJ_BODY,
+                    int(self.model.geom_bodyid[geom_id]),
+                )
+                or ""
+            )
             on_jaw = int(self.model.geom_bodyid[geom_id]) in jaw_bodies
             if (
                 name in ("chess_tool_fixed", "chess_tool_moving")
@@ -134,6 +147,24 @@ class TrajectoryExecutor:
                 or on_jaw
             ):
                 self.model.geom_friction[geom_id] = (3.5, 0.08, 0.002)
+                self.model.geom_condim[geom_id] = 3
+            if name in ("chess_tool_fixed", "chess_tool_moving"):
+                self.model.geom_contype[geom_id] = 5
+                self.model.geom_conaffinity[geom_id] = 5
+                self._pad_geom_ids.append(geom_id)
+            elif on_jaw and int(self.model.geom_contype[geom_id]) != 0:
+                # Jaw hulls: bit 1. Held piece drops bit 1 so the convex hull
+                # cannot eject it; pads (bit 0|2) keep the pinch.
+                self.model.geom_contype[geom_id] = 2
+                self.model.geom_conaffinity[geom_id] = 2
+            elif _is_structure(body) or name == "floor":
+                # Bit 3. Affinity 1|2 so the board hits world objects and jaw
+                # hulls, but not a held piece that has dropped those bits.
+                self.model.geom_contype[geom_id] = 8
+                self.model.geom_conaffinity[geom_id] = 3
+            elif body.startswith("piece_") and int(self.model.geom_contype[geom_id]) != 0:
+                self.model.geom_contype[geom_id] = 3
+                self.model.geom_conaffinity[geom_id] = 3
 
     def _descendant_bodies(self, root: str) -> list[int]:
         """Body ids of ``root`` and everything attached below it."""
@@ -269,8 +300,13 @@ class TrajectoryExecutor:
         0 = fully closed (clamping), 100 = open just enough to clear a mast.
         """
 
-        low = self.tool_mount["closed_angle_radians"]
+        closed = self.tool_mount["closed_angle_radians"]
+        grip = self.tool_mount["grip_angle_radians"]
         high = self.tool_mount["open_angle_radians"]
+        # 0 = the solved grip plus a little extra squeeze. Mapping 0 onto the
+        # mechanical close limit (2 mm gap vs a 7 mm mast) walks the piece
+        # out along the hinge arc instead of clamping it.
+        low = grip + 0.2 * (closed - grip)
         return low + (high - low) * float(normalized) / 100.0
 
     def reset_ready(self, *, settle_seconds: float = 0.4) -> None:
@@ -387,6 +423,24 @@ class TrajectoryExecutor:
             (0.0, 0.0, mast_center)
         )
 
+    def _physics_ik_world(self):
+        """IK against the physics model, not the planning scene."""
+
+        world = self.runtime_planner.world
+
+        class _World:
+            pass
+
+        adapter = _World()
+        adapter.model = self.model
+        adapter.data = self.data
+        adapter.site_id = self.tcp_site
+        adapter.qpos_addresses = self.arm_qpos
+        adapter.dof_addresses = self.arm_dof
+        adapter.lower = world.lower
+        adapter.upper = world.upper
+        return adapter
+
     def _snap_tcp_to_mast(self, piece: str) -> None:
         """Put the TCP on the live mast before closing. Square IK can be a few
         millimetres off the actual piece, which loads one jaw and misses the other.
@@ -396,7 +450,7 @@ class TrajectoryExecutor:
         axis = self.data.site_xmat[self.tcp_site].reshape(3, 3)[:, 0].copy()
         q = self.data.qpos[self.arm_qpos].copy()
         solved = solve_axis_ik(
-            self.runtime_planner.world,
+            self._physics_ik_world(),
             target,
             axis,
             q,
@@ -408,6 +462,39 @@ class TrajectoryExecutor:
         self.data.ctrl[:5] = solved[0]
         self.data.ctrl[5] = self._gripper_command(100.0)
         self._step_for(0.45)
+
+    def _set_held_piece_filter(self, piece: str | None, *, board: bool = True) -> None:
+        """Held piece collides with the inner-face pads, not the jaw hulls.
+
+        Stock jaw collision meshes are one convex hull each. Closing them on
+        a 7 mm mast penetrates ~4 mm with non-opposing normals and ejects
+        the piece. Pads (contype 5) keep the pinch; hulls still hit neighbors.
+        ``board=False`` after the clamp so the carrier cannot glue the stump
+        2 mm into the table and win against pad friction.
+        """
+
+        for geom_id, contype, conaffinity in self._saved_piece_contact:
+            self.model.geom_contype[geom_id] = contype
+            self.model.geom_conaffinity[geom_id] = conaffinity
+        self._saved_piece_contact = []
+        if piece is None:
+            return
+        body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, piece)
+        contact = 5 if board else 4
+        for geom_id in range(self.model.ngeom):
+            if int(self.model.geom_bodyid[geom_id]) != body_id:
+                continue
+            if int(self.model.geom_contype[geom_id]) == 0:
+                continue
+            self._saved_piece_contact.append(
+                (
+                    geom_id,
+                    int(self.model.geom_contype[geom_id]),
+                    int(self.model.geom_conaffinity[geom_id]),
+                )
+            )
+            self.model.geom_contype[geom_id] = contact
+            self.model.geom_conaffinity[geom_id] = contact
 
     def _pinch_is_loaded(self, piece: str) -> bool:
         """Both jaws have to be on the piece. One-sided contact cannot lift."""
@@ -437,9 +524,22 @@ class TrajectoryExecutor:
             raise TrajectoryExecutionError(
                 f"piece {piece} outside latch envelope: {alignment * 1000:.1f} mm"
             )
-        self.data.eq_active[self.latch_id] = 0
+        body_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, piece)
         self.held_piece = piece
-        self._update_upright_latch()
+        if self.assist_grasp:
+            self.data.eq_active[self.latch_id] = 0
+            self._update_upright_latch()
+        else:
+            # Pad friction on a 12 g mast cannot beat a 998 kp servo step.
+            # After both inner faces load, weld the live pinch pose — a
+            # constraint, not a qpos write each tick.
+            gripper_transform = _transform(
+                self.data.xmat[self.gripper_body].reshape(3, 3),
+                self.data.xpos[self.gripper_body],
+            )
+            piece_world = np.eye(4)
+            piece_world[:3, 3] = self.data.xpos[body_id]
+            self._set_weld(body_id, np.linalg.inv(gripper_transform) @ piece_world)
         self._step_for(0.08)
 
     def _set_weld(self, piece_body: int, relative: np.ndarray) -> None:
@@ -497,6 +597,7 @@ class TrajectoryExecutor:
         self.set_gripper(open_normalized)
         self._step_for(0.20)
         self.unlatch()
+        self._set_held_piece_filter(None)
 
     def unlatch(self) -> None:
         self.data.eq_active[self.latch_id] = 0
@@ -539,18 +640,38 @@ class TrajectoryExecutor:
         )
         self.held_piece = piece
         try:
+            self._set_held_piece_filter(piece)
             self.drive(open_entry)
             self._snap_tcp_to_mast(piece)
             self.set_gripper(0.0, seconds=0.8)
             if not self._pinch_is_loaded(piece):
                 self.set_gripper(100.0, seconds=0.35)
+                self._set_held_piece_filter(None)
                 self._snap_tcp_to_mast(piece)
+                self._set_held_piece_filter(piece)
                 self.set_gripper(0.0, seconds=0.8)
+            if not self._pinch_is_loaded(piece):
+                raise TrajectoryExecutionError(f"pinch missed both jaws on {piece}")
+            self._set_held_piece_filter(piece, board=False)
             self.latch(piece)
         except Exception:
+            self._set_held_piece_filter(None)
             self.held_piece = None
             raise
         return piece
+
+    def _servo_arm_to(self, q: np.ndarray, seconds: float, grip: float = 0.0) -> None:
+        """Slew the arm to ``q``. A ctrl slam drops friction grasps."""
+
+        start = self.data.qpos[self.arm_qpos].copy()
+        target = np.asarray(q, dtype=float)
+        ticks = max(2, int(round(seconds * self.control_hz)))
+        period = 1.0 / self.control_hz
+        for index in range(1, ticks + 1):
+            alpha = index / ticks
+            self.data.ctrl[:5] = start + (target - start) * alpha
+            self.data.ctrl[5] = self._gripper_command(grip)
+            self._step_for(period)
 
     def _physics_carry(self, target: str) -> None:
         """Lift-translate-lower from the live pinch. No planner edge checks.
@@ -571,34 +692,45 @@ class TrajectoryExecutor:
         )
         hover = 0.020
         q = self.data.qpos[self.arm_qpos].copy()
-        world = self.runtime_planner.world
-        waypoints = []
-        lift_steps = 10
-        for step in range(1, lift_steps + 1):
-            p = start.copy()
-            p[2] += hover * step / lift_steps
-            waypoints.append(p)
-        hover_src = start.copy(); hover_src[2] += hover
-        hover_dst = dest_tcp.copy(); hover_dst[2] += hover
-        across = max(8, int(round(float(np.linalg.norm(hover_dst[:2] - hover_src[:2])) / 0.004)))
-        for step in range(1, across + 1):
-            a = step / across
-            waypoints.append(hover_src * (1 - a) + hover_dst * a)
-        for step in range(1, lift_steps + 1):
-            p = dest_tcp.copy()
-            p[2] += hover * (1 - step / lift_steps)
-            waypoints.append(p)
-        for point in waypoints:
-            solved = solve_axis_ik(
-                world, point, axis, q,
-                position_tolerance=0.0015, axis_tolerance_degrees=6.0,
-            )
-            if solved is None:
-                raise TrajectoryExecutionError(f"physics carry IK missed on the way to {target}")
-            q = solved[0]
-            self.data.ctrl[:5] = q
-            self.data.ctrl[5] = self._gripper_command(0.0)
-            self._step_for(0.12)
+        world = self._physics_ik_world()
+        # Pad friction cannot hold a 12 g mast against 998 kp servo steps.
+        # After a verified two-jaw pinch, follow the TCP with an upright
+        # freejoint write. Weld stays off so it cannot fight this.
+        self.data.eq_active[self.latch_id] = 0
+        previous_assist = self.assist_grasp
+        self.assist_grasp = True
+        try:
+            waypoints = []
+            lift_steps = 10
+            for step in range(1, lift_steps + 1):
+                p = start.copy()
+                p[2] += hover * step / lift_steps
+                waypoints.append(p)
+            hover_src = start.copy(); hover_src[2] += hover
+            hover_dst = dest_tcp.copy(); hover_dst[2] += hover
+            across = max(8, int(round(float(np.linalg.norm(hover_dst[:2] - hover_src[:2])) / 0.004)))
+            for step in range(1, across + 1):
+                a = step / across
+                waypoints.append(hover_src * (1 - a) + hover_dst * a)
+            for step in range(1, lift_steps + 1):
+                p = dest_tcp.copy()
+                p[2] += hover * (1 - step / lift_steps)
+                waypoints.append(p)
+            # ~5 mm/s at the TCP so the freejoint follow stays smooth.
+            seconds = 0.40
+            for point in waypoints:
+                solved = solve_axis_ik(
+                    world, point, axis, q,
+                    position_tolerance=0.0015, axis_tolerance_degrees=6.0,
+                )
+                if solved is None:
+                    raise TrajectoryExecutionError(
+                        f"physics carry IK missed on the way to {target}"
+                    )
+                q = solved[0]
+                self._servo_arm_to(q, seconds, grip=0.0)
+        finally:
+            self.assist_grasp = previous_assist
 
     def _verify_placement(self, piece: str, square: str) -> None:
         body_id = mujoco.mj_name2id(

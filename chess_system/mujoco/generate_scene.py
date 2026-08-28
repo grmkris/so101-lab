@@ -59,41 +59,67 @@ def _augment_robot_model() -> None:
         raise RuntimeError("moving jaw body missing from SO-101 model")
 
     attached = []
+
+    def _pad_geom(name: str, pos, quat, size, mass: str) -> ET.Element:
+        return ET.Element(
+            "geom",
+            {
+                "name": name,
+                "type": "box",
+                "pos": " ".join(f"{v:.6f}" for v in pos),
+                "quat": " ".join(f"{v:.6f}" for v in quat),
+                "size": " ".join(f"{v:.6f}" for v in size),
+                "rgba": "1.0 0.25 0.0 1",
+                "mass": mass,
+                "friction": "3.5 0.08 0.002",
+                "condim": "3",
+                "group": "2",
+            },
+        )
+
     if use_extensions:
         tip_half_thickness = float(geometry.tool["tip_thickness"]) / 2
         tip_half_width = float(geometry.tool["tip_width"]) / 2
         extension = float(geometry.tool["extension_length"])
-        size = f"{tip_half_thickness:.6f} {tip_half_width:.6f} {extension / 2:.6f}"
+        size = (tip_half_thickness, tip_half_width, extension / 2)
         centre_z = mount.jaw_tip_z - extension / 2
         attached.append(
-            ET.Element(
-                "geom",
-                {
-                    "name": "chess_tool_fixed",
-                    "type": "box",
-                    "pos": f"{mount.fixed_x:.6f} {mount.tcp_pos[1]:.6f} {centre_z:.6f}",
-                    "size": size,
-                    "rgba": "1.0 0.25 0.0 1",
-                    "mass": "0.009",
-                    "friction": "1.4 0.02 0.001",
-                    "group": "2",
-                },
+            _pad_geom(
+                "chess_tool_fixed",
+                (mount.fixed_x, mount.tcp_pos[1], centre_z),
+                (1.0, 0.0, 0.0, 0.0),
+                size,
+                "0.009",
             )
         )
         jaw.append(
-            ET.Element(
-                "geom",
-                {
-                    "name": "chess_tool_moving",
-                    "type": "box",
-                    "pos": " ".join(f"{v:.6f}" for v in mount.moving_local_pos),
-                    "quat": " ".join(f"{v:.6f}" for v in mount.moving_local_quat),
-                    "size": size,
-                    "rgba": "1.0 0.25 0.0 1",
-                    "mass": "0.009",
-                    "friction": "1.4 0.02 0.001",
-                    "group": "2",
-                },
+            _pad_geom(
+                "chess_tool_moving",
+                mount.moving_local_pos,
+                mount.moving_local_quat,
+                size,
+                "0.009",
+            )
+        )
+    elif mount.fixed_pad_pos is not None and mount.pad_size is not None:
+        # Collision boxes on the stock inner faces at the pinch. Visual
+        # meshes stay; the convex hulls cannot pinch a 7 mm mast.
+        attached.append(
+            _pad_geom(
+                "chess_tool_fixed",
+                mount.fixed_pad_pos,
+                mount.fixed_pad_quat or (1.0, 0.0, 0.0, 0.0),
+                mount.pad_size,
+                "0.002",
+            )
+        )
+        jaw.append(
+            _pad_geom(
+                "chess_tool_moving",
+                mount.moving_local_pos,
+                mount.moving_local_quat,
+                mount.pad_size,
+                "0.002",
             )
         )
 
@@ -145,6 +171,10 @@ def _augment_robot_model() -> None:
                 "separation_when_closed_m": mount.separation_when_closed,
                 "jaw_tip_z_m": mount.jaw_tip_z,
                 "tcp_pos_m": list(mount.tcp_pos),
+                "fixed_pad_pos_m": list(mount.fixed_pad_pos)
+                if mount.fixed_pad_pos is not None
+                else None,
+                "pad_size_m": list(mount.pad_size) if mount.pad_size is not None else None,
             },
             indent=2,
         )
