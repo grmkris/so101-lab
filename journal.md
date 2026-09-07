@@ -2,6 +2,36 @@
 
 Newest on top. Template:
 
+## 2026-09-07 — robo-harness drove the real SO-101 (agent-workbench powered runs, 09-06/07)
+
+`~/code/robo-harness` — the standalone SO-101 agent workbench (Bun/TS coordinator on the
+netcup box + a Python FastAPI motor-owner and Rerun worker on `lab-pi`) — was powered against
+the real arm on 2026-09-06 and 2026-09-07. It uses `lab_cameras.CameraOwner` for capture, so
+so101-lab stays the camera source of record. The lab-pi profile records the activation:
+"2026-09-06: user confirmed clear workspace and powered activation … initial joint control
+only, ≤2 deg/percent and ≤2 units/s; Cartesian geometry not commissioned."
+
+- **Powered motion verified, measured.** Bounded gripper opens (+2 pts over 1.5 s) complete
+  with measured deltas ~1.2–1.6, residual 0 on the untouched joints and ≤0.5 on the moved
+  one; `stop` releases control and holds the commanded pose (operator → null, no fault
+  latched). Short runs record ~45–47 frames / 2.8–4.4 MB Rerun replay.
+- **Cameras healthy through the lab owner.** workspace + wrist both fresh (age ~30–50 ms),
+  MJPG 640×480. robo-harness's own dormant `devices` capture path now asserts the MJPG fourcc
+  took (it did not before) and recovers from a read error instead of dying — matching the lab
+  rule that only `lab_cameras/` owns `/dev/cam_*`.
+- **Two LLM providers verified read-only on the arm** (Alibaba qwen3.8-max, xAI grok-4.6):
+  each observed the arm and reported joint state with no motion. Agent control uses 3 s
+  leases, bounded moves checked against the commissioned limits, and measured completion; a
+  lost lease cancels motion (the safe direction).
+- **Software:** robo-harness was brought onto the house Effect/Bun conventions this window
+  (Effect Schema contracts, Config, a decoded I/O boundary, the house chat loop with
+  stop-conditions + a stall watchdog). It runs from `main` via systemd (`robo-app`,
+  `robo-rerun`); config and provider keys live outside the repo.
+
+Open items for the lab: `joint_offsets_deg` are still all 0 (`cartesian_reviewed: false`
+unresolved); robo-harness's `assets/so101.urdf` is a verbatim copy of
+`phone_teleop/SO101/so101_kinematics.urdf`, now labelled as such at both ends.
+
 ## 2026-08-23 — room host `lab-pi` built; camera layer done; thermal limit found
 
 lerobot 0.6.0 (`~/lab/.venv`, torch 2.11.0+cpu, aarch64), no dataset recorded yet.
