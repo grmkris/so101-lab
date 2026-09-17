@@ -96,6 +96,7 @@ class CameraStats:
     repeats: int = 0          # byte-identical consecutive frames (a frozen sensor)
     read_failures: int = 0
     stale_reads: int = 0      # latest() calls that exceeded max_age_ms
+    reopens: int = 0          # device re-opened after it stopped delivering
     last_seq: int = 0
     last_mono: float = 0.0
     fourcc: str = ""
@@ -107,30 +108,78 @@ class CameraStats:
         return d
 
 
+# A device that has delivered nothing for this long is reopened. The wrist
+# Innomaker drops off the bus under arm motion and comes back re-enumerated
+# (a new /dev/videoN behind the same udev name); the old handle then reads
+# nothing forever, which looked like a dead camera and ended two runs.
+STALL_REOPEN_S = 2.0
+REOPEN_RETRY_S = 1.0
+REOPEN_FIRST_FRAME_S = 3.0
+
+
 class _Reader(threading.Thread):
     """One thread per camera.  Grabs as fast as the device delivers and keeps
-    only the newest frame — a slow consumer must never back-pressure capture."""
+    only the newest frame — a slow consumer must never back-pressure capture.
+    Reopens the device when it stops delivering."""
 
     daemon = True
 
-    def __init__(self, name: str, cap: "cv2.VideoCapture", stats: CameraStats):
+    def __init__(self, name: str, cap: "cv2.VideoCapture", stats: CameraStats, reopen=None):
         super().__init__(name=f"labcam-{name}")
         self.cam_name = name
         self.cap = cap
         self.stats = stats
+        self._reopen = reopen  # () -> cv2.VideoCapture, or None to never reopen
         self._lock = threading.Lock()
         self._frame: Frame | None = None
         self._stopping = threading.Event()
         self._last_digest = b""
         self._first = threading.Event()
 
+    def _recover(self) -> None:
+        """Release the stalled handle and open a fresh one; keep trying until
+        one delivers a frame or the reader is stopped."""
+        assert self._reopen is not None
+        while not self._stopping.is_set():
+            try:
+                self.cap.release()
+            except Exception:
+                pass
+            try:
+                cap = self._reopen()
+            except Exception:
+                self._stopping.wait(REOPEN_RETRY_S)
+                continue
+            # After a re-enumeration the first handle often reads nothing
+            # for ten seconds while the second works, so give each one a
+            # short chance and move on.
+            deadline = time.monotonic() + REOPEN_FIRST_FRAME_S
+            while time.monotonic() < deadline and not self._stopping.is_set():
+                ok, img = cap.read()
+                if ok and img is not None:
+                    self.cap = cap
+                    self.stats.reopens += 1
+                    return
+                time.sleep(0.005)
+            try:
+                cap.release()
+            except Exception:
+                pass
+            self._stopping.wait(REOPEN_RETRY_S)
+
     def run(self) -> None:
+        last_ok = time.monotonic()
         while not self._stopping.is_set():
             ok, img = self.cap.read()
             if not ok or img is None:
                 self.stats.read_failures += 1
+                if self._reopen is not None and time.monotonic() - last_ok > STALL_REOPEN_S:
+                    self._recover()
+                    last_ok = time.monotonic()
+                    continue
                 time.sleep(0.005)
                 continue
+            last_ok = time.monotonic()
             mono, wall = time.monotonic(), time.time()
             # subsampled digest: 40x30x3 bytes, cheap enough to run every frame
             digest = hashlib.blake2b(img[::16, ::16].tobytes(), digest_size=8).digest()
@@ -233,14 +282,15 @@ class CameraOwner:
         os.write(fd, f"{os.getpid()} {self.owner}\n".encode())
         self._lock_fd = fd
 
-    def _open_one(self, name: str, dev) -> None:
+    def _open_capture(self, name: str, dev) -> "tuple[cv2.VideoCapture, str, int, int]":
+        """Open `dev` as MJPG at the configured size; the same procedure serves
+        the first open and every reopen after a stall."""
         # CAP_V4L2 explicitly: the default backend probe is slow and has picked
         # GStreamer on some builds, which ignores CAP_PROP_FOURCC entirely.
         backend = cv2.CAP_V4L2 if os.name == "posix" and os.uname().sysname == "Linux" else cv2.CAP_ANY
         cap = cv2.VideoCapture(dev, backend)
         if not cap.isOpened():
             raise LabCameraError(f"{name}: cannot open {dev} (in use, or udev symlink missing)")
-        self._caps[name] = cap
 
         # ORDER MATTERS: fourcc before size.  Setting size first makes some UVC
         # drivers pick a YUYV mode that then refuses the MJPG switch.
@@ -257,14 +307,26 @@ class CameraOwner:
         w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         if self.require_mjpg and got != "MJPG":
+            cap.release()
             raise LabCameraError(
                 f"{name} ({dev}) is {got}, not MJPG. Refusing to continue: YUYV at "
                 f"{w}x{h} exceeds the USB 2.0 isochronous budget and hangs the device."
             )
+        return cap, got, w, h
+
+    def _open_one(self, name: str, dev) -> None:
+        cap, got, w, h = self._open_capture(name, dev)
+        self._caps[name] = cap
 
         st = CameraStats(fourcc=got, size=(w, h))
         self.stats[name] = st
-        reader = _Reader(name, cap, st)
+
+        def reopen():
+            cap, _, _, _ = self._open_capture(name, dev)
+            self._caps[name] = cap
+            return cap
+
+        reader = _Reader(name, cap, st, reopen=reopen)
         self._readers[name] = reader
         reader.start()
         if not reader.wait_first(self.first_frame_timeout):
