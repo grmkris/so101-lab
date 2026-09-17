@@ -2,6 +2,24 @@
 
 Newest on top. Template:
 
+## 2026-09-17 (evening) — weak joints were LeRobot's P=16 dead band; P=32 makes the control smoke pass
+
+robo-harness `scripts/servo_step_trace.py` (robo-io stopped, one joint, ≤1.8° steps, ~470 Hz register reads):
+wrist_flex lifting against gravity moved **0.00°** of 1.8° at P=16 (32 mA) vs **1.41°** at P=32 (143 mA);
+shoulder_pan/lift residuals 0.44–0.75° at 16 vs 0.00–0.48° at 32. Supply 5.3 V at rest, sags to 4.7 V under
+load (not the main cause). LeRobot writes P=16 "to avoid shakiness" on every connect — hidden under teleop and
+policies (moving targets, no per-step settle check), exposed by bounded agent steps with 0.8° completion.
+robo-harness profile now sets `p_coefficients` 32 on the five arm joints, gripper 16 (deployed to lab-pi,
+backup in `var/backup-2026-09-17-pgain`). Pose: upright neutral, tub removed, piece on open mat.
+
+Control smoke rerun (gripper +4, wrist_flex +2, back), same limits/candidates:
+- rules: **done**, 4/4 moves completed, 8.6 s
+- Jev choice: **done**, 5/5 completed, 14.2 s, $0.00028
+- Jev critic: **done**, 5 completed + 1 failed (residual 0.92 > 0.8) → reobserve → corrective −1.06° → done, 17.2 s
+Before the gain change the same three runs all ended `repeated_failures` on the wrist return.
+Also 09-17: follower USB board stopped enumerating after a power pull (`device not accepting address`);
+only a full power cycle of Pi + arms recovered it — watch that cable/hub port.
+
 ## 2026-09-17 — Jev decision runner on the real arm: first supervised runs
 
 robo-harness `main` (decision runner `6a5c51d`…`goal syntax fix`), lab-pi `robo-io` restarted 13:51 after a full
