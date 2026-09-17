@@ -722,7 +722,7 @@ safe — no motion is physically possible.
 
 ## ✅ FIRST COMMANDED MOTION ON `lab-pi` (2026-08-23)
 shoulder_pan ±5°, 4-point sequence: tracking error 3–10 ticks (0.3–0.9°, normal STS3215
-deadband), return drift **-3 ticks (0.26°)**. Full chain verified:
+deadband — correction 2026-09-17: mostly LeRobot's P=16 gain, see journal 09-17 and CLAUDE.md lever 6), return drift **-3 ticks (0.26°)**. Full chain verified:
 udev → CDC serial → feetech-servo-sdk → lerobot 0.6.0 → calibration → accurate motion.
 
 ---

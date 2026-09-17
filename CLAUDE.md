@@ -30,10 +30,11 @@ Key facts: transport = 20 Hz HTTP polling + MJPEG re-serve (deliberate — no WS
 3. **Coverage + orientation** — a ~40-ep dataset can't learn position AND orientation invariance. Keep object orientation consistent; spread positions evenly (incl. corners) or the thin regions fail. Proven: act_v3 failed left-of-center because only 5/20 eps were left.
 4. **macOS shuffles camera indexes on replug** — ALWAYS verify indexes before a session (console `GET /api/cameras/probe`, or the snippet in crib-sheet). Currently overhead C922=0, wrist Innomaker=1, but they swap. **Retired on `lab-pi`**, where udev gives every device a stable name (`/dev/cam_context`, `/dev/cam_wrist`, `/dev/so101_follower`, `/dev/so101_leader`) — `gemini_er/devices.py` resolves by role on either host.
 5. **lerobot degree zero = mid of calibrated range** — any consumer with a different frame (MJCF, URDF) must offset per joint or poses land ~90° off (bit us on shoulder_lift/elbow_flex in the sim; fixed in `backends/sim.py`). wrist_roll zero is calibration-pose-relative across devices — unresolved wart for cross-device leader→follower.
+6. **LeRobot's follower writes P=16 on every connect** ("avoid shakiness"; firmware default 32) — a dead band where a ≤2° commanded step never overcomes friction+gravity: the goal reaches the servo and nothing moves (trace 09-17: wrist_flex 0.00° at P=16 vs 1.41° at P=32). Teleop and policies hide it (moving targets, no per-step settle check); bounded agent steps expose it. Fix: robo-harness profile `p_coefficients` 32 on arm joints, gripper 16. Diagnose with `robo-harness/scripts/servo_step_trace.py`, not by blaming the model.
 
 ## The room host — `lab-pi` (2026-08-23)
 Pi 4B 4GB, SSD at `/data`, lerobot 0.6.0 + placo, LCD status display. Full build log and
-every measured number: `notes/lab-setup-2026-08.md`. The four that bite:
+every measured number: `notes/lab-setup-2026-08.md`. Since 09-06 the arm and cameras are owned by robo-harness `robo-io` (`sudo systemctl stop|start robo-io`; conflicts with `labcam-preview`; not enabled at boot; stopping keeps torque on — cut servo power to go limp; startup refuses a joint left past its calibration range). A follower USB board can stop enumerating after a power pull (`device not accepting address`) — full power cycle of Pi + arms. The four that bite:
 - **`lab_cameras/` owns the cameras.** No code outside that package may call
   `cv2.VideoCapture` on `/dev/cam_*`. It asserts MJPG on open (a YUYV dual-camera open hangs
   the Innomaker and USB-resets the C922) and holds an `flock`, which `kill -9` releases.
@@ -47,7 +48,9 @@ every measured number: `notes/lab-setup-2026-08.md`. The four that bite:
 - **The Pi throttles to 1231 MHz (−18%) after ~1 min of 4-thread load.** It does NOT gate
   recording (3× headroom), but it gates anything pinning all cores for minutes. A €5 fan.
 
-## Current state (2026-07-25)
+## Current state (2026-09-17) — full status lives in myplan `SO-101 Lab/00 Overview`
+- **Agent control of the real arm works:** robo-harness (`~/code/robo-harness`, netcup coordinator + lab-pi `robo-io`) runs a decision runner (`bun run jev`) where rules or TypeSafe **Jev** (Vercel AI Gateway, paid credits) pick bounded joint steps; control smoke passes with rules / Jev choice / Jev critic after the P=32 fix (journal 09-17). Next: a recorded Jev-driven pickup of the white piece.
+- Older tracks below are unchanged since late July.
 - **Platform v1 LIVE**: hub on Railway; sim rig (`kris-sim`) + real follower (`kris-arm`) both registered and driven over the internet — browser keyboard AND a real leader through `controller.py`. Remaining: the actual two-person test (friend's follower/leader — `notes/friend-setup.md` is ready), wrist_roll handshake, stale queued hub commands delivered on rig re-register.
 - **ML track (2-cam wall setup)**: arm at white wall, overhead C922 (idx 0) + wrist Innomaker (idx 1), 640×480@30. Taped pick rectangle, black mat, lighting locked ~120–130. Working policy: `act_wall_v1` (20 eps, single orientation) = reliable grasp ✅. Orientation model `act_wall_v3_final` (dataset `kris0/so101_pickplace_wall_v1_20260722_174720`, 57 eps, 0°/±45°/±90°): works at 90°/center, **weak at edges + ±45°**. Next: finish to 40k → eval → DAgger-correct edge/45° failures → retrain.
 - **Queued next real-world move: SmolVLA fine-tune on blue-pegs** (ggando: SmolVLA 100% vs ACT 80% on same demos) — dataset `kris0/so101_blue_pegs_v1_20260723_171824`, A/B vs `act_blue_pegs_v1`.
@@ -64,6 +67,7 @@ every measured number: `notes/lab-setup-2026-08.md`. The four that bite:
 iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Standalone scripts work (LeLab env, patched). The console's `phone` source needs the same 2-line patch in `app/driver/.venv` — see `phone_teleop/README.md`. Needs iPhone hotspot + firewall off.
 
 ## Roadmap
+0. **Agent decision layer (robo-harness + Jev)** — recorded pickup of a light object with Jev choosing every step; then strategy D (fast stream mode, jev-drone style layering). Plan/status: myplan Overview.
 1. **SmolVLA fine-tune on blue-pegs** (queued — see journal 2026-07-24).
 2. Two-person remote teleop test (friend's hardware) → then task assignment / recording by operators (the crowdsourced-data product).
 3. DAgger corrections for tight-tolerance failures (keyboard trusted-timeout patch applied, untested).

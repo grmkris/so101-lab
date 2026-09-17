@@ -129,4 +129,6 @@ curl -s -X POST http://localhost:8000/jobs/import -H 'Content-Type: application/
 - Camera black / index shuffled after replug → re-verify indexes (block above).
 - Motor "no status packet" → loose 3-pin cable, reseat; `Overload error` latches → power-cycle follower PSU.
 - Leader gripper range tiny → didn't squeeze the trigger during calibration.
+- Joint receives the goal but a small step doesn't move → LeRobot's P=16 dead band (not power); robo-harness profile `p_coefficients` 32, trace with `robo-harness/scripts/servo_step_trace.py`.
+- Follower `/dev/so101_follower` missing, dmesg `device not accepting address … error -22` after a power pull → full power cycle of Pi + both arms.
 - `lerobot==0.6.0` is latest on PyPI; git `main` is ahead — only upgrade between dataset generations.
