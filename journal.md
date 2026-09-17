@@ -2,6 +2,52 @@
 
 Newest on top. Template:
 
+## 2026-09-17 (night) — skill-level tactician, two recorded pickup attempts, stream mode; blocker is gain under load
+
+robo-harness `main` (`de427bd`…`bc94ca7`), lab-pi `robo-io` restarted twice (stream deploy, backups
+`var/backup-2026-09-17-lazyjpeg` / `-stream`), lerobot 0.6.0, both cameras fresh, white piece on the open mat
+~20 cm out, lighting unchanged. Jev spend for the day $0.0033 total (both attempts ran the rules tactician).
+
+**Rebuilt the decision layer as jev-drone does it** — model picks *skills*, code owns the loops and the veto
+(`decision/skills.ts`, `scene-state.ts`, `tactics.ts`, `skill-loop.ts`, DR 0011). Two skills had to change
+before a real run could work: the search now **rises to a vantage height and sweeps a serpentine raster**
+(a 5 cm hover sees about a hand's width of mat, so no pan sweep could ever find a piece 20 cm away), and
+centring **takes a step and keeps it only if the piece measurably moved closer in the image** — the estimated
+image Jacobian was the fragile part, one wrong sign pushed the piece out of frame. Simulated arm now does
+scan → centre → open → descend → re-centre → close → lift in 209 moves (was: four stalls and a lucky back_off).
+
+**Attempt 1** died after 5 moves: `Control loop deadline missed`. The Pi was at 81.3 °C, `throttled=0x80008`,
+and `robo-io` was JPEG+base64-encoding **every** frame of both cameras at 30 fps — 7.3 ms per `imencode`
+measured, about half the process's CPU, in the same process as the 30 Hz motor loop, for frames nobody asked
+for (consumers pull at ≤10 Hz). Encoding is now lazy (83 % → 64 % of a core) and the runner caps wrist
+captures at one per 400 ms. After that: `/observe` age 16.8 ms p50 / 42.6 ms worst against a 250 ms deadline,
+idle and while recording.
+
+**Attempt 2** (recorded, 438 s, 2355 samples at 4.85 Hz, 27 MB MP4): swept all three arcs, never saw the piece.
+Both cameras stayed fresh the whole run, so it was **blind, not broken** — `shoulder_lift` is unresolved in
+30 of 34 multi-joint moves, including the first 17 (the climb), so the sweep ran at 3.5 cm. Under that, every
+joint settles ~0.7° short of a 1.6° step (152 of 209 pan moves "failed" at the 0.8° tolerance while still
+moving ~0.9°).
+
+**Stream mode** (DR 0012) shipped for exactly this: a command that *leads* the measured position accumulates
+the error a re-planned bounded step never can, bounded to one `max_step` so a joint breaking free cannot
+lurch. Deployed and measured at 10.07 Hz on the Pi (5.2 ms round trip): against a −3° setpoint `wrist_flex`
+travelled 1.58° and `shoulder_lift` 1.32° — the lift moved at all, which stepped commands never achieved —
+then both sat ~1.5° short, while the unloaded return landed within 0.09°. Two degrees of lead at P=48 is all
+the torque there is.
+
+Also fixed three recording faults that made every recording useless: one transient stale observation ended the
+whole recording (223 ms p95 age against a 250 ms gate — that is why attempt 1 kept 39 frames), every
+overlapping poll counted as a missed deadline (160 ms round trip under a 100 ms poll), and starting a recording
+demanded a motion-grade observation. Recordings now report `captured` with `sampling_fps_achieved`; ~6 Hz is
+the ceiling, one sample per round trip. MP4 export is fine at that rate; LeRobot **dataset** export is not
+(it refuses gaps over 250 ms).
+
+**Blocker, measured, for the next session:** gain, not geometry (top-down solutions exist from 0.10 to 0.35 m
+radius), not the control path, not the model. Next: `servo_step_trace.py` on `shoulder_lift`/`elbow_flex` at
+P 48/64/96 under load, then a profile change — needs a human, P gains are not changed unattended. Third
+attempt deliberately unused: same configuration, same failure.
+
 ## 2026-09-17 (evening) — weak joints were LeRobot's P=16 dead band; P=32 makes the control smoke pass
 
 robo-harness `scripts/servo_step_trace.py` (robo-io stopped, one joint, ≤1.8° steps, ~470 Hz register reads):
