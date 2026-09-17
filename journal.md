@@ -2,6 +2,31 @@
 
 Newest on top. Template:
 
+## 2026-09-17 — Jev decision runner on the real arm: first supervised runs
+
+robo-harness `main` (decision runner `6a5c51d`…`goal syntax fix`), lab-pi `robo-io` restarted 13:51 after a full
+replug (boot `b3f28111`, 09-09 table-clearance fault cleared), lerobot 0.6.0, cameras workspace+wrist fresh
+(~50 ms). Jev = `typesafe-ai/jev` via Vercel AI Gateway, `ai@7.0.105`, ZDR off (Hobby plan). Total model spend
+$0.0018. Arm leaning forward with the jaw near the mat, white piece and tub right in front (not moved).
+
+- **Gateway:** needed card + a *paid* top-up (free credits exclude Jev). Smoke 479 ms, `reobserve` p=0.97.
+- **Fixtures (11) with live Jev:** critic 11/11, choice 10/11, parallel 8/11 (parallel says `stop` where
+  reobserve/wait is right). p50 ≈ 300 ms.
+- **Joint baseline (≤1.8° steps, measured change of commanded):** gripper 1.2/1.8 and 0.96 back ·
+  wrist_roll 1.1–1.7 (all completed) · wrist_flex 1.5 and 0.9 back · elbow_flex 1.2, then 2 of 3 failed to
+  settle (0.7–0.8) · **shoulder_lift 0.26 · shoulder_pan 0.09–0.26 — both failed**. Same weak-shoulder
+  signature as 09-09. Hypothesis to test: P=16 static-friction deadband (lerobot #3400) and/or supply sag.
+- **Bug found live:** a signed goal after `=` meant relative, so a return to `wrist_roll=-8.48` moved another
+  −8.5° (away from the table). Goals are now `joint+=N` relative, `joint=-N` absolute. Also full 2% steps were
+  refused by ~0.1 sensor jitter at the exact max_step; candidates now keep 0.2 headroom.
+- **Control smoke (gripper +4, wrist_flex +2, back), same limits/candidates:** rules 3 moves ok then 2
+  wrist_flex failures · Jev choice 2 ok, 2 failures · Jev critic 3 ok, 2 failures. All stopped on
+  `repeated_failures` at wrist_flex +1.8 (residual 0.9–1.6). Gripper ended at 47% open; the opened jaw sits
+  close to the mat, so likely contact rather than a decision problem. No fault latched.
+
+Next: raise the arm (shoulders don't respond, so by hand with robo-io stopped, or re-probe after a P/power
+check), clear the tub, rerun the smoke from a pose with clearance; then pickup.
+
 ## 2026-09-07 — robo-harness drove the real SO-101 (agent-workbench powered runs, 09-06/07)
 
 `~/code/robo-harness` — the standalone SO-101 agent workbench (Bun/TS coordinator on the
