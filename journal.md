@@ -37,12 +37,24 @@ Plus: a camera stall no longer ends a run (it waits, up to 15 s, six times), ski
 run's wall clock, `joint_health` is in the scene so a stalled joint stops a run, and a `place`
 skill puts the piece back for repeat attempts.
 
+**How it ended (attempt #11):** 233 moves, **zero failures**, recording `captured`
+(2710 samples, 5.6 Hz, 32 MB MP4 `13e53f58`), arm sweeping three arcs at 9.6 cm from
+r = 0.20 m in to r = 0.10 m, lift residuals 0.63–0.72°, no stall and no abort. It found
+nothing — and two frames from that recording say why: with the tip at r = 0.147 m the **wrist
+camera is looking at the mat's edge and the white table**, because the gripper is still over
+the table, while the overhead frame shows the piece far out on the mat. **The mat itself
+starts beyond the arm's usable reach.** Next session's first move is physical: slide the mat
+toward the arm so the piece sits 15–20 cm from the base, then `bun run jev --observe --task
+pickup-skills` to confirm the wrist sees it before spending a run.
+
 **The wall we hit: torque, not kinematics.** With the arm extended at r ≈ 0.27 the lift is
 1.2–1.4° short at P96; re-tracing there, P128 moved it 2.2° but drew **1.5 A and took the servo
 from 52 °C to 88 °C** in one step — the trace's own guard stopped it (transient; back to 51 °C a
 minute later, status clean). So the workspace is capped at **0.22 m** — the radius where the
-arm's own moves complete — not at the 0.35 m the solver will happily return. **The piece is
-sitting further out than that.** Next session's first move is physical: put it 15–20 cm from the
+arm's own moves complete — not at the 0.35 m the solver will happily return. Re-traced at
+working reach afterwards, **P128 is the right lift gain there**: residual 0.39° at 949 mA with
+the servo flat at 51 °C (the 1.5 A / 88 °C spike was only at full extension, which the cap now
+refuses). With that, multi-joint transit went from failing every move to 8/8, then 233/233. Next session's first move is physical: put it 15–20 cm from the
 base, then rerun `bun run jev --execute --supervised --task pickup-skills --record`.
 
 Also caught by the gate: the repo's "a live smoke without a key is blocked" test inherited this
