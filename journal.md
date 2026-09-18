@@ -2,6 +2,53 @@
 
 Newest on top. Template:
 
+## 2026-09-18 (overnight) — the arm climbs; six infrastructure bugs, each of which looked like "the model can't do it"
+
+Free-rein night (Kris: lights on, mat clear, P ceiling 128 trace-gated, place-back allowed).
+robo-harness `main` `de427bd`…`5d9d1ad`, lab-pi profile + engine redeployed several times
+(backups in `var/backup-2026-09-18-pgain/`), Jev spend $0 — every attempt ran the rules
+tactician, because none of the failures were decisions.
+
+**Gain, resolved.** `servo_step_trace.py` (now reads `Present_Temperature` and samples rest
+jitter) in the forward-leaning hover pose: raising `shoulder_lift` 1.8° moved 0.61° at P48,
+1.32° at P64, **1.85° at P96** (403 mA), 1.76° at P128 (566 mA); `shoulder_pan` residual
+0.39° at 32 → 0.05° at 64; `wrist_flex` return residual 0.79° at 32 → 0.26° at 64. Zero rest
+jitter anywhere, servos ≤41 °C. Profile: **pan 64, lift 96, elbow 96, wrist 64, roll 32,
+gripper 16**. The climb that failed 17/17 moves on 09-17 now completes 14/14 and the tip goes
+3.5 → 9.7 cm. Control smoke `done`, residuals 0.22–0.30.
+
+**Then five more, each found by reading a recording against FK:**
+1. `moveTip` solved once and walked the goal in joint space — the tip's path between two joint
+   poses is not a straight line: a "7 cm outward" step **lost 6 cm of height**. Now waypointed
+   (≤3 cm), re-solved from measured, judged on where the tip ended up.
+2. The wrist Innomaker **re-enumerates under arm motion** (`/dev/cam_wrist` → a new `videoN`);
+   the stale handle reads nothing forever. It refused all 312 moves of one run. `lab_cameras`
+   now reopens a device that has delivered nothing for 1 s.
+3. A **wedge of white table** at the mat edge passed the background rule and the arm went to
+   centre on it. Bright regions touching the frame edge or >12 % of it are background now; a
+   real piece between the jaws (0.7 % of frame) still detects.
+4. The motor owner planned every operation **from the measured pose**, so a pan-only move
+   re-commanded the other joints to wherever gravity had let them sag — a ratchet that sank the
+   raised arm 4 cm over thirty *completed* moves. Unmentioned joints hold their command now…
+5. …which then failed every move, because the completion check still judged those held joints,
+   and a loaded joint sits ~1.3° below its command. A move is judged on the joints it asked to
+   move.
+Plus: a camera stall no longer ends a run (it waits, up to 15 s, six times), skills respect the
+run's wall clock, `joint_health` is in the scene so a stalled joint stops a run, and a `place`
+skill puts the piece back for repeat attempts.
+
+**The wall we hit: torque, not kinematics.** With the arm extended at r ≈ 0.27 the lift is
+1.2–1.4° short at P96; re-tracing there, P128 moved it 2.2° but drew **1.5 A and took the servo
+from 52 °C to 88 °C** in one step — the trace's own guard stopped it (transient; back to 51 °C a
+minute later, status clean). So the workspace is capped at **0.22 m** — the radius where the
+arm's own moves complete — not at the 0.35 m the solver will happily return. **The piece is
+sitting further out than that.** Next session's first move is physical: put it 15–20 cm from the
+base, then rerun `bun run jev --execute --supervised --task pickup-skills --record`.
+
+Also caught by the gate: the repo's "a live smoke without a key is blocked" test inherited this
+host's real `AI_GATEWAY_API_KEY` through the spawned app and made a **billed** Gateway call.
+The harness hands tests no ambient credential now.
+
 ## 2026-09-17 (night) — skill-level tactician, two recorded pickup attempts, stream mode; blocker is gain under load
 
 robo-harness `main` (`de427bd`…`bc94ca7`), lab-pi `robo-io` restarted twice (stream deploy, backups
