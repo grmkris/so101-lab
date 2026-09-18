@@ -112,7 +112,9 @@ class CameraStats:
 # Innomaker drops off the bus under arm motion and comes back re-enumerated
 # (a new /dev/videoN behind the same udev name); the old handle then reads
 # nothing forever, which looked like a dead camera and ended two runs.
-STALL_REOPEN_S = 2.0
+# Consumers call a frame stale at 500 ms, so waiting seconds to react means
+# the stall is always noticed downstream first.
+STALL_REOPEN_S = 1.0
 REOPEN_RETRY_S = 1.0
 REOPEN_FIRST_FRAME_S = 3.0
 
