@@ -2,6 +2,55 @@
 
 Newest on top. Template:
 
+## 2026-09-21 (night) — desk work, no arm: the model fails exactly the cases critic hides from it
+
+Lights off, Kris asleep, **nothing actuated**: no observe, no dry-run, no gain change, no camera
+touched. `robo-io` left running and untouched on lab-pi the whole night (74 °C at the end).
+robo-harness `8c215cc` → `d7df153`, gate green before each push. Live Jev spend for the night
+**$0.0028** (155 cumulative calls, $0.0062 all-time) against a nightly cap of $2.
+
+**Decider comparison (11 offline fixtures, identical observations and candidates).** Gateway
+smoke passed live at 973 ms, `reobserve` p=0.98.
+
+| strategy | passed | p50 | p95 | cost | model calls |
+| --- | --- | --- | --- | --- | --- |
+| rules | 11/11 | 0 ms | 0 ms | $0 | none |
+| choice | 10/11 | 308 ms | 388 ms | $0.000442 | all 11 |
+| parallel | 8/11 | 302 ms | 374 ms | $0.000455 | all 11 |
+| critic | 11/11 | 0 ms | 383 ms | $0.000139 | 4 of 11 |
+
+Three repetitions of `choice` and `parallel` gave **identical pass counts, identical failing
+fixtures and identical cost to six decimals** — systematic, not sampling. Every failure is a
+case where the right move is *not to move*: both model strategies **re-pick a step that just
+failed to move** (the 09-17 `repeated_failures` signature), and `parallel` reaches for `stop`
+on a stale frame and on another owner's running operation.
+
+**`critic` wins on accuracy and cost for the same reason:** it is rules-first, model-for-approval.
+Seven fixtures report `no review needed` and resolve in 0 ms with no call; every fixture the
+model gets wrong is in that set. The model never gets a vote on the cases it fails. Run `critic`
+on hardware; `parallel` should not drive an arm. Detail: `robo-harness/docs/decider-comparison-2026-09-21.md`.
+
+**Coverage bar, fixed (`ce35b44`).** `overhead_calibration.py` measured axis-aligned extents,
+which measure the camera's heading as much as the sweep's reach: the 0.2 m / 90° arc the search
+actually sweeps reads span_x 0.059 / span_y 0.283 at heading 0° but 0.200 / 0.200 at 45° — the
+same arc passing or failing a 0.15 m bar on orientation alone, so every real recording was
+rejected by construction. Coverage is now extent along the points' own principal axes (0.283
+major, 0.059 minor, at any heading), with a separate smaller bar on the minor axis because
+collinear points fix no plane however far apart they are. `scripts` is on the pytest path now.
+
+**Raster footprint, asserted (`d7df153`).** "3 degrees — far less than the camera's footprint"
+was a comment and nothing else. `rasterCoverage` now measures both gap directions against the
+footprint — 0.05 m radially between arcs, 0.012 m along the widest arc between looks, against
+~0.208 m of visible mat at the 0.1 m scan height — and the scan skill vetoes **before its first
+move** instead of sweeping rings it never looks at. **The footprint ratio itself is an unverified
+assumption**: the wrist Innomaker's field of view is recorded nowhere in the lab, and it looks
+along the jaws rather than straight down. A test halves it to prove it is load-bearing. Point the
+wrist at a ruler at a known height and replace the number.
+
+**Discrepancy for the record:** the brief states the lab-pi profile is lift **P96**; the live
+profile on the Pi reads **P128** (`shoulder_lift`), set 09-18 after the second trace at working
+reach. Nothing was changed — flagging it because the brief's number is stale.
+
 ## 2026-09-21 — first daylight-less run: the detector was blind because the lights were off
 
 robo-harness `main` `b24228d` (+ a staged, uncommitted grok-4.7 capability change, gate green),
