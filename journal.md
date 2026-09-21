@@ -2,6 +2,36 @@
 
 Newest on top. Template:
 
+## 2026-09-21 — first daylight-less run: the detector was blind because the lights were off
+
+robo-harness `main` `b24228d` (+ a staged, uncommitted grok-4.7 capability change, gate green),
+lab-pi `robo-io` up 3d21h, profile P: pan 64, **lift 128**, elbow 96, wrist_flex 64, roll 32,
+gripper 16. Jev spend $0 (rules tactician only).
+
+**Run #1 `14e7ea15` (recorded `23b4a572`, 4752 samples at 9.83 Hz, `captured`):** 186 moves,
+113 completed / 71 failed / 2 cancelled, ended `max_seconds` after 480 s still inside
+`scan_for_piece`. Arm swept pan −32.2° to +46.8°, lift −53.9° to −19.9°, gripper untouched at
+62.3%. **Zero piece sightings in 4484 wrist frames.**
+
+**Cause: the room was dark.** The run started at 22:33 local with the lights off. Overhead
+frame mean brightness **5.6/255** during the run against **84.8** the same afternoon; the wrist
+frames are **1.0** against 95.9, with a maximum pixel value of **1**. The piece detector
+thresholds at >170, so nothing in the wrist image could ever qualify — the sweep was
+mechanically perfect and optically blind. CLAUDE.md lever 2 (lock the lighting) applies to the
+agent stack too, and nothing in the runner checks it.
+
+**Also measured:** 71 failed moves were `shoulder_pan` short by 1.37° mean / 1.60° max while
+lift (0.27° mean at P128), wrist_flex (0.16°) and elbow (0.74°) stayed inside tolerance —
+the opposite joint from every previous session. Worth a trace before blaming the sweep.
+
+**Before the run, unrelated:** `robo-app`/`robo-rerun` restarted onto the staged grok-4.7
+change; live catalog now reports xai `grok-4.7` vision true (`source: configured`, not
+`documented` — the live host does not match the gateway rule the staged test asserts).
+Repo gate green (100 python tests + typecheck) on that staged tree.
+
+**Next:** lights on, repeat the identical run. Then add a frame-brightness gate to the scene so
+a dark room aborts in one move instead of 480 s.
+
 ## 2026-09-18 (overnight) — the arm climbs; six infrastructure bugs, each of which looked like "the model can't do it"
 
 Free-rein night (Kris: lights on, mat clear, P ceiling 128 trace-gated, place-back allowed).
