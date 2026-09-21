@@ -47,9 +47,20 @@ assumption**: the wrist Innomaker's field of view is recorded nowhere in the lab
 along the jaws rather than straight down. A test halves it to prove it is load-bearing. Point the
 wrist at a ruler at a known height and replace the number.
 
-**Discrepancy for the record:** the brief states the lab-pi profile is lift **P96**; the live
+**Discrepancy for the record:** the brief stated the lab-pi profile is lift **P96**; the live
 profile on the Pi reads **P128** (`shoulder_lift`), set 09-18 after the second trace at working
-reach. Nothing was changed — flagging it because the brief's number is stale.
+reach. Nothing on the arm was changed. `~/briefs/so101-lab-overnight.md` corrected 09-21.
+
+**PENDING FOR KRIS — two edits to myplan `SO-101 Lab/00 Overview` (`doc_QblnKgCzgiEdmZmR`).**
+The connector was not authorised in that session and the login was deferred, so the Overview
+still says:
+1. **lift P96** — should read **pan 64 / lift 128 / elbow 96 / wrist_flex 64 / roll 32 /
+   gripper 16**, the live lab-pi profile.
+2. **"next session starts with a P sweep"** — stale; that blocker was resolved 09-18. The
+   current blocker is the **unverified wrist-camera footprint ratio** (`wristFootprintRatio`,
+   2.08, in `decision/skills.ts`): the three-arc raster's sufficiency rests on it and the
+   Innomaker's field of view is recorded nowhere. Measuring it is a ruler on the mat at a known
+   height, no arm motion needed.
 
 ## 2026-09-21 — first daylight-less run: the detector was blind because the lights were off
 
