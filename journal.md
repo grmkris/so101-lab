@@ -59,8 +59,18 @@ still says:
 2. **"next session starts with a P sweep"** — stale; that blocker was resolved 09-18. The
    current blocker is the **unverified wrist-camera footprint ratio** (`wristFootprintRatio`,
    2.08, in `decision/skills.ts`): the three-arc raster's sufficiency rests on it and the
-   Innomaker's field of view is recorded nowhere. Measuring it is a ruler on the mat at a known
-   height, no arm motion needed.
+   Innomaker's field of view is recorded nowhere.
+
+**MORNING TASK FOR KRIS — measure the wrist camera footprint.** It is the one unverified number
+the search now depends on, and it needs a person, not a run. Lay a ruler across the mat, put the
+tip a known height above it (the scan height, 0.10 m, is the case that matters), and read off how
+much of the ruler the wrist frame spans. That width divided by the height is `wristFootprintRatio`
+in `apps/server/src/decision/skills.ts`, currently the assumed **2.08** (≈0.21 m of mat at 0.10 m).
+No arm motion is required — park the tip by hand with `robo-io` stopped, or read it off a frame
+from any recording where the tip height is known. If the real ratio is much below ~1.0 the shipped
+three-arc raster no longer tiles and the scan will now say so instead of sweeping blind. Note the
+camera looks *along* the jaws rather than straight down, so the footprint is a skewed quad: record
+the across-jaw width and say which it is.
 
 ## 2026-09-21 — first daylight-less run: the detector was blind because the lights were off
 
