@@ -2,6 +2,39 @@
 
 Newest on top. Template:
 
+## 2026-09-22/23 (night) — first real pickup of the white block, driven by hand from Claude
+
+Continued from the previous session's handoff (`/tmp/so101-session/HANDOFF.md`, tool
+`/tmp/so101-session/arm.ts`: IK on netcup, joint walks of ≤1.6°, lease renewed per step).
+lerobot 0.6.0, lab-pi `robo-io`, lamp on, overhead C922 = `cam_context`, wrist Innomaker = `cam_wrist`,
+gains pan 64 / lift 128 / elbow 96 / wrist_flex 64 / roll 32 / gripper 16, max_speed 2.
+
+**Result: block grasped and lifted ~6 cm** (gripper stalled at 11.1% on it, block rides with the jaws
+in both cameras, mat spot empty). Two misses first, each nudging the block 1.4–2 cm.
+
+What made it work — all four contradict assumptions the handoff was working from:
+1. **The gripper closes onto its FIXED finger** (the +y one, image-right in the overhead). The
+   block must sit against that finger's inner face, not mid-gap. At 86–90% open the moving jaw swings
+   nearly level and sweeps a wide area into the fixed finger — a forgiving push-grasp.
+2. **The overhead barely sees y.** Collating fingertip pixels over ~10 poses: its image-x hardly
+   changes with y; image-y tracks reach (~12.5 px/cm). The handoff's "16 px/cm of y" was a pan/reach
+   confound. Overhead is a reach/height gauge, not a y gauge. Wrist image-vertical ≈ y (~45–65 px/cm
+   at 3–4 cm), wrist image-x ≈ reach (weak, ~15–25 px/cm).
+3. **Model "tip" ≠ fingertip.** With the pose the walker reached, the fixed finger was on the mat
+   while `tip` read 2.5 cm; "did not settle" on every step meant the finger was pressing on the mat.
+   Earlier the table-clearance guard stopped descent at a model 1.8 cm. Trust the cameras for contact.
+4. **The wrist-camera dropout was electrical, not lamp glare.** When a finger landed on the block
+   both cameras reset in the same second on the Pi's hub; the Innomaker then failed to re-enumerate
+   (`port4: Cannot enable. Maybe the USB cable is bad?`) until Pi + arm USB were replugged. After
+   that, wrist frames were clean at 2.2 cm with the same lamp. The prior "truncates below 4 cm"
+   correlates with arm load as much as with distance. Fix candidate: cameras on a powered hub with a
+   supply separate from the servos.
+
+Other: robo-io refuses an agent lease while any camera is stale — with the wrist camera dead at 2 cm
+the arm is stuck in place (human-mode leases skip the guard; not used). The follower boards came back
+behind a Genesys hub (05e3:0610) after the replug. The walker moves joints independently, so a long
+Cartesian target can wander to a different IK branch — drive to a recorded joint pose instead.
+
 ## 2026-09-21 (night) — desk work, no arm: the model fails exactly the cases critic hides from it
 
 Lights off, Kris asleep, **nothing actuated**: no observe, no dry-run, no gain change, no camera
