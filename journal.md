@@ -2,6 +2,12 @@
 
 Newest on top. Template:
 
+## 2026-09-23 — real-model image preflight and passive-diagnostic preparation
+
+Using the existing LeRobot 0.6.0 SO-101 deployment, captured actual workspace C922 and wrist Innomaker images (640×480, existing lamp and live camera settings). No dataset recording or object-orientation policy trial. Astra and Grok accepted the image payload and returned the low-level `reobserve` candidate (4.828 s / 9.225 s); Qwen exceeded its 30 s deadline, with provider completion/billing unknown. djev credentials remain unavailable. Intermittent source-freshness failures were preserved; Grok/Qwen used the hash-verified saved real camera pair. These checks establish adapter responses, not visual accuracy or physical task success.
+
+Local robo-harness commits `e2a3d40` (existing-owner passive servo readback) and `844e7e4` (real-model probe/report) passed 305 TypeScript + 128 Python tests, final static checks, build and isolated browser acceptance. No service restart, motion, gain/limit/calibration/guard change, physical reset or scored pickup. The old held elbow residual remains unresolved; sampled checks retained the original boot/epoch/commanded hold with no fault/operator. Attended restart/readback is prepared but awaiting Kris's current presence and clearance confirmation because startup rebases that hold. [Test preparation and remaining gates](notes/real-model-test-preparation-2026-09-23.md). Room images remain private.
+
 ## 2026-09-23 11:02–11:06 — command-path hypothesis, offline only
 
 Reconstructed the failed operation from saved endpoints using both checkout and deployed engine snapshots at synthetic 10 ms, 33.3 ms and 100 ms ticks. The operation starts from measured elbow 55.956° although the previous commanded hold was 55.046°; the first trajectory setpoint is therefore still 55.816–55.942° before it crosses the previous goal after 0.66–0.70 s and reaches the encoded target after 1.15–1.20 s. The endpoint replay fails with the recorded 0.808791° residual, no engine fault and unchanged held joints. The final target discrepancy is 1.19° inside the configured 2° relative-target threshold, based on the saved position only. This is a synthetic command-path audit, not a servo transient measurement or driver readback.
