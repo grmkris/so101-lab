@@ -2,6 +2,13 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 03:49 CEST — replay pushed; coordinator runtime restarted safely
+
+- `e3b28c7` pushed to robo-harness main after the serialized gate: 248 TypeScript tests, 112 Python tests. The offline replay validates frame hashes, camera roles, freshness, clock domain and before/lift/after ordering; it never calls providers or motion. Docs record that live runner/reset execution is unfinished.
+- `bun run bench:judge` replayed `var/bench/2026-09-23/replay-idle/manifest.json` from two read-only snapshots. Result: `pick_success: null`, `place_error_m: null`, `needs_review: true`, absent SAM/VLM proof retained as null. One accepted CC candidate per workspace frame; no lift frame and no scored trial.
+- `heavy bun run build` passed; `robo-app` and `robo-rerun` restarted and are active. Live status after restart: HTTP 200, no run/fault/operator, same tip `(0.1243, -0.0377, 0.0312) m`, cameras 45/27 ms, servos 25/29/39/24/26/26 C. Invalid `wall_ms=999` request returned 400; no chat was started.
+- Final physical decision: remain parked. TCP/homography/safe polygon/home and reset/model smoke are still not commissioned; no descent, calibration or benchmark trial is justified overnight.
+
 ## 2026-09-23 03:37 CEST — read-only evidence capture and hardware recheck
 
 - New evidence collector saved original JPEGs, metadata and SHA-256 hashes in `robo-harness/var/bench/2026-09-23/safety-0337c/`. Workspace image confirms empty gripper raised and object on the mat. No provider call, motion or lease.
