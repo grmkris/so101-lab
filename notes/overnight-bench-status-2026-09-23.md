@@ -2,6 +2,20 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 03:37 CEST — read-only evidence capture and hardware recheck
+
+- New evidence collector saved original JPEGs, metadata and SHA-256 hashes in `robo-harness/var/bench/2026-09-23/safety-0337c/`. Workspace image confirms empty gripper raised and object on the mat. No provider call, motion or lease.
+- The first two captures refused HTTP 503 from the coordinator's 250 ms observation freshness guard. Read-only sampling confirmed intermittent cache ages of 159–242 ms and a few refusals, while direct I/O, both cameras and the arm were healthy. Collector now retries only an observation HTTP 503, at most four times, and records retry count; guard thresholds are unchanged. Successful capture used one retry. Failed capture manifests remain intact.
+- Latest saved observation: model tip `(0.1243, -0.0377, 0.0312) m`, fault null, operator null, camera ages 31/23 ms, temperatures 25/29/39/24/28/26 C. Pose unchanged; no recovery or cooling intervention needed.
+- Evidence collector gate is running. Remaining physical prerequisites are unchanged; no calibration values were filled in from these images.
+
+## 2026-09-23 03:33 CEST — bounded trial chat shipped
+
+- `a8c0743` pushed to robo-harness main. Added coordinator-enforced optional `wall_ms` (1 s–30 min), exposed as `bun run chat --wall-ms`; an expired cap cancels the turn even if its client has gone away. Mock integration verifies a running operation cancels and releases ownership, without a second model step.
+- Headless chat now refuses a pre-aborted start, decodes streamed events, skips replay duplicates, closes readers, and bounds cancellation drain. A missing `chat.finished` remains an unverified outcome; it is never automatically retried as a new trial.
+- Full gate and serialized pre-push passed: 243 TypeScript tests, 112 Python tests. Runtime activation will happen after the next stable checkpoint while the arm is idle.
+- Report/HTML/journal were updated and pushed in lab commit `207605c` with the earlier offline fixture, explicitly distinguishing schedule/judge/reset policy from unfinished live execution. Now adding append-only read-only evidence capture and offline replay. Physical trials remain blocked on commissioning and smoke.
+
 ## 2026-09-23 03:11 CEST — offline fixture green; continuing runner work
 
 - Resumed from `90bed02`/`7434fa5` and preserved the uncommissioned geometry. Read-only arm check at 03:07 CEST: same raised tip `(0.1243, -0.0377, 0.0312) m`, no lease/fault, camera ages 43/52 ms, maximum servo 39 C. No motion issued.
