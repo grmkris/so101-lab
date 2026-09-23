@@ -2,6 +2,13 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 03:11 CEST — offline fixture green; continuing runner work
+
+- Resumed from `90bed02`/`7434fa5` and preserved the uncommissioned geometry. Read-only arm check at 03:07 CEST: same raised tip `(0.1243, -0.0377, 0.0312) m`, no lease/fault, camera ages 43/52 ms, maximum servo 39 C. No motion issued.
+- `881cee7` adds deterministic fenced/spaced schedules, fail-closed stop conditions, a recorded-frame judge, and the three-attempt reset policy. Full `heavy bun run check` passed (239 TypeScript tests, 112 Python tests); pushed to origin/main (pre-push gate also green). Corrected camera provenance: wrist recordings cannot establish table position, even when a homography is supplied. Missing SAM/VLM evidence stays unverified.
+- `bun run bench` is explicitly schedule preflight only and refuses the current uncommissioned config. Decision: finish runner/reset/evidence orchestration offline before exposing live execution. A successful offline fixture is not the attended calibration/reset/model smoke gate.
+- The required report and journal already exist and are pushed. Keep updating them with later green pieces; scored physical trials remain zero.
+
 ## 2026-09-23 02:51 CEST — final overnight safety recheck
 
 - Final direct I/O check: tip `(0.1243, -0.0377, 0.0312) m`, fault null, operator/lease null, workspace/wrist ages 15/46 ms, temperatures shoulder 25, lift 28, elbow 38, wrist-flex 24, roll 26, gripper 26 C. `robo-app` and `robo-rerun` remain active.
