@@ -1,6 +1,6 @@
 # Overnight SO-101 benchmark — 2026-09-23
 
-Updated 2026-09-23 04:23 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
+Updated 2026-09-23 05:37 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
 
 The provider integration and general manipulation tools are green, pushed and deployed. Physical commissioning stopped before calibration touches: upward probes exposed a motor-completion deadband, a transient stale observation and one elbow non-settling step. The arm was left raised with no lease; no descent or pickup was attempted during this continuation. The prior evening's human-directed pickup is not counted as a benchmark trial.
 
@@ -17,7 +17,7 @@ Probe latencies (tool / image / `parallel_tool_calls:false`, ms): Astra 1676 / 1
 
 ## What shipped
 
-`robo-harness` main is pushed through `8c19f2b`. The latest complete gate passed **252 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed and `robo-app`/`robo-rerun` were restarted at 03:48 CEST from the tree through `e3b28c7`. The later reset fixture in `8c19f2b` has no live adapter and was not activated on hardware. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
+`robo-harness` main is pushed through `547fff1`. The latest complete gate passed **261 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed and `robo-app`/`robo-rerun` were restarted at 03:48 CEST from the tree through `e3b28c7`. The later reset fixture (`8c19f2b`) and orchestration fixture (`547fff1`) have no live adapters and were not activated on hardware. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
 
 - Generic cliproxy provider, chat usage, bounded run overrides, headless chat client and capability probe CLI.
 - Connected-component bright-object detector and strictly decoded coordinator manipulation configuration.
@@ -41,11 +41,12 @@ Later upward steps stopped at a stale observation and at elbow residual **0.848 
 - Hardware observations: one stale-observation refusal before submission; one non-settling upward elbow step; no latched fault. Camera recovery count: 0. Servo cooling pauses: 0.
 - Reset-operator attempts/interventions: 0. Reset smoke: not run. Model manipulation smoke: not run.
 - Offline benchmark fixture shipped in `881cee7`; hashed evidence capture in `e9440d4`; replay and provenance validation in `e3b28c7`: seeded model rotation, >=3 cm target spacing inside the reviewed polygon/radius, fail-closed STOP/fault/camera/temperature checks, saved-frame judge and three-attempt reset decision policy. Camera provenance is enforced; absent SAM/VLM evidence remains unverified. `bun run bench` only produces a schedule and refuses the current uncommissioned config. Live runner execution and automated SAM/VLM judge integration remain unfinished; the fixture reset loop is tested but not wired to hardware; no offline check is counted as a physical smoke or scored trial.
+- Offline orchestration fixture `547fff1` sequences home, capture, bounded chat, judge, verified reset and home with exclusive artifact directories and a phase/event journal. Nine tests cover unknown outcomes, STOP/heat/deadline cancellation, consecutive tool errors, inconclusive evidence, reset failure, reused frames/sessions, and identical caps across model rotation. All injected runs remain `offline_fixture` with zero scored trials; no live adapter or new motion endpoint is installed.
 - Initial full gate was externally terminated during passing tests; it was retried. `heavy` exit 75 was treated as contention and retried, never reported as a pass.
 
 ## Arm end state and evidence
 
-Read-only monitoring began at **04:04 CEST** and remains active until 07:20 CEST. Through 04:21 there are 18 consecutive samples, no alerts, no pose/boot change, no fault or lease, fresh cameras, and a maximum servo temperature of 39 C. The JSONL log is local at `var/bench/2026-09-23/watch-morning.jsonl`. This is a parked-arm observation window, not a motion or reliability benchmark.
+Read-only monitoring began at **04:04 CEST** and remains active until 07:20 CEST. Through 05:36 there are **90 samples, no alerts**, no measured pose/boot change, no fault or lease, fresh cameras, and a maximum servo temperature of 39 C. Turn interruptions left sampling gaps from 05:14:47 to 05:17:37 and from 05:25:38 to 05:27:28; there is no observation proof for those gaps. The watcher now runs in tmux. Local evidence is split across `watch-morning.jsonl`, `watch-morning-continued.jsonl` and `watch-morning-detached.jsonl` under `var/bench/2026-09-23/`. This is a parked-arm observation window, not a motion or reliability benchmark.
 
 At the 2026-09-23 03:49 CEST post-restart recheck: fault null, operator null, workspace/wrist camera ages about 45/27 ms, servos 25–39 C; the measured pose was unchanged. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
 

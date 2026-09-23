@@ -2,6 +2,23 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 05:37 CEST — offline orchestration pushed; report updated
+
+- `547fff1` pushed after `heavy bun run check` and the serialized pre-push gate: 261 TypeScript tests, 112 Python tests. Nine new tests exercise trial sequencing, exclusive artifacts, model rotation, fresh session/frame identities, uncertain evidence and reset outcomes, STOP/heat/wall cancellation and the three-error cap. It has no live adapter; every result is labelled offline with zero scored trials.
+- Updated report MD/HTML and journal with shipped versus deployed state and the two monitoring gaps. Physical commissioning/reset/model smoke remain blocked; no gain, limit, geometry or runtime changes were made.
+- Watcher is persistent in tmux. Across three preserved log segments: 90 received samples through 05:36 CEST, zero alerts, unchanged pose/boot, no fault/lease/chat, fresh cameras and max servo 39 C. Continue to 07:20, inspect the complete window, then push final report/journal before 07:30.
+
+## 2026-09-23 05:32 CEST — offline runner validation; monitoring made persistent
+
+- Continuing priority 4 after the renewed instruction: added an offline orchestration fixture for home/capture/chat/judge/reset, append-only artifacts, model rotation with fresh sessions, shared caps and cancellation. It has no installed live adapter and reports zero scored trials. The full serialized gate is running after owned lint/type fixes.
+- Correction to the 05:18 decision: commissioning blocks live activation, not implementing and testing offline orchestration. No live motion adapter is being installed, and the uncommissioned profile remains unchanged.
+- Turn interruptions ended the first two watcher processes. Logs are preserved separately: `watch-morning.jsonl` ends 05:14:47, `watch-morning-continued.jsonl` spans 05:17:37–05:25:38. Restarted at 05:27:28 in tmux session `so101-bench-watch-20260923`, logging `watch-morning-detached.jsonl` until 07:20. These are sampling gaps, not evidence of a fault. All received samples are clean: same raised pose, no lease/fault/chat, cameras fresh, max servo 39 C.
+
+## 2026-09-23 05:18 CEST — live runner remains gated after offline triage
+
+- Inspected the remaining priority-4 boundary. `bench.ts` is a safe schedule/stop preflight; `bench-reset.ts` is an injected fixture loop; `bench-replay.ts` is offline-only. The missing live adapter would have to admit model chat and motion before TCP/homography/home commissioning, reset smoke and model smoke exist.
+- Decision: do not add or activate live orchestration from an uncommissioned profile. This preserves the handoff's fail-closed gate and the arm's raised hold. Continue the separate read-only watcher (`watch-morning-continued.jsonl`) through 07:20; no code or hardware action is justified.
+
 ## 2026-09-23 05:10 CEST — first hour of monitoring clear
 
 - 66 read-only samples from 04:04 through 05:09 CEST; zero alerts, unchanged measured pose and boot ID, no fault/lease/chat, fresh cameras, max servo 39 C.
@@ -98,8 +115,3 @@ Opus was checked after the primary three. All requests returned HTTP 400: the up
 - Main `robo-harness` has local commits `fde320a` and `5813f66` ahead of `origin/main`; the Python changes and camera scripts are already deployed per handoff. Preserved unrelated uncommitted edits listed by the handoff.
 - Decision: follow the handoff priority order. First merge and validate the cliproxy branch, then manipulation tools/skills, then commissioning, fixture, smoke, and benchmark only if all safety gates pass.
 - Decision: no arm actuation until the software gate and coordinator deployment are green. During hardware work use the existing agent guard, stop any descent on the first non-settling step, recover stale cameras only through the documented ladder, pause on any servo over 60 C, and end raised with no lease.
-
-## 2026-09-23 05:18 CEST — live runner remains gated after offline triage
-
-- Inspected the remaining priority-4 boundary. `bench.ts` is a safe schedule/stop preflight; `bench-reset.ts` is an injected fixture loop; `bench-replay.ts` is offline-only. The missing live adapter would have to admit model chat and motion before TCP/homography/home commissioning, reset smoke and model smoke exist.
-- Decision: do not add or activate live orchestration from an uncommissioned profile. This preserves the handoff's fail-closed gate and the arm's raised hold. Continue the separate read-only watcher (`watch-morning-continued.jsonl`) through 07:20; no code or hardware action is justified.

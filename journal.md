@@ -14,7 +14,9 @@ Replay/evidence continuation `e3b28c7` adds append-only hashed camera capture an
 
 Bounded upward agent-mode probes exposed a joint completion deadband, one stale-observation refusal, and a non-settling elbow residual of 0.848 degrees against the unchanged 0.8-degree guard. Every failed operation stopped its sequence; no takeover, recalibration, gain/limit change or camera recovery. TCP, homography and home remain uncommissioned, so no benchmark motion was admitted. Arm left holding with no lease, no fault and fresh cameras; the later read-only checks show a maximum servo temperature of 39 C; model tip z 0.0312 m, approximately 6.2 cm fingertip clearance using the prior contact measurement. Exact TCP clearance remains unverified.
 
-Parked-arm monitoring began at 04:04 CEST and continues until the 07:20 report checkpoint. Through 04:21, all 18 samples were clean: unchanged pose/boot, no lease/fault/run, cameras fresh, maximum servo 39 C. No hardware or provider actions are performed by the watcher. Runtime deployment is through `e3b28c7`; later reset fixture `8c19f2b` remains offline.
+Offline orchestration fixture `547fff1` passed and pushed with **261 TypeScript + 112 Python tests**. It sequences home/capture/chat/judge/reset through injected adapters, preserves artifacts, and stops on uncertain outcomes and cap/safety failures. There is no live adapter; physical scored trials remain zero.
+
+Parked-arm monitoring began at 04:04 CEST and continues until the 07:20 report checkpoint. Through 05:36, all 90 received samples were clean: unchanged pose/boot, no lease/fault/run, cameras fresh, maximum servo 39 C. Turn interruptions caused sampling gaps at 05:14:47–05:17:37 and 05:25:38–05:27:28; the watcher now runs in tmux. No hardware or provider actions are performed by the watcher. Runtime deployment is through `e3b28c7`; later reset/orchestration fixtures remain offline.
 
 [Report](notes/overnight-bench-report-2026-09-23.md) · [Running status](notes/overnight-bench-status-2026-09-23.md). Evidence local under `robo-harness/var/bench/2026-09-23/`; room images not published to the public lab repository.
 
