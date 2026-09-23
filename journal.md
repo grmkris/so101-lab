@@ -2,6 +2,16 @@
 
 Newest on top. Template:
 
+## 2026-09-23 — lighting follow-up after readback
+
+Kris pointed out that the lamp state had not been announced before the diagnostic. I did not toggle the lamp; I assumed the prior setup and failed to recheck actual image brightness. After Kris turned it on, a read-only checkpoint confirmed the same boot/epoch, no fault/operator/operation, and fresh camera streams. The workspace frame is still dark around the arm while the wrist frame is usable, so light-on is now recorded as the current setup but camera visibility remains a commissioning check. Current controls were read without writes: workspace manual exposure 329, gain 0, WB 4000, zoom 150, pan -7200, tilt -14400; wrist manual exposure 330, gain 60, WB 3108. Private checkpoint: `/tmp/so101-light-on-check/`. No motion or service restart followed.
+
+## 2026-09-23 23:25–23:35 CEST — attended diagnostic activation and real passive elbow trace
+
+Kris confirmed presence and a clear workspace and approved one motor-owner restart/readback. Activated robo-harness `e2a3d40` on the existing LeRobot 0.6.0 Pi owner, opt-in enabled, unchanged profile/calibration/guards; restarted `robo-io` once and the coordinator once. The diagnosis panel was notified. Startup shifted measured elbow +1.318681° and rebased its held command; all other measured joints were unchanged. This is a real startup movement, despite no submitted move operation. The former 0.808791° held error was not raw-read before restart.
+
+Three passive sample sets completed (42 raw reads, no errors, maximum read 3.240 ms). Goal 2663 / present 2667 = new steady 0.351648° error; actual P/I/D 96/0/32, current 19.5–26 mA, load 88 register units, 5.3 V, 39–40°C, torque on, moving/status 0. Commands and measurements stayed fixed throughout the trace. New boot `538bde8f-b498-4f14-aa33-2420334a8a70`, epoch 1; no fault/operator/operation/chat afterward, both cameras fresh. Existing lamp and C922/Innomaker 640×480 views; no dataset, model inference, orientation-policy trial, contact, pickup or reset. The passive route works; the old miss remains unexplained. [Activation, raw telemetry and evidence](notes/passive-elbow-readback-2026-09-23.md).
+
 ## 2026-09-23 — real-model image preflight and passive-diagnostic preparation
 
 Using the existing LeRobot 0.6.0 SO-101 deployment, captured actual workspace C922 and wrist Innomaker images (640×480, existing lamp and live camera settings). No dataset recording or object-orientation policy trial. Astra and Grok accepted the image payload and returned the low-level `reobserve` candidate (4.828 s / 9.225 s); Qwen exceeded its 30 s deadline, with provider completion/billing unknown. djev credentials remain unavailable. Intermittent source-freshness failures were preserved; Grok/Qwen used the hash-verified saved real camera pair. These checks establish adapter responses, not visual accuracy or physical task success.
