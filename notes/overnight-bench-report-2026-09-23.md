@@ -1,6 +1,6 @@
 # Overnight SO-101 benchmark — 2026-09-23
 
-Updated 2026-09-23 02:45 CEST. **0 scored trials. No pickup-rate comparison is available.**
+Updated 2026-09-23 03:21 CEST. **0 scored trials. No pickup-rate comparison is available.**
 
 The provider integration and general manipulation tools are green, pushed and deployed. Physical commissioning stopped before calibration touches: upward probes exposed a motor-completion deadband, a transient stale observation and one elbow non-settling step. The arm was left raised with no lease; no descent or pickup was attempted during this continuation. The prior evening's human-directed pickup is not counted as a benchmark trial.
 
@@ -17,7 +17,7 @@ Probe latencies (tool / image / `parallel_tool_calls:false`, ms): Astra 1676 / 1
 
 ## What shipped
 
-`robo-harness` main is pushed through `7434fa5`. The final complete gate passed **230 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed, `robo-app` and `robo-rerun` restarted and reported active. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
+`robo-harness` main is pushed through `881cee7`. The latest complete gate passed **239 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed. The live coordinator remains on the previously deployed `7434fa5`; both `robo-app` and `robo-rerun` were active at deployment. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
 
 - Generic cliproxy provider, chat usage, bounded run overrides, headless chat client and capability probe CLI.
 - Connected-component bright-object detector and strictly decoded coordinator manipulation configuration.
@@ -40,12 +40,12 @@ Later upward steps stopped at a stale observation and at elbow residual **0.848 
 - Model alignment / reach / pushing / false-success / misuse failures: **not measured** (no trials).
 - Hardware observations: one stale-observation refusal before submission; one non-settling upward elbow step; no latched fault. Camera recovery count: 0. Servo cooling pauses: 0.
 - Reset-operator attempts/interventions: 0. Reset smoke: not run. Model manipulation smoke: not run.
-- Benchmark runner/judge/reset integration: not complete at this checkpoint. Offline preparation can continue while the arm stays parked.
+- Offline benchmark fixture shipped in `881cee7`: seeded model rotation, >=3 cm target spacing inside the reviewed polygon/radius, fail-closed STOP/fault/camera/temperature checks, saved-frame judge and three-attempt reset decision policy. Camera provenance is enforced; absent SAM/VLM evidence remains unverified. `bun run bench` only produces a schedule and refuses the current uncommissioned config. Live runner/reset execution and automated SAM/VLM judge integration remain unfinished; no offline check is counted as a physical smoke or scored trial.
 - Initial full gate was externally terminated during passing tests; it was retried. `heavy` exit 75 was treated as contention and retried, never reported as a pass.
 
 ## Arm end state and evidence
 
-At deployment verification: fault null, operator null, workspace/wrist camera ages about 37/14 ms, servos 24–36 C. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
+At the 03:07 CEST read-only recheck: fault null, operator null, workspace/wrist camera ages about 43/52 ms, servos 24–39 C; the measured pose was unchanged. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
 
 Evidence on netcup: `robo-harness/var/bench/2026-09-23/`: `probe-primary.json`, `probe-opus.json`, and `commissioning/` (guarded console, action ledger, measured observations, raw camera frames, raise logs). There is no trial frame strip because there are no trials. Private room images remain local and are not copied into this public lab repository.
 
