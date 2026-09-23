@@ -2,6 +2,11 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 05:10 CEST — first hour of monitoring clear
+
+- 66 read-only samples from 04:04 through 05:09 CEST; zero alerts, unchanged measured pose and boot ID, no fault/lease/chat, fresh cameras, max servo 39 C.
+- Both coordinator services remain active. `robo-harness` main matches origin at `8c19f2b`; report/journal checkpoint `5673c49` is pushed. No additional implementation or hardware action; continue the parked-arm watch to 07:20 and final documentation push before 07:30.
+
 ## 2026-09-23 04:23 CEST — parked-arm monitoring continues
 
 - Re-read handoff/plan and current commits. Both repositories are clean and pushed. Priority 3 is physically blocked; priority 4 has tested offline components but no live runner/reset/SAM/VLM adapter. Physical smoke and scored trials remain zero.
