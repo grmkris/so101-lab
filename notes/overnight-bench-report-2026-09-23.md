@@ -1,6 +1,6 @@
 # Overnight SO-101 benchmark — 2026-09-23
 
-Updated 2026-09-23 03:50 CEST. **0 scored trials. No pickup-rate comparison is available.**
+Updated 2026-09-23 04:23 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
 
 The provider integration and general manipulation tools are green, pushed and deployed. Physical commissioning stopped before calibration touches: upward probes exposed a motor-completion deadband, a transient stale observation and one elbow non-settling step. The arm was left raised with no lease; no descent or pickup was attempted during this continuation. The prior evening's human-directed pickup is not counted as a benchmark trial.
 
@@ -17,7 +17,7 @@ Probe latencies (tool / image / `parallel_tool_calls:false`, ms): Astra 1676 / 1
 
 ## What shipped
 
-`robo-harness` main is pushed through `e3b28c7`; supervised reset fixture loop in `8c19f2b`. The latest complete gate passed **252 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed; `robo-app` and `robo-rerun` were restarted from the pushed tree and are active. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
+`robo-harness` main is pushed through `8c19f2b`. The latest complete gate passed **252 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed and `robo-app`/`robo-rerun` were restarted at 03:48 CEST from the tree through `e3b28c7`. The later reset fixture in `8c19f2b` has no live adapter and was not activated on hardware. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
 
 - Generic cliproxy provider, chat usage, bounded run overrides, headless chat client and capability probe CLI.
 - Connected-component bright-object detector and strictly decoded coordinator manipulation configuration.
@@ -45,7 +45,9 @@ Later upward steps stopped at a stale observation and at elbow residual **0.848 
 
 ## Arm end state and evidence
 
-At the 2026-09-23 03:50 CEST read-only recheck: fault null, operator null, workspace/wrist camera ages about 45/27 ms, servos 25–39 C; the measured pose was unchanged. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
+Read-only monitoring began at **04:04 CEST** and remains active until 07:20 CEST. Through 04:21 there are 18 consecutive samples, no alerts, no pose/boot change, no fault or lease, fresh cameras, and a maximum servo temperature of 39 C. The JSONL log is local at `var/bench/2026-09-23/watch-morning.jsonl`. This is a parked-arm observation window, not a motion or reliability benchmark.
+
+At the 2026-09-23 03:49 CEST post-restart recheck: fault null, operator null, workspace/wrist camera ages about 45/27 ms, servos 25–39 C; the measured pose was unchanged. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
 
 Evidence on netcup: `robo-harness/var/bench/2026-09-23/`: `probe-primary.json`, `probe-opus.json`, and `commissioning/` (guarded console, action ledger, measured observations, raw camera frames, raise logs). There is no trial frame strip because there are no trials. Private room images remain local and are not copied into this public lab repository.
 

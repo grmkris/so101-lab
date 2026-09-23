@@ -2,6 +2,12 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 04:23 CEST — parked-arm monitoring continues
+
+- Re-read handoff/plan and current commits. Both repositories are clean and pushed. Priority 3 is physically blocked; priority 4 has tested offline components but no live runner/reset/SAM/VLM adapter. Physical smoke and scored trials remain zero.
+- Watcher has 18 consecutive clean samples from 04:04 through 04:21 CEST: unchanged pose and boot, no fault/lease/chat, cameras fresh, max servo 39 C. Evidence: `robo-harness/var/bench/2026-09-23/watch-morning.jsonl`.
+- Decision: preserve the raised hold and continue read-only monitoring to 07:20, then push the final report/journal update before 07:30. No code, configuration, motion or provider changes are warranted during this window. Corrected report/journal wording: runtime restart was through `e3b28c7`; `8c19f2b` is an offline reset fixture, not live deployment.
+
 ## 2026-09-23 04:03 CEST — reset fixture loop green
 
 - `8c19f2b` pushed after the serialized full gate: 252 TypeScript tests, 112 Python tests. The fixture-only reset loop requires commissioned TCP/homography/home, fences source/target, reobserves before contact, requires first-failed-step contact plus independent lift/placement evidence, never advances an unknown outcome, and pauses at three attempts. It is not wired to live hardware or model tools.
