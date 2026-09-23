@@ -2,6 +2,14 @@
 
 Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
 
+## 2026-09-23 10:22 CEST — elbow under-tracking diagnosis parked safely
+
+- Arm remains stationary pending Kris's physical camera-reposition confirmation. No motion, contact, provider call, gain/limit/calibration write or completion-guard change was made in this diagnosis.
+- Offline evidence is now documented in `notes/elbow-undertracking-diagnosis-2026-09-23.md` and private snapshots under `robo-harness/var/elbow-diagnosis-2026-09-23/`. The isolated elbow-only request moved 0.7912088° of 1.6° and failed at 0.8087912° residual. A fresh read-only snapshot 49.3 minutes later had the same measured elbow, command and operation ID. Encoder truncation contributes ~0.0703° (less than one count), not the full miss. Historical traces remain pose/load/direction dependent; deployed elbow P96, max step 2° and max speed 2°/s are unchanged.
+- Verification: the saved-evidence diagnosis tests pass **6/6**; selected engine safety tests pass **5/5**. Checkout and deployed engine ASTs are equivalent. Current ordinary observations do not expose raw current/load/voltage, so load/friction versus action timing is not yet distinguished.
+- Decision: after camera confirmation and hold release, first take a **zero-motion raw goal/present/P-I-D/current/load/voltage/temperature/boot/clock readback through the sole motor owner**. Only if healthy, do one attended isolated elbow step at existing P96 with a strict 60°C stop; stop on the first failed settle, with no automatic replay/return and no table contact. Do not run the historical P-writing trace unchanged. High load/current or voltage sag requires reviewed hardware/gain work; low-load settled data with a coordinator miss goes to offline timing/trajectory/driver analysis.
+- Commissioning stays gated on final framing, explained elbow behavior, repeatable raised home, measured TCP, nine-point homography with held-out error under ~1 cm, reviewed safe polygon/home, three watched reset smokes and one watched model trial. No scored trials or resets are admitted.
+
 ## 2026-09-23 09:17 CEST — hardware camera zoom comparison
 
 - Kris explicitly requested hardware crop/zoom experiments after fixing lighting. This supersedes the overnight preference for software-only crop for these morning camera tests. The arm stayed stationary throughout; no lease, motion, service restart or provider call.
