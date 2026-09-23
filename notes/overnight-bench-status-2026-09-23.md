@@ -2,6 +2,11 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 06:38 CEST — monitoring remains clean after temperature drift to 40 C
+
+- Combined watcher summary: 151 samples through 06:37 CEST, zero alerts, one observed pose and boot ID, fresh cameras, max servo 40 C. The threshold is 60 C; no cooling pause or intervention is indicated. Both coordinator services are active.
+- Decision: preserve the raised hold, continue the persistent watcher to 07:20, then perform the final read-only state check and push the final report/journal before 07:30. Scored trials remain zero.
+
 ## 2026-09-23 05:45 CEST — runner race fix pushed; final monitoring window
 
 - `ac75f4b` pushed after the full serialized gate and pre-push: 262 TypeScript tests, 112 Python tests. The offline runner now waits for an in-flight health check before writing a completed artifact; its tenth test covers the late-fault race. No live adapter or physical command was added.
@@ -120,8 +125,3 @@ Opus was checked after the primary three. All requests returned HTTP 400: the up
 - Main `robo-harness` has local commits `fde320a` and `5813f66` ahead of `origin/main`; the Python changes and camera scripts are already deployed per handoff. Preserved unrelated uncommitted edits listed by the handoff.
 - Decision: follow the handoff priority order. First merge and validate the cliproxy branch, then manipulation tools/skills, then commissioning, fixture, smoke, and benchmark only if all safety gates pass.
 - Decision: no arm actuation until the software gate and coordinator deployment are green. During hardware work use the existing agent guard, stop any descent on the first non-settling step, recover stale cameras only through the documented ladder, pause on any servo over 60 C, and end raised with no lease.
-
-## 2026-09-23 06:38 CEST — monitoring remains clean after temperature drift to 40 C
-
-- Combined watcher summary: 151 samples through 06:37 CEST, zero alerts, one observed pose and boot ID, fresh cameras, max servo 40 C. The threshold is 60 C; no cooling pause or intervention is indicated. Both coordinator services are active.
-- Decision: preserve the raised hold, continue the persistent watcher to 07:20, then perform the final read-only state check and push the final report/journal before 07:30. Scored trials remain zero.
