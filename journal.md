@@ -2,6 +2,12 @@
 
 Newest on top. Template:
 
+## 2026-09-23 11:02–11:06 — command-path hypothesis, offline only
+
+Reconstructed the failed operation from saved endpoints using both checkout and deployed engine snapshots at synthetic 10 ms, 33.3 ms and 100 ms ticks. The operation starts from measured elbow 55.956° although the previous commanded hold was 55.046°; the first trajectory setpoint is therefore still 55.816–55.942° before it crosses the previous goal after 0.66–0.70 s and reaches the encoded target after 1.15–1.20 s. The endpoint replay fails with the recorded 0.808791° residual, no engine fault and unchanged held joints. The final target discrepancy is 1.19° inside the configured 2° relative-target threshold, based on the saved position only. This is a synthetic command-path audit, not a servo transient measurement or driver readback.
+
+The next passive readback remains a trace of the existing hold with raw goal/position/current/load/voltage/P-I-D/mode/temperature; it cannot reconstruct the earlier physical transient. If a later motion diagnostic is separately justified, capture its previous command and first trajectory setpoints too. This makes measured-start trajectory timing testable while preserving the 0.8° completion guard and P96, without claiming that it explains the persistent residual. No motion, contact, second bus owner or service restart was made; scored trials and resets remain zero. Private audit: `robo-harness/var/elbow-diagnosis-2026-09-23/command-path-audit.json`.
+
 ## 2026-09-23 09:39–10:25 — elbow diagnosis, no new motion
 
 Analyzed saved commissioning endpoints, historical servo traces and deployed-source snapshots using lerobot 0.6.0 conversion semantics. No dataset, trial, object-orientation policy, camera setting or hardware configuration change. Workspace C922 and wrist Innomaker remain the camera roles; physical repositioning is still pending confirmation. No gains, limits, calibration, completion guards or production code changed.

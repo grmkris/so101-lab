@@ -2,6 +2,12 @@
 
 Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
 
+## 2026-09-23 11:06 CEST — offline command-path hypothesis added
+
+- Reconstructed the checkout and saved deployed engine with the recorded endpoints at synthetic 10 ms, 33.3 ms and 100 ms ticks. All six runs agree: measured elbow start 55.956°, previous commanded hold 55.046°, first generated command 55.942°/55.909°/55.816°, old goal crossed after 0.66–0.70 s, final encoded goal reached after 1.15–1.20 s, then the saved endpoint fails at 0.808791° with no engine fault. The final saved target discrepancy is 1.19° inside the configured 2° relative-target threshold; this arithmetic does not verify driver reads or hardware goals. Held joints remain unchanged in the reconstruction.
+- This is not a physical transient capture and does not explain the persistent residual by itself. The next passive trace remains limited to the existing hold and cannot recover earlier setpoints. If later motion is separately justified, its telemetry should include the previous command and first generated setpoints alongside raw goal/position/current/load/voltage. Private audit: `robo-harness/var/elbow-diagnosis-2026-09-23/command-path-audit.json`.
+- Decision unchanged: no motion, retry, contact, gain/limit/calibration/guard change, second bus owner or service restart. The arm remains stationary pending camera confirmation and the supervisor hold.
+
 ## 2026-09-23 10:25 CEST — passive diagnostic prerequisite and final hold check
 
 - Read-only coordinator snapshot: unchanged boot, all measured joints, all commands and failed operation ID; no robot error, fault, operator or running chat; cameras 51/25 ms, maximum servo 42 C. The elbow readings still match the failure about 89 minutes earlier. This is sampled evidence, not a continuous trace. Private snapshot: `robo-harness/var/elbow-diagnosis-2026-09-23/held-state-final.json`.
