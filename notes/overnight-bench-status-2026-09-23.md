@@ -98,3 +98,8 @@ Opus was checked after the primary three. All requests returned HTTP 400: the up
 - Main `robo-harness` has local commits `fde320a` and `5813f66` ahead of `origin/main`; the Python changes and camera scripts are already deployed per handoff. Preserved unrelated uncommitted edits listed by the handoff.
 - Decision: follow the handoff priority order. First merge and validate the cliproxy branch, then manipulation tools/skills, then commissioning, fixture, smoke, and benchmark only if all safety gates pass.
 - Decision: no arm actuation until the software gate and coordinator deployment are green. During hardware work use the existing agent guard, stop any descent on the first non-settling step, recover stale cameras only through the documented ladder, pause on any servo over 60 C, and end raised with no lease.
+
+## 2026-09-23 05:18 CEST — live runner remains gated after offline triage
+
+- Inspected the remaining priority-4 boundary. `bench.ts` is a safe schedule/stop preflight; `bench-reset.ts` is an injected fixture loop; `bench-replay.ts` is offline-only. The missing live adapter would have to admit model chat and motion before TCP/homography/home commissioning, reset smoke and model smoke exist.
+- Decision: do not add or activate live orchestration from an uncommissioned profile. This preserves the handoff's fail-closed gate and the arm's raised hold. Continue the separate read-only watcher (`watch-morning-continued.jsonl`) through 07:20; no code or hardware action is justified.
