@@ -2,6 +2,14 @@
 
 Newest on top. Template:
 
+## 2026-09-23 09:11–09:17 — workspace hardware zoom experiments, arm stationary
+
+At Kris's request, compared C922 hardware zoom 100/125/150/200 and a shifted 150 view after the morning lighting correction. Output remains 640×480; manual focus 10, exposure 330 and WB 4000 stayed fixed. Wrist Innomaker settings were untouched. Existing lerobot 0.6.0 / lab-pi `robo-io`; no motion, lease, dataset, model trial, orientation policy or service restart.
+
+Left zoom 150 / pan -7200 / tilt -14400 live for review: larger gripper/object and useful mat coverage. The 2x view crops more upper-arm context. This comparison establishes framing only; it does not prove optical detail gain or full reach coverage. Calibration is still unset and must use the final chosen framing. Startup/recovery scripts are unchanged. Original settings: zoom 100 / pan 0 / tilt 0; saved control dumps and restoration command are in the running status.
+
+Private comparison/evidence: `robo-harness/var/bench/2026-09-23/camera-zoom-0911/`, with source JPEGs and state under `commissioning/zoom-*-0911-*`. Measured joints identical before/after, no fault or operator/lease, fresh cameras and maximum servo 41 C. Elbow settling and physical commissioning remain unresolved; zero scored trials or resets.
+
 ## 2026-09-23 08:50–08:57 — lighting fixed; isolated elbow still misses settling threshold
 
 Kris corrected the lighting and requested continuation. Workspace C922 now clearly shows the gripper/object/mat; wrist Innomaker is fresh but dark and mostly mat at this pose. Existing lerobot 0.6.0 / lab-pi `robo-io`, 640×480 cameras. No dataset or object-orientation policy; no provider/model trial, camera setting change, motor gain/limit change or recalibration.

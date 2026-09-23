@@ -2,6 +2,15 @@
 
 Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
 
+## 2026-09-23 09:17 CEST — hardware camera zoom comparison
+
+- Kris explicitly requested hardware crop/zoom experiments after fixing lighting. This supersedes the overnight preference for software-only crop for these morning camera tests. The arm stayed stationary throughout; no lease, motion, service restart or provider call.
+- Saved the original C922 V4L2 controls, then captured zoom values 100, 125, 150 and 200 (1x, 1.25x, 1.5x, 2x), all at 640x480. Also tested 150 with electronic pan -7200 / tilt -14400. Focus 10, manual exposure 330, white balance 4000 and all wrist settings remained unchanged.
+- Selected **zoom 150, pan -7200, tilt -14400** for live review: the shifted crop centers the empty gripper/object and useful mat area; 2x loses more upper-arm context. This is a visual framing preference, not proof of extra optical resolution or coverage across all robot poses. Reach-area coverage still needs checking during commissioning.
+- Live controls now hold the selected framing; startup/recovery scripts are unchanged, so persistence across re-enumeration is not guaranteed. Original values were zoom 100 / pan 0 / tilt 0. Restore with `ssh lab-pi 'v4l2-ctl -d /dev/cam_context --set-ctrl=zoom_absolute=100,pan_absolute=0,tilt_absolute=0'`. Freeze the chosen view before homography calibration; the current mapping is still unset.
+- Private before/after control dumps, `summary.json` and a four-view `comparison.jpg` are under `robo-harness/var/bench/2026-09-23/camera-zoom-0911/`; source frames/state are `commissioning/zoom-*-0911-*`. Final 09:15 capture confirms identical measured joints, no fault/operator, fresh cameras (24/30 ms), max servo 41 C. Public notes contain no room images.
+- Workbench: `http://100.105.51.45:8940/` over Tailscale. Motor/camera host: `lab-pi`, `100.77.154.45`.
+
 ## 2026-09-23 08:57 CEST — lighting corrected; elbow lag reproduced in isolation
 
 - Kris corrected the lighting and asked to continue. Fresh 08:50 workspace imagery clearly shows the arm, empty gripper, mat and object; the overexposure blocker is resolved. Wrist imagery is fresh but dark and mostly mat from this pose. Frames are saved as `commissioning/lighting-check-085038-*`.
