@@ -2,6 +2,22 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 02:45 CEST — manipulation pushed and deployed; report checkpoint
+
+- `7434fa5` pushed after the final gate (230 TypeScript tests, 112 Python tests) and a green pre-push hook. Stage was limited to the 19 owned manipulation paths. The concurrent decision commit was preserved.
+- `heavy bun run build` passed; restarted `robo-app` and `robo-rerun`, both active. Backed up the 0600 coordinator environment file and added the three probed cliproxy model/vision aliases. Live `/api/status`: HTTP 200, all three available, no runs, no fault or lease, cameras fresh, servos 24–36 C.
+- Config remains uncommissioned. Decision: no more physical calibration attempts tonight after the upward non-settling result; keep the raised park. Continue useful offline fixture work, without silently enabling geometry or admitting benchmark trials.
+- Created the required report and dated journal entry, with honest zero trials. HTML companion contains no private room images or fabricated trial frame strips. It is a checkpoint and can be updated with subsequent offline work.
+
+## 2026-09-23 02:38 CEST — raised park and measured residual finding
+
+- First full manipulation gate passed: 229 TypeScript tests and 112 Python tests. A further deadband regression is now added; the final gate is running after waiting for the shared heavy slot.
+- Ran bounded, agent-mode vertical raise probes through the existing supervised executor. No takeover, no descent, no object contact, no gain/limit changes. Evidence: `robo-harness/var/bench/2026-09-23/commissioning/` (console, action ledger, measured observations, frames, raise logs).
+- The temporary console's 3 mm waypoints plus 0.15-degree joint convergence stalled in the motor completion deadband. General tools now use 0.8-degree joint convergence while retaining the strict 2 mm measured Cartesian success criterion. A simulated 0.6-degree residual test verifies progress without stationary retries and honestly reports a remaining 2.3 mm residual as incomplete.
+- A fresh upward plan later stopped on its first failed operation: elbow residual 0.848 degrees, just outside the unchanged 0.8-degree motor limit. A previous raise also stopped on a stale observation before submitting its next step. These are observed safety stops, not pickups or calibration touches.
+- Current raised pose: model frame approximately (0.1243, -0.0377, 0.0312) m; 8.5 cm above the mat, approximately 6.2 cm fingertip clearance using the earlier 2.3 cm contact measurement. Workspace image visibly shows the empty gripper raised. No fault, no operator/lease, cameras fresh, servos 24–33 C. Exact TCP remains uncommissioned.
+- Decision: preserve all motor guards and inspect failures before any further motion. No benchmark until held-out calibration, home, reset smoke and model smoke pass.
+
 ## 2026-09-23 02:22 CEST — manipulation integration and commissioning preparation
 
 - Provider/chat plumbing passed the complete gate (218 TypeScript tests, 112 Python tests) and was pushed through `a7626ff`. A concurrent agent's `dd9057b` decision-layer commit is preserved.

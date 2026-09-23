@@ -2,6 +2,16 @@
 
 Newest on top. Template:
 
+## 2026-09-23 (overnight) — manipulation tools deployed; benchmark stopped before commissioning
+
+lerobot 0.6.0; lab-pi `robo-io`; lamp on; workspace C922 `/dev/cam_context`, wrist Innomaker `/dev/cam_wrist`, 640×480. Camera settings remained locked (workspace focus 10 / exposure 330 / WB 4000; wrist exposure 221 / WB 3108). No dataset recorded. No object orientation policy evaluated: **0 scored trials, 0 resets, no pickup or descent** in this continuation.
+
+`robo-harness` pushed and deployed through `7434fa5`: generic cliproxy chat, usage/probe CLI, CC detector, TCP-aware general manipulation tools, first-failed-step stopping, geometry/camera/temperature guards, sequence admission and general skills. Full gate: 230 TypeScript tests + 112 Python tests; build and coordinator restart passed. Astra / Grok / Qwen tool and vision probes passed. Opus unavailable (proxy Claude Code version below upstream minimum), no trials attempted.
+
+Bounded upward agent-mode probes exposed a joint completion deadband, one stale-observation refusal, and a non-settling elbow residual of 0.848 degrees against the unchanged 0.8-degree guard. Every failed operation stopped its sequence; no takeover, recalibration, gain/limit change or camera recovery. TCP, homography and home remain uncommissioned, so no benchmark motion was admitted. Arm left holding with no lease, no fault, fresh cameras, servos 24–36 C; model tip z 0.0312 m, approximately 6.2 cm fingertip clearance using the prior contact measurement. Exact TCP clearance remains unverified.
+
+[Report](notes/overnight-bench-report-2026-09-23.md) · [Running status](notes/overnight-bench-status-2026-09-23.md). Evidence local under `robo-harness/var/bench/2026-09-23/`; room images not published to the public lab repository.
+
 ## 2026-09-22/23 (night) — first real pickup of the white block, driven by hand from Claude
 
 Continued from the previous session's handoff (`/tmp/so101-session/HANDOFF.md`, tool
