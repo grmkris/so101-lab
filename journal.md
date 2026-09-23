@@ -2,6 +2,14 @@
 
 Newest on top. Template:
 
+## 2026-09-23 08:47–08:49 — morning upward diagnostic moved; Cartesian target incomplete
+
+User requested movement after the overnight stop. Existing lerobot 0.6.0 / lab-pi `robo-io`; workspace C922 and wrist Innomaker, 640×480. No dataset or model trial; no object orientation policy evaluated. No camera settings, motor gains, limits or calibration changed. Morning workspace imagery is severely overexposed, so lighting/vision is unsuitable for alignment even though the streams are fresh.
+
+Commanded a 5 mm upward model-tip move through the guarded commissioning console, using agent leases without takeover and joint steps capped at 1.6 degrees. Both operations completed, but measured model-tip rise was 3.27 mm and final Cartesian target error was 2.83 mm; the helper correctly returned `reached: false`. Position changed from `(0.124250, -0.037682, 0.031183)` to `(0.122199, -0.036778, 0.034454) m`. No descent or pickup. Last completed operation: `0b1d97d0-2aad-44d7-8eb9-a9d9e855a8f5`.
+
+Left raised with no fault/operator/lease, unchanged boot, fresh camera streams and maximum servo 41 C. Two coordinator evidence captures were refused by freshness checks; fresh direct I/O frames and state were subsequently saved with unchanged guards. Evidence remains private under `robo-harness/var/bench/2026-09-23/commissioning/morning-motion-0850-*` (actual capture 08:49), with action/measured ledgers alongside and incomplete captures preserved separately. Restore usable exposure before visual alignment/contact commissioning; measured positioning, TCP, table homography, safe polygon and home are still uncommissioned. Scored trials and resets remain zero.
+
 ## 2026-09-23 (overnight) — manipulation tools deployed; benchmark stopped before commissioning
 
 lerobot 0.6.0; lab-pi `robo-io`; lamp on; workspace C922 `/dev/cam_context`, wrist Innomaker `/dev/cam_wrist`, 640×480. Camera settings remained locked (workspace focus 10 / exposure 330 / WB 4000; wrist exposure 221 / WB 3108). No dataset recorded. No object orientation policy evaluated: **0 scored trials, 0 resets, no pickup or descent** in this continuation.

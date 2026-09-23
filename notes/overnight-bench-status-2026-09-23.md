@@ -1,6 +1,15 @@
 # Overnight SO-101 benchmark status — 2026-09-23
 
-Newest first. Kris asleep; decisions are made within the approved handoff and plan.
+Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
+
+## 2026-09-23 08:49 CEST — user-requested morning motion diagnostic
+
+- Correction to the earlier completion wording: the overnight report and software delivery were complete; the physical benchmark was not. Zero scored trials were run, and the live runner/reset adapters remain unfinished. The user is now asking to resume movement.
+- At 08:47, commanded a 5 mm upward model-tip diagnostic from the measured parked pose through the existing guarded commissioning console: agent lease, no takeover, at most 1.6-degree joint steps, measured completion and first-failed-step stopping. Two joint operations completed. No descent, grasp, calibration or gain/limit changes.
+- Measured model tip moved from `(0.124250, -0.037682, 0.031183)` to `(0.122199, -0.036778, 0.034454) m`: 3.27 mm upward, with 2.83 mm total error from the requested target. The helper returned `reached: false`; joint completion is not Cartesian accuracy. Final elbow residual was 0.741 degrees, inside the unchanged 0.8-degree joint threshold.
+- Post-move state at 08:49: no fault or operator/lease, unchanged boot, both camera streams fresh, maximum servo 41 C, raised hold. Last operation `0b1d97d0-2aad-44d7-8eb9-a9d9e855a8f5` completed. Action and measured-state ledgers remain in ignored `robo-harness/var/bench/2026-09-23/commissioning/`.
+- Two coordinator evidence attempts were refused (stale wrist image; observation HTTP 503); incomplete manifests are preserved in `morning-motion-0847/` and `morning-motion-0848/`. The commissioning console then saved fresh direct I/O frames with the existing 400 ms guard as `commissioning/morning-motion-0850-*` (actual capture 08:49; filename is a label). Workspace/wrist frame ages were 56/17 ms. No freshness threshold changed.
+- New visual blocker: the workspace JPEG is severely overexposed in morning light. Fresh frames do not establish usable vision. Stop this diagnostic with the arm raised; restore usable exposure before visual alignment/contact work, then resolve measured positioning and commission TCP, homography, safe polygon and home. Benchmark resets/model smoke remain gated; scored trials and resets remain zero.
 
 ## 2026-09-23 07:27 CEST — final continuation verification
 
