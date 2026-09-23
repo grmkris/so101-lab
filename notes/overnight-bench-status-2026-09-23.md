@@ -2,6 +2,15 @@
 
 Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
 
+## 2026-09-23 08:57 CEST — lighting corrected; elbow lag reproduced in isolation
+
+- Kris corrected the lighting and asked to continue. Fresh 08:50 workspace imagery clearly shows the arm, empty gripper, mat and object; the overexposure blocker is resolved. Wrist imagery is fresh but dark and mostly mat from this pose. Frames are saved as `commissioning/lighting-check-085038-*`.
+- A further 6 mm upward request completed two joint operations, raising the model tip 4.33 mm, with 3.00 mm final Cartesian error (`reached: false`). The handoff's example home `(0.09, 0, 0.08)` failed dry IK (18.3 mm error at the wrist limit) and was never commanded. A reachable raised candidate `(0.105, -0.03577, 0.06)` stopped at its first step: elbow residual 0.910 degrees, beyond the unchanged 0.8-degree threshold. No descent or contact.
+- Inspected the failed coupled step, then issued one bounded elbow-only diagnostic: target change -1.6 degrees, predicted upward/outward with ample mat clearance. It moved -0.791 degrees and stopped with residual 0.808791 degrees. This rules out simultaneous joint motion as the sole cause of the lag; do not treat a failed settle as table contact in this raised pose. Last operation `ea3781a9-7a13-4d0e-9387-088a2aa02a76` failed honestly; no automatic replay.
+- The temporary console's failure-cleanup fallback used the wrong endpoint/body. A separate private `commissioning/morning-diagnostic.ts` corrects it to `/control/cancel-owner` with `boot_id`, matching the production adapter, and adds the single bounded elbow test. Production code/config are unchanged. The previous operation had already dropped its lease; post-failure observations confirmed no owner in both cases.
+- Final state at 08:57: model tip `(0.117977, -0.035645, 0.040785) m`, visually raised empty gripper, fault/operator null, unchanged boot, fresh cameras, maximum servo 41 C. Evidence: `commissioning/elbow-diagnostic-stop-*`, `morning-actions.jsonl`, `morning-measured.jsonl`, and the original action/measured ledgers. All room images remain local.
+- Decision: stop physical probes here. The next hardware work is diagnosis of elbow settling under load, with any gain change treated as a reviewed configuration change with backup. Keep the 0.8-degree completion guard and all motor limits. TCP, homography, safe polygon, repeatable home, reset smoke and model smoke remain unfinished; no pickup, descent, reset or scored trial occurred.
+
 ## 2026-09-23 08:49 CEST — user-requested morning motion diagnostic
 
 - Correction to the earlier completion wording: the overnight report and software delivery were complete; the physical benchmark was not. Zero scored trials were run, and the live runner/reset adapters remain unfinished. The user is now asking to resume movement.

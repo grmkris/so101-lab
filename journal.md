@@ -2,6 +2,14 @@
 
 Newest on top. Template:
 
+## 2026-09-23 08:50–08:57 — lighting fixed; isolated elbow still misses settling threshold
+
+Kris corrected the lighting and requested continuation. Workspace C922 now clearly shows the gripper/object/mat; wrist Innomaker is fresh but dark and mostly mat at this pose. Existing lerobot 0.6.0 / lab-pi `robo-io`, 640×480 cameras. No dataset or object-orientation policy; no provider/model trial, camera setting change, motor gain/limit change or recalibration.
+
+A 6 mm upward request completed two joint operations, yielding 4.33 mm model-tip rise and 3.00 mm Cartesian target error. Dry planning rejected the proposed `(0.09, 0, 0.08)` home because it hits the wrist limit. The first step toward a reachable raised home candidate failed with elbow residual 0.910 degrees. After inspecting that result, one elbow-only -1.6-degree diagnostic moved -0.791 degrees, leaving 0.808791 degrees residual against the unchanged 0.8-degree completion guard. Stopped on each first failure; no descent or contact. The isolated test shows simultaneous joint motion is not the sole cause of the lag.
+
+Final measured-joint model tip `(0.117977, -0.035645, 0.040785) m`; empty gripper visibly raised, no fault or lease, unchanged boot, cameras fresh, maximum servo 41 C. Last operation `ea3781a9-7a13-4d0e-9387-088a2aa02a76` failed; outcome was not retried or relabelled. Private evidence under `robo-harness/var/bench/2026-09-23/commissioning/`: `lighting-check-085038-*`, `home-probe-stop-0856-*`, `elbow-diagnostic-stop-*`, action/measured ledgers. A separate temporary console corrects its cleanup fallback endpoint to match production; production code remains unchanged. Next: diagnose elbow settling under load, then commission geometry and repeatable home before reset/model smoke. Zero scored trials and resets.
+
 ## 2026-09-23 08:47–08:49 — morning upward diagnostic moved; Cartesian target incomplete
 
 User requested movement after the overnight stop. Existing lerobot 0.6.0 / lab-pi `robo-io`; workspace C922 and wrist Innomaker, 640×480. No dataset or model trial; no object orientation policy evaluated. No camera settings, motor gains, limits or calibration changed. Morning workspace imagery is severely overexposed, so lighting/vision is unsuitable for alignment even though the streams are fresh.
