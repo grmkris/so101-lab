@@ -2,6 +2,12 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 04:03 CEST — reset fixture loop green
+
+- `8c19f2b` pushed after the serialized full gate: 252 TypeScript tests, 112 Python tests. The fixture-only reset loop requires commissioned TCP/homography/home, fences source/target, reobserves before contact, requires first-failed-step contact plus independent lift/placement evidence, never advances an unknown outcome, and pauses at three attempts. It is not wired to live hardware or model tools.
+- Reset tests cover a successful synthetic pick/place, unknown motion, null contact, failed lift verification, three-attempt cap, commissioning gate, reused frames and pre-abort. No arm command was issued.
+- Decision: stop implementation here for the night. The next safe physical step is attended TCP/homography commissioning and reset/model smoke; do not activate the fixture adapter by inference from the current evidence.
+
 ## 2026-09-23 03:49 CEST — replay pushed; coordinator runtime restarted safely
 
 - `e3b28c7` pushed to robo-harness main after the serialized gate: 248 TypeScript tests, 112 Python tests. The offline replay validates frame hashes, camera roles, freshness, clock domain and before/lift/after ordering; it never calls providers or motion. Docs record that live runner/reset execution is unfinished.
