@@ -2,6 +2,12 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 02:51 CEST — final overnight safety recheck
+
+- Final direct I/O check: tip `(0.1243, -0.0377, 0.0312) m`, fault null, operator/lease null, workspace/wrist ages 15/46 ms, temperatures shoulder 25, lift 28, elbow 38, wrist-flex 24, roll 26, gripper 26 C. `robo-app` and `robo-rerun` remain active.
+- No benchmark trial, reset, descent or further calibration command was issued after the prior failed upward step. The report, HTML artifact and journal are pushed in so101-lab commit `217f3ce`; robo-harness manipulation is pushed in `7434fa5`.
+- Morning decision is explicit: resume with attended TCP/homography commissioning and held-out validation; keep geometry disabled and do not start the runner until that gate, reset smoke and model smoke pass.
+
 ## 2026-09-23 02:45 CEST — manipulation pushed and deployed; report checkpoint
 
 - `7434fa5` pushed after the final gate (230 TypeScript tests, 112 Python tests) and a green pre-push hook. Stage was limited to the 19 owned manipulation paths. The concurrent decision commit was preserved.
