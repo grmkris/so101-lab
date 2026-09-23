@@ -2,6 +2,13 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 07:27 CEST — final continuation verification
+
+- Verified `so101-lab` `main` and `origin/main` match at `9f63362`; the Markdown report, HTML report, journal entry and status log are present and pushed before 07:30.
+- Verified `robo-harness` `main` and `origin/main` match at `ac75f4b`; `robo-app` and `robo-rerun` are active. A read-only status check shows no robot error, fault, operator or lease, no running chat, unchanged boot ID, fresh workspace/wrist cameras (about 29/35 ms), and servo temperatures at or below 39 C.
+- No safe unattended priority remains: the next physical item is attended TCP/contact commissioning and held-out homography validation. The profile stays uncommissioned and the arm stays raised; scored trials, resets and descents remain zero.
+- Decision: stop at the morning gate with this checkpoint pushed. Do not issue motion, enable the live runner, change gains/limits/geometry, or alter the preserved concurrent worktree.
+
 ## 2026-09-23 07:21 CEST — final morning report
 
 - Watcher reached its 07:20 checkpoint: 193 received samples from 04:04–07:20 CEST, zero alerts, one pose and boot ID, maximum observed servo 40 C, and both camera streams fresh. Two turn-interruption gaps remain explicitly disclosed; no evidence is claimed for those intervals.
