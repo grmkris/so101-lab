@@ -1,6 +1,6 @@
 # Overnight SO-101 benchmark — 2026-09-23
 
-Updated 2026-09-23 05:37 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
+Updated 2026-09-23 05:45 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
 
 The provider integration and general manipulation tools are green, pushed and deployed. Physical commissioning stopped before calibration touches: upward probes exposed a motor-completion deadband, a transient stale observation and one elbow non-settling step. The arm was left raised with no lease; no descent or pickup was attempted during this continuation. The prior evening's human-directed pickup is not counted as a benchmark trial.
 
@@ -17,7 +17,7 @@ Probe latencies (tool / image / `parallel_tool_calls:false`, ms): Astra 1676 / 1
 
 ## What shipped
 
-`robo-harness` main is pushed through `547fff1`. The latest complete gate passed **261 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed and `robo-app`/`robo-rerun` were restarted at 03:48 CEST from the tree through `e3b28c7`. The later reset fixture (`8c19f2b`) and orchestration fixture (`547fff1`) have no live adapters and were not activated on hardware. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
+`robo-harness` main is pushed through `ac75f4b`. The latest complete gate passed **262 TypeScript tests and 112 Python tests**; the pre-push hook passed again. Build passed and `robo-app`/`robo-rerun` were restarted at 03:48 CEST from the tree through `e3b28c7`. The later reset fixture (`8c19f2b`) and orchestration fixture (`ac75f4b`) have no live adapters and were not activated on hardware. Live HTTP status confirmed the three primary cliproxy vision models, fresh cameras, no fault and no active controller.
 
 - Generic cliproxy provider, chat usage, bounded run overrides, headless chat client and capability probe CLI.
 - Connected-component bright-object detector and strictly decoded coordinator manipulation configuration.
@@ -41,7 +41,7 @@ Later upward steps stopped at a stale observation and at elbow residual **0.848 
 - Hardware observations: one stale-observation refusal before submission; one non-settling upward elbow step; no latched fault. Camera recovery count: 0. Servo cooling pauses: 0.
 - Reset-operator attempts/interventions: 0. Reset smoke: not run. Model manipulation smoke: not run.
 - Offline benchmark fixture shipped in `881cee7`; hashed evidence capture in `e9440d4`; replay and provenance validation in `e3b28c7`: seeded model rotation, >=3 cm target spacing inside the reviewed polygon/radius, fail-closed STOP/fault/camera/temperature checks, saved-frame judge and three-attempt reset decision policy. Camera provenance is enforced; absent SAM/VLM evidence remains unverified. `bun run bench` only produces a schedule and refuses the current uncommissioned config. Live runner execution and automated SAM/VLM judge integration remain unfinished; the fixture reset loop is tested but not wired to hardware; no offline check is counted as a physical smoke or scored trial.
-- Offline orchestration fixture `547fff1` sequences home, capture, bounded chat, judge, verified reset and home with exclusive artifact directories and a phase/event journal. Nine tests cover unknown outcomes, STOP/heat/deadline cancellation, consecutive tool errors, inconclusive evidence, reset failure, reused frames/sessions, and identical caps across model rotation. All injected runs remain `offline_fixture` with zero scored trials; no live adapter or new motion endpoint is installed.
+- Offline orchestration fixture `ac75f4b` sequences home, capture, bounded chat, judge, verified reset and home with exclusive artifact directories and a phase/event journal. Ten tests cover unknown outcomes, STOP/heat/deadline cancellation, consecutive tool errors, inconclusive evidence, reset failure, reused frames/sessions, and identical caps across model rotation. All injected runs remain `offline_fixture` with zero scored trials; no live adapter or new motion endpoint is installed.
 - Initial full gate was externally terminated during passing tests; it was retried. `heavy` exit 75 was treated as contention and retried, never reported as a pass.
 
 ## Arm end state and evidence

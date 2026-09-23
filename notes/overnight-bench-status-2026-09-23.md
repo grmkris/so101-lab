@@ -2,6 +2,11 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 05:45 CEST — runner race fix pushed; final monitoring window
+
+- `ac75f4b` pushed after the full serialized gate and pre-push: 262 TypeScript tests, 112 Python tests. The offline runner now waits for an in-flight health check before writing a completed artifact; its tenth test covers the late-fault race. No live adapter or physical command was added.
+- Report MD/HTML and journal now name `ac75f4b`, preserve zero scored trials, and disclose watcher sampling gaps. Continue the persistent watcher through 07:20; final status/report push remains required before 07:30.
+
 ## 2026-09-23 05:37 CEST — offline orchestration pushed; report updated
 
 - `547fff1` pushed after `heavy bun run check` and the serialized pre-push gate: 261 TypeScript tests, 112 Python tests. Nine new tests exercise trial sequencing, exclusive artifacts, model rotation, fresh session/frame identities, uncertain evidence and reset outcomes, STOP/heat/wall cancellation and the three-error cap. It has no live adapter; every result is labelled offline with zero scored trials.
