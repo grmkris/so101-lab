@@ -2,6 +2,14 @@
 
 Newest first. Kris asleep; decisions are made within the approved handoff and plan.
 
+## 2026-09-23 07:21 CEST — final morning report
+
+- Watcher reached its 07:20 checkpoint: 193 received samples from 04:04–07:20 CEST, zero alerts, one pose and boot ID, maximum observed servo 40 C, and both camera streams fresh. Two turn-interruption gaps remain explicitly disclosed; no evidence is claimed for those intervals.
+- Final read-only state: fault/lease/operator null, `robo-app` and `robo-rerun` active, unchanged boot and raised tip `(0.12425, -0.03768, 0.03118) m`. The last operation remains the earlier failed upward probe with elbow residual 0.848 degrees; no new motion was issued. The empty gripper is visibly raised and the object remains on the mat in the 07:18 workspace JPEG.
+- `bench:capture` first refused a stale workspace frame at 07:17; the new 07:18 directory succeeded after three bounded observation retries and preserves original JPEGs/hashes. No guard was relaxed. Report MD/HTML and journal are finalized with this evidence for the morning push; code is green and pushed through `ac75f4b` (262 TypeScript / 112 Python tests). Scored trials, resets and descents remain zero.
+
+- Housekeeping: removed the clean `bench-cliproxy` worktree after verifying all five commits are patch-equivalent on main. `git branch -d` refused its cherry-picked branch, so that branch is retained. The `manip-tools` worktree still has another agent's uncommitted `decision/skills.ts` and `decision/sim-arm.ts`; preserved intact. Both committed manipulation patches are already on main.
+
 ## 2026-09-23 06:38 CEST — monitoring remains clean after temperature drift to 40 C
 
 - Combined watcher summary: 151 samples through 06:37 CEST, zero alerts, one observed pose and boot ID, fresh cameras, max servo 40 C. The threshold is 60 C; no cooling pause or intervention is indicated. Both coordinator services are active.

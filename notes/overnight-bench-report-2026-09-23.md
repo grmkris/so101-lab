@@ -1,6 +1,6 @@
 # Overnight SO-101 benchmark — 2026-09-23
 
-Updated 2026-09-23 05:45 CEST; read-only monitoring continues until morning. **0 scored trials. No pickup-rate comparison is available.**
+Updated 2026-09-23 07:21 CEST; final morning checkpoint. Read-only monitoring completed at 07:20 CEST. **0 scored trials. No pickup-rate comparison is available.**
 
 The provider integration and general manipulation tools are green, pushed and deployed. Physical commissioning stopped before calibration touches: upward probes exposed a motor-completion deadband, a transient stale observation and one elbow non-settling step. The arm was left raised with no lease; no descent or pickup was attempted during this continuation. The prior evening's human-directed pickup is not counted as a benchmark trial.
 
@@ -46,10 +46,16 @@ Later upward steps stopped at a stale observation and at elbow residual **0.848 
 
 ## Arm end state and evidence
 
-Read-only monitoring began at **04:04 CEST** and remains active until 07:20 CEST. Through 05:36 there are **90 samples, no alerts**, no measured pose/boot change, no fault or lease, fresh cameras, and a maximum servo temperature of 39 C. Turn interruptions left sampling gaps from 05:14:47 to 05:17:37 and from 05:25:38 to 05:27:28; there is no observation proof for those gaps. The watcher now runs in tmux. Local evidence is split across `watch-morning.jsonl`, `watch-morning-continued.jsonl` and `watch-morning-detached.jsonl` under `var/bench/2026-09-23/`. This is a parked-arm observation window, not a motion or reliability benchmark.
+Read-only monitoring ran from **04:04 through 07:20 CEST**. Through 07:20 there are **193 samples, no alerts**, no measured pose/boot change, no fault or lease, fresh cameras, and a maximum observed servo temperature of 40 C. Turn interruptions left sampling gaps from 05:14:47 to 05:17:37 and from 05:25:38 to 05:27:28; there is no observation proof for those gaps. The watcher ran persistently in tmux after two disclosed turn-interruption gaps. Local evidence is split across `watch-morning.jsonl`, `watch-morning-continued.jsonl` and `watch-morning-detached.jsonl` under `var/bench/2026-09-23/`. This is a parked-arm observation window, not a motion or reliability benchmark.
+
+The final 2026-09-23 07:20 CEST read-only state check: fault null, operator/lease null, both coordinator services active, boot ID unchanged, cameras fresh, and tip `(0.12425, −0.03768, 0.03118) m`. The last operation ledger entry remains the previously observed failed upward probe with elbow residual 0.848 degrees; no new operation was issued.
 
 At the 2026-09-23 03:49 CEST post-restart recheck: fault null, operator null, workspace/wrist camera ages about 45/27 ms, servos 25–39 C; the measured pose was unchanged. Recorded raised model-frame position is **(0.1243, −0.0377, 0.0312) m**: 8.5 cm above the mat, approximately **6.2 cm fingertip clearance** using the earlier contact-height measurement. This clearance is approximate pending TCP commissioning; workspace imagery independently shows the empty gripper raised. Torque remains enabled, holding the pose.
+
+A final read-only evidence capture at 07:18 CEST succeeded after three bounded observation retries; its original JPEGs, metadata and hashes are under ignored `robo-harness/var/bench/2026-09-23/morning-0718/`. The first 07:17 capture refused a stale workspace frame and remains as `morning-0717/capture-failed.json`; no freshness guard was relaxed.
 
 Evidence on netcup: `robo-harness/var/bench/2026-09-23/`: `probe-primary.json`, `probe-opus.json`, and `commissioning/` (guarded console, action ledger, measured observations, raw camera frames, raise logs). There is no trial frame strip because there are no trials. Private room images remain local and are not copied into this public lab repository.
 
 Next physical gate: an operator-reviewed return-to-home and TCP/contact session, nine distributed mat points with a held-out error within about 1 cm, then three reset pick-and-places and one trial per available model. Keep the motor limits and first-contact stop in force.
+
+Housekeeping: the clean provider worktree was removed after patch-equivalence verification. Its cherry-picked branch remains because `git branch -d` refused it. The manipulation worktree and its two uncommitted files were preserved; its committed patches are already on main.
