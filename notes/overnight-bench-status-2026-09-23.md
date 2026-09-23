@@ -2,6 +2,14 @@
 
 Newest first. Overnight decisions follow the approved handoff and plan; morning resumption is logged separately below.
 
+## 2026-09-23 10:25 CEST — passive diagnostic prerequisite and final hold check
+
+- Read-only coordinator snapshot: unchanged boot, all measured joints, all commands and failed operation ID; no robot error, fault, operator or running chat; cameras 51/25 ms, maximum servo 42 C. The elbow readings still match the failure about 89 minutes earlier. This is sampled evidence, not a continuous trace. Private snapshot: `robo-harness/var/elbow-diagnosis-2026-09-23/held-state-final.json`.
+- Tightened the next step in the [diagnosis](elbow-undertracking-diagnosis-2026-09-23.md): passive raw readback and a short hold trace only. A healthy snapshot is not automatic permission for another elbow move. Preserve the last commanded hold after failure; never automatically return to the start. This supersedes the conditional motion suggestion in the 10:22 entry.
+- Concrete blocker: raw goal/current/load/P-I-D are absent from the API. The passive diagnostic needs reviewed instrumentation in the existing motor owner with bounded bus reads. A new driver connection or service restart configures torque/gains and rebases the target, so it is not a read-only substitute. No such change was implemented or deployed in this diagnosis-only lane.
+- Distinguish profile/encoded predictions from actual registers: P96 is the saved configured gain and raw goal 2642 is predicted, not read back. Current low-load data alone would not prove a timing bug. The note gives the decision table and source references.
+- Agent `%38` acknowledged the reserved diagnosis note/status/journal paths and the telemetry prerequisite. Visual-operator production files remain untouched. Camera confirmation and hardware hold release are still pending; the supervision deadline does not release them.
+
 ## 2026-09-23 10:22 CEST — elbow under-tracking diagnosis parked safely
 
 - Arm remains stationary pending Kris's physical camera-reposition confirmation. No motion, contact, provider call, gain/limit/calibration write or completion-guard change was made in this diagnosis.

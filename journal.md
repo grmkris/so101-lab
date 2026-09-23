@@ -2,6 +2,14 @@
 
 Newest on top. Template:
 
+## 2026-09-23 09:39–10:25 — elbow diagnosis, no new motion
+
+Analyzed saved commissioning endpoints, historical servo traces and deployed-source snapshots using lerobot 0.6.0 conversion semantics. No dataset, trial, object-orientation policy, camera setting or hardware configuration change. Workspace C922 and wrist Innomaker remain the camera roles; physical repositioning is still pending confirmation. No gains, limits, calibration, completion guards or production code changed.
+
+The isolated 1.6-degree elbow request had moved 0.791 degrees and failed with 0.808791 degrees residual. Fresh read-only samples 49 and 89 minutes later have the same measured/commanded elbow; the final sample has all joints and boot unchanged, no fault/operator/running chat, cameras 51/25 ms and max servo 42 C. Offline evidence tests passed 6/6 again; earlier selected engine safety tests passed 5/5. These validate software handling of saved evidence, not a physical fix.
+
+Next diagnostic is passive raw goal/position/gain/current/load/voltage/temperature readback through the sole motor owner. The current API lacks it, and opening a new driver or restarting IO would reconfigure torque/gains and rebase the hold. No repeated motion, contact or automatic return is authorized by the diagnosis. Camera framing, elbow tracking, repeatable home, measured TCP/homography/safe polygon and watched reset/model smokes remain the benchmark gates. Scored trials and resets remain zero. [Diagnosis and decision table](notes/elbow-undertracking-diagnosis-2026-09-23.md); private evidence under `robo-harness/var/elbow-diagnosis-2026-09-23/`.
+
 ## 2026-09-23 09:11–09:17 — workspace hardware zoom experiments, arm stationary
 
 At Kris's request, compared C922 hardware zoom 100/125/150/200 and a shifted 150 view after the morning lighting correction. Output remains 640×480; manual focus 10, exposure 330 and WB 4000 stayed fixed. Wrist Innomaker settings were untouched. Existing lerobot 0.6.0 / lab-pi `robo-io`; no motion, lease, dataset, model trial, orientation policy or service restart.
