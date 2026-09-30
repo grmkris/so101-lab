@@ -1,0 +1,15 @@
+[Unit]
+Description=so101-lab LCD status display
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/kris/labstatus.py --touch-calibration /home/kris/labstatus-touch.json --debug-touch
+Restart=always
+RestartSec=5
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=multi-user.target
