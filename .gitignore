@@ -10,7 +10,6 @@ chess_system/.local/
 /node_modules/
 /package.json
 /package-lock.json
-/.mcp.json
 /.claude/
 /.agents/
 /skills-lock.json

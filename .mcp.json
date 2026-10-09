@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "myplan": {
+      "type": "http",
+      "url": "https://myplan.lol/mcp"
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    }
+  }
+}
