@@ -6,12 +6,12 @@ __pycache__/
 chess_system/.local/
 
 # machine-local agent/MCP tooling — the app itself lives in app/ (bun);
-# the root npm tree exists only to back the shadcn MCP server
+# the root npm tree backed the retired shadcn MCP server
 /node_modules/
 /package.json
 /package-lock.json
-/.claude/
-/.agents/
+/.claude/*
+!/.claude/skills/
 /skills-lock.json
 /.agent-sources/
 

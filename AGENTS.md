@@ -6,7 +6,7 @@ Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal:
 
 ## How to work here
 - Be concise. Sacrifice grammar for concision. No time estimates (use complexity).
-- This repo = the hands-on lab. Learning notes live in **myplan** (Life workspace → `Archive/Robotics/Robotics learning track`, written via the `personal-kb` skill / `mcp__myplan__*`) since 2026-09-18; the old `personal` repo files (`learning/robotics*.md`) are gone — that repo is infra + tools only now.
+- This repo = the hands-on lab. Learning notes live in **myplan** (Life workspace → `Archive/Robotics/Robotics learning track`, written with the myplan MCP, `mcp__myplan__*`) since 2026-09-18; the old `personal` repo files (`learning/robotics*.md`) are gone.
 - Planning/status source of truth: myplan `SO-101 Lab/00 Overview` (https://myplan.lol/w/ws_ppp0EllAj9g0BRK9Wbt8/n/doc_QblnKgCzgiEdmZmR); `01 Reference` beside it.
 - After each real record/train/eval run, append a dated entry to `journal.md` (newest on top): lerobot version, dataset, lighting, camera indexes, orientation policy, result. This log is the point — past runs couldn't be compared because nothing was written down.
 - Commit + push to `origin main` after meaningful changes. Public repo (build-in-public).
@@ -83,3 +83,9 @@ iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Standalone scripts work (L
 - Dense small workspace beats broad coverage at small ep counts.
 - Record SLOW — teleop lag degrades demo quality.
 - One dominant desk lamp > ambient light.
+
+## Agent config
+
+Skills live in `.agents/skills` (vendored ones pinned in `sources.json`), MCP servers in `.mcp.json`
+(myplan, myinbox, mytab, mytmux, mygram, cloudflare). After editing either, run `bun scripts/agents-sync.ts`;
+`--check` must pass. Standard and commands: grmkris/personal `infra/agents.md`.

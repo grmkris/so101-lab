@@ -1,0 +1,211 @@
+{
+  "version": 2,
+  "skills": {
+    "animate": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/animate",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "cad4cbda82810bbd771af0c636015ceab28a89460f619d48332709cc370a57c4",
+      "localTreeSha256": "585419279f9b7cd085f67d961158ab8413be20a57b1c78ced831db3cbe044685",
+      "unchanged": false,
+      "adaptation": "Cross-reference points at find-animation-opportunities (improve-animations is not in the shared set).",
+      "baseCommit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d"
+    },
+    "animation-vocabulary": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/animation-vocabulary",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "e8f2f403dff9e422b11c420d78bac0ed82c999cf7f56ef75745c9e8c548ec142",
+      "localTreeSha256": "e8f2f403dff9e422b11c420d78bac0ed82c999cf7f56ef75745c9e8c548ec142",
+      "unchanged": true
+    },
+    "apple-design": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/apple-design",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "17d56c00b870b03bfcfe83e603a47f81e01c48937105c5850be5f4a748b213e2",
+      "localTreeSha256": "17d56c00b870b03bfcfe83e603a47f81e01c48937105c5850be5f4a748b213e2",
+      "unchanged": true
+    },
+    "apple-web-app": {
+      "repository": "joe-bell/skills",
+      "commit": "2eb6b5da2ff003abf428255599d002047312b815",
+      "path": "skills/apple-web-app",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "614619e9f53f261d4d714ff9853ace03a00f2654955f693c77c4f89a7d9e972c",
+      "localTreeSha256": "614619e9f53f261d4d714ff9853ace03a00f2654955f693c77c4f89a7d9e972c",
+      "unchanged": true
+    },
+    "break-ui": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/break-ui",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "c1c67d8e5bf7431ea78226e4c2558908a0aea7bbfa558736063227bb37d91690",
+      "localTreeSha256": "da4e4d466e8242efde2b8b7afbe2b1dab5f59ca4261020c3e92a59cbb9d41268",
+      "unchanged": false,
+      "adaptation": "Made manual-only (disable-model-invocation: true).",
+      "baseCommit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d"
+    },
+    "find-animation-opportunities": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/find-animation-opportunities",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "d9225e049ebfc4dab5eac71fc2c6994eb1d340475b105808cdbc9ef3a3cec426",
+      "localTreeSha256": "4450c9a13e17417f2a2d8e4dae8b4cf67d8e6bd9fe9e2364bc380d7b0b80abe2",
+      "unchanged": false,
+      "adaptation": "Cross-reference points at review-animations only (improve-animations is not in the shared set).",
+      "baseCommit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d"
+    },
+    "frontend-design": {
+      "repository": "anthropics/skills",
+      "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "path": "skills/frontend-design",
+      "license": "Apache-2.0",
+      "licenses": [
+        "LICENSE.txt"
+      ],
+      "treeSha256": "7e9c2af00fd5b3144f49ce6fb1b16037b392ab9c2f049423b0b6114d99381ba2",
+      "localTreeSha256": "7e9c2af00fd5b3144f49ce6fb1b16037b392ab9c2f049423b0b6114d99381ba2",
+      "unchanged": true
+    },
+    "good-css": {
+      "repository": "vojtaholik/good-css",
+      "commit": "b645ab15b9fcd059c0227c21b6a144bb70639f1a",
+      "path": "skills/good-css",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "c2a7a6b2a292b775cd700bfe8440ea07df308ae5bd379f8a037cf6d795f7b2d4",
+      "localTreeSha256": "20af66f79b57c1c1319056092bca631d4ff89a42fc7aac755881508b1606ac3a",
+      "unchanged": false,
+      "adaptation": "Description narrowed to CSS implementation; direction and finish deferred to frontend-design and make-interfaces-feel-better.",
+      "baseCommit": "b645ab15b9fcd059c0227c21b6a144bb70639f1a"
+    },
+    "grilling": {
+      "repository": "mattpocock/skills",
+      "commit": "49dd158d1076134a641b33efb035946536778336",
+      "path": "skills/productivity/grilling",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "714b8c4d1544298615f0647b237e7ea13c6940c302417c51571ca77ba5161dad",
+      "localTreeSha256": "714b8c4d1544298615f0647b237e7ea13c6940c302417c51571ca77ba5161dad",
+      "unchanged": true
+    },
+    "make-interfaces-feel-better": {
+      "repository": "jakubkrehel/make-interfaces-feel-better",
+      "commit": "35545ea1512ad59fa463e6b1f95ca9c052981fe6",
+      "path": "skills/make-interfaces-feel-better",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "a38394c031e268bf8d7d05ff6f742baf1787395692bedf76f07cef911c472bcb",
+      "localTreeSha256": "3fd67c0f8a5f0d5777331755f0c6d08745e50aa247b09dd34f29438d597f1853",
+      "unchanged": false,
+      "adaptation": "Description narrowed to static polish; motion and visual direction deferred to animate/apple-design and frontend-design (no overlap in the shared set).",
+      "baseCommit": "35545ea1512ad59fa463e6b1f95ca9c052981fe6"
+    },
+    "mobile-native": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/mobile-native",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "e09d6a584beac50f1f52be3c80164e1935ca0694f9e93fcb6893b564c7ce1d44",
+      "localTreeSha256": "1f4c18339885d3a74329fb24a2daec840726a9d30ce473aa548dbc7776bf6710",
+      "unchanged": false,
+      "adaptation": "Description narrowed to general touch/mobile web; Apple and Safari specifics deferred to apple-web-app.",
+      "baseCommit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d"
+    },
+    "review-animations": {
+      "repository": "emilkowalski/skills",
+      "commit": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "path": "skills/review-animations",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "42e71687b56e255eb085d668506e12ac0a067c19a6f19088ee45fd6b419c14a3",
+      "localTreeSha256": "42e71687b56e255eb085d668506e12ac0a067c19a6f19088ee45fd6b419c14a3",
+      "unchanged": true
+    },
+    "shadcn": {
+      "repository": "shadcn-ui/ui",
+      "commit": "2d3f1cd436b18ea12f24130de4df781355925b08",
+      "path": "skills/shadcn",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE.md"
+      ],
+      "treeSha256": "baa5d621c794745ae8295f478cfacdcc1f89e2f49b435f5afc236031b03819ed",
+      "localTreeSha256": "baa5d621c794745ae8295f478cfacdcc1f89e2f49b435f5afc236031b03819ed",
+      "unchanged": true
+    },
+    "thermo-nuclear-code-quality-review": {
+      "repository": "cursor/plugins",
+      "commit": "ccb5507cec1546dc88135c1139c811e6c59115ba",
+      "path": "thermos/skills/thermo-nuclear-code-quality-review",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "b92ba8ebcf36f421a22a6af2972325d4e8b56ee397ca7de6734f84806050dbb4",
+      "localTreeSha256": "b92ba8ebcf36f421a22a6af2972325d4e8b56ee397ca7de6734f84806050dbb4",
+      "unchanged": true
+    },
+    "thermo-nuclear-review": {
+      "repository": "cursor/plugins",
+      "commit": "ccb5507cec1546dc88135c1139c811e6c59115ba",
+      "path": "thermos/skills/thermo-nuclear-review",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "6555687f1bffa96a3cd813aa7e94707d4aec98465c1184c3d12fbfd034bfc3f0",
+      "localTreeSha256": "6555687f1bffa96a3cd813aa7e94707d4aec98465c1184c3d12fbfd034bfc3f0",
+      "unchanged": true
+    },
+    "unslop": {
+      "repository": "cursor/plugins",
+      "commit": "ccb5507cec1546dc88135c1139c811e6c59115ba",
+      "path": "pstack/skills/unslop",
+      "license": "MIT",
+      "licenses": [
+        "LICENSE"
+      ],
+      "treeSha256": "8ccc1d0bebf98bb77486238ca07d7dc7fba9b467aef3ad49477aa64cbcef89aa",
+      "localTreeSha256": "0104941d97e0bb6900594e77ef994de8de083518f9b4051be48d99312abeba3b",
+      "unchanged": false,
+      "adaptation": "Description scoped to prose; upstream 'Must always apply' contradicts its manual-only flag (cursor/plugins#308, #367).",
+      "baseCommit": "ccb5507cec1546dc88135c1139c811e6c59115ba"
+    }
+  }
+}

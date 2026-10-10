@@ -3,12 +3,20 @@
     "myplan": {
       "url": "https://myplan.lol/mcp"
     },
-    "shadcn": {
-      "command": "npx",
-      "args": [
-        "shadcn@latest",
-        "mcp"
-      ]
+    "myinbox": {
+      "url": "https://myinbox.lol/mcp"
+    },
+    "mytab": {
+      "url": "https://mytab.lol/mcp"
+    },
+    "mytmux": {
+      "url": "https://mytmux.lol/mcp"
+    },
+    "mygram": {
+      "url": "https://mygram.lol/mcp"
+    },
+    "cloudflare": {
+      "url": "https://mcp.cloudflare.com/mcp"
     }
   }
 }
