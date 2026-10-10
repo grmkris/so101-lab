@@ -14,6 +14,7 @@ import {
   existsSync,
   lstatSync,
   mkdirSync,
+  mkdtempSync,
   readdirSync,
   readFileSync,
   readlinkSync,
@@ -21,7 +22,7 @@ import {
   symlinkSync,
   writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 
 export const VERSION = "2.0.0";
@@ -364,8 +365,7 @@ function git(args: string[], cwd: string): string {
 
 /** Sparse, shallow fetch of one path (plus root license files) at ref; returns the checkout dir and resolved commit. */
 function fetchUpstream(repository: string, path: string, ref = "HEAD"): { dir: string; commit: string } {
-  const dir = join(Bun.env.TMPDIR ?? "/tmp", `agents-sync-${process.pid}-${Math.random().toString(36).slice(2)}`);
-  mkdirSync(dir, { recursive: true });
+  const dir = mkdtempSync(join(tmpdir(), "agents-sync-"));
   git(["init", "-q"], dir);
   git(["remote", "add", "origin", repoUrl(repository)], dir);
   // path "." vendors the whole repo (skills whose SKILL.md sits at the repo root)
