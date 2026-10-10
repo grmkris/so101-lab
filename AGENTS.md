@@ -1,6 +1,6 @@
 # so101-lab — context for Claude
 
-Master file. `CLAUDE.md` is a symlink to it — edit `AGENTS.md`. MCP servers: `.mcp.json` (myplan); run `bun scripts/agents-sync.ts` after changing agent config.
+Master file. `CLAUDE.md` is a symlink to it — edit `AGENTS.md`. MCP servers: `.mcp.json` (myplan); run `bunx repoagents` after changing agent config.
 
 Hands-on lab for Kristjan's SO-101 arm (LeRobot imitation learning). **End goal: the arm plays chess.** Current rung: a reliably-grasping pick-and-place policy — and a remote-teleop platform growing around it (`app/`).
 
@@ -87,5 +87,5 @@ iPhone HEBI Mobile I/O → ARKit pose → IK → arm. Standalone scripts work (L
 ## Agent config
 
 Skills live in `.agents/skills` (vendored ones pinned in `sources.json`), MCP servers in `.mcp.json`
-(myplan, myinbox, mytab, mytmux, mygram, cloudflare). After editing either, run `bun scripts/agents-sync.ts`;
+(myplan, myinbox, mytab, mytmux, mygram, cloudflare). After editing either, run `bunx repoagents`;
 `--check` must pass. Standard and commands: grmkris/personal `infra/agents.md`.
